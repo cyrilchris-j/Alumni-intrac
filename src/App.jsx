@@ -12,7 +12,8 @@ import ProtectedRoute from './components/auth/ProtectedRoute';
 function App() {
   return (
     <AuthProvider>
-      <Router>
+      {/* ADD THE BASENAME HERE */}
+      <Router basename="/Alumni-intrac">
         <Routes>
           <Route path="/" element={<Entry />} />
           <Route path="/role-selection" element={<RoleSelection />} />
