@@ -18,7 +18,7 @@ const AlumniOverview = () => {
                         <h3>154</h3>
                         <p>Profile Views</p>
                     </div>
-                    <div className="stat-icon bg-blue-100">
+                    <div className="stat-icon">
                         <User size={24} color="var(--primary)" />
                     </div>
                 </div>
