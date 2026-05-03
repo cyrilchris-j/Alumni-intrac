@@ -25,3 +25,32 @@ pnpm workspace monorepo using TypeScript. Each package manages its own dependenc
 - `pnpm --filter @workspace/api-server run dev` — run API server locally
 
 See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and package details.
+
+## Application: NEXORA Alumni Network
+
+A React + Vite alumni management platform with Firebase auth and Firestore.
+
+### Features
+- Role-based authentication (Student, Alumni, Admin) via Firebase
+- Google Sign-In support
+- Alumni directory with search and filtering
+- Job & internship portal
+- Mentorship connections
+- Admin dashboards for managing alumni, students, events, and donations
+
+### Architecture
+- **Frontend**: `artifacts/nexora-alumni/` — React + Vite app (served at `/`)
+- **Auth**: Firebase Auth (email/password + Google) — project `onestopalumni`
+- **Database**: Firebase Firestore (user profiles, role data)
+- **API Server**: `artifacts/api-server/` — Express 5 backend (served at `/api`)
+
+### Routes
+- `/` — Entry page (login/signup)
+- `/student/*` — Student dashboard (overview, find alumni, jobs, mentorship, webinars)
+- `/alumni/*` — Alumni dashboard (overview, profile, connections, jobs, mentorship, stories)
+- `/admin/*` — Admin dashboard (overview, alumni directory, students, jobs, events, donations)
+
+### Firebase Config
+- Project: `onestopalumni`
+- Auth domain: `onestopalumni.firebaseapp.com`
+- Config is hardcoded in `artifacts/nexora-alumni/src/services/firebase.js`

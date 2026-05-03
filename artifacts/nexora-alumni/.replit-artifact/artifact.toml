@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "NEXORA Alumni Network"
+version = "1.0.0"
+id = "artifacts/nexora-alumni"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 26201
+
+[services.development]
+run = "pnpm --filter @workspace/nexora-alumni run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/nexora-alumni", "run", "build" ]
+publicDir = "artifacts/nexora-alumni/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "26201"
+BASE_PATH = "/"
