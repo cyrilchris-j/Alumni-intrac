@@ -8,6 +8,7 @@ import RoleSelection from './pages/RoleSelection';
 
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/auth/ProtectedRoute';
+import './App.css';
 
 function App() {
   return (
