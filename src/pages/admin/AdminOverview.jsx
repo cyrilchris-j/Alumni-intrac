@@ -28,8 +28,8 @@ const AdminOverview = () => {
                         <h3>1,240</h3>
                         <p>Total Alumni</p>
                     </div>
-                    <div className="stat-icon bg-blue-100">
-                        <GraduationCap size={24} />
+                    <div className="stat-icon">
+                        <GraduationCap size={24} color="var(--primary)" />
                     </div>
                 </div>
 

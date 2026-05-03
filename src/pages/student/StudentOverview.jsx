@@ -19,7 +19,7 @@ const StudentOverview = () => {
                         <h3>1,200+</h3>
                         <p>Alumni Connected</p>
                     </div>
-                    <div className="stat-icon bg-blue-100">
+                    <div className="stat-icon">
                         <Users size={24} color="var(--primary)" />
                     </div>
                 </div>
@@ -66,7 +66,7 @@ const StudentOverview = () => {
                                         <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Class of {mentor.batch} • {mentor.dept}</p>
                                     </div>
                                 </div>
-                                <button className="btn btn-outline btn-sm" onClick={mentor.name === 'Cyril Chris' ? () => navigate('/student/profile') : undefined}>Profile</button>
+                                <button className="btn btn-secondary btn-sm" onClick={mentor.name === 'Cyril Chris' ? () => navigate('/student/profile') : undefined}>Profile</button>
                             </div>
                         ))}
                     </div>
@@ -88,7 +88,7 @@ const StudentOverview = () => {
                                 </div>
                             </div>
                         ))}
-                        <button className="btn btn-link" style={{ textAlign: 'left', paddingLeft: 0, marginTop: '0.5rem' }}>View All Jobs <ArrowRight size={14} /></button>
+                        <button className="btn-link" style={{ textAlign: 'left', paddingLeft: 0, marginTop: '0.5rem' }}>View All Jobs <ArrowRight size={14} style={{ marginLeft: '0.25rem' }} /></button>
                     </div>
                 </div>
             </div>

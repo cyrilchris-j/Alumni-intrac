@@ -261,3 +261,57 @@
 .data-table tr:hover {
     background-color: #f9fafb;
 }
+
+/* Additional Utility Classes */
+.btn-sm {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.85rem;
+}
+
+.btn-lg {
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+}
+
+.w-full {
+    width: 100%;
+}
+
+.h-full {
+    height: 100%;
+}
+
+/* Stat Icon Colors */
+.stat-icon.blue {
+    background-color: #dbeafe;
+    color: var(--primary);
+}
+
+.stat-icon.purple {
+    background-color: #f3e8ff;
+    color: #9333ea;
+}
+
+/* Badge Styling */
+.badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.badge-student { 
+    background-color: #e0f2fe; 
+    color: #0369a1; 
+}
+
+.badge-alumni { 
+    background-color: #dcfce7; 
+    color: #15803d; 
+}
+
+.badge-admin { 
+    background-color: #fee2e2; 
+    color: #b91c1c; 
+}
