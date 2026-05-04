@@ -3,7 +3,7 @@ import { Search, Briefcase, MapPin, Clock, Plus, Filter, Building } from 'lucide
 
 const AdminJobs = () => {
     // Mock Job Data
-    const [jobs, setJobs] = useState([
+    const [jobs] = useState([
         { id: 1, title: 'Software Engineer Intern', company: 'Google', location: 'Bangalore', type: 'Internship', postedBy: 'Cyril Chris (Alumni)', date: '2 days ago', applicants: 12 },
         { id: 2, title: 'Product Manager', company: 'Microsoft', location: 'Hyderabad', type: 'Full-time', postedBy: 'Admin', date: '5 days ago', applicants: 45 },
         { id: 3, title: 'Data Scientist', company: 'Amazon', location: 'Chennai', type: 'Full-time', postedBy: 'Sarah Johnson (Alumni)', date: '1 week ago', applicants: 28 },

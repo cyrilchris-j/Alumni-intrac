@@ -12,6 +12,7 @@ import { auth, db } from '../services/firebase';
 
 const AuthContext = createContext();
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
@@ -55,12 +56,8 @@ export const AuthProvider = ({ children }) => {
 
     // Login Function
     const login = async (email, password) => {
-        try {
-            const userCredential = await signInWithEmailAndPassword(auth, email, password);
-            return userCredential.user;
-        } catch (error) {
-            throw error;
-        }
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        return userCredential.user;
     };
 
     // Google Sign In Function

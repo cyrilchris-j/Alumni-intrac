@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Search, Trash2, CheckCircle, XCircle, MoreVertical, Filter, Download } from 'lucide-react';
 
 const AdminAlumni = () => {

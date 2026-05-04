@@ -14,7 +14,7 @@ function App() {
   return (
     <AuthProvider>
       {/* ADD THE BASENAME HERE */}
-      <Router basename="/Alumni-intrac">
+      <Router>
         <Routes>
           <Route path="/" element={<Entry />} />
           <Route path="/role-selection" element={<RoleSelection />} />

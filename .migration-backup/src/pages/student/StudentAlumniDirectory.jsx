@@ -3,7 +3,7 @@ import { Search, Filter, MapPin, Briefcase, GraduationCap, Mail, MessageCircle }
 
 const StudentAlumniDirectory = () => {
     // Mock Alumni Data
-    const [alumni, setAlumni] = useState([
+    const [alumni] = useState([
         { id: 1, name: "Cyril Chris", batch: "2023", dept: "Computer Science", role: "Software Engineer", company: "Google", location: "Bangalore", verified: true },
         { id: 2, name: "Sarah Johnson", batch: "2020", dept: "Electronics", role: "Product Manager", company: "Microsoft", location: "Hyderabad", verified: true },
         { id: 3, name: "Mike Ross", batch: "2018", dept: "Law", role: "Associate", company: "Pearson Specter", location: "New York", verified: true },

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Calendar, Clock, MapPin, Video, Plus, Users } from 'lucide-react';
 
 const AdminEvents = () => {
-    const [events, setEvents] = useState([
+    const [events] = useState([
         {
             id: 1,
             title: 'Global Alumni Meet 2026',
