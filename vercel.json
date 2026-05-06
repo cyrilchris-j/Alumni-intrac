@@ -1,0 +1,17 @@
+{
+  "version": 2,
+  "projects": [
+    {
+      "name": "nexora-alumni",
+      "rootDirectory": "artifacts/nexora-alumni",
+      "buildCommand": "pnpm run build",
+      "outputDirectory": "dist",
+      "environment": [
+        "VITE_API_URL",
+        "FIREBASE_API_KEY",
+        "FIREBASE_AUTH_DOMAIN",
+        "FIREBASE_PROJECT_ID"
+      ]
+    }
+  ]
+}
