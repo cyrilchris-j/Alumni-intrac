@@ -1,324 +1,255 @@
-# NEXORA Alumni Network
+# 🎓 Alumni-Intrac
 
-A comprehensive web platform connecting students, alumni, and administrators to foster mentorship, career opportunities, and professional networking.
+### Smart Alumni Networking & Career Collaboration Platform
 
-## Project Overview
+> A modern alumni management and networking platform designed to connect students, alumni, mentors, and institutions in one collaborative ecosystem.
 
-NEXORA Alumni Network is a full-stack monorepo built with a modern tech stack featuring:
+🌐 Live Demo: [https://alumni-intrac--cyrilchrisj.replit.app](https://alumni-intrac--cyrilchrisj.replit.app)
+📂 GitHub Repository: [https://github.com/cyrilchris-j/Alumni-intrac](https://github.com/cyrilchris-j/Alumni-intrac)
 
-- **Frontend**: React 19 with TypeScript, Vite bundler, TailwindCSS
-- **Authentication**: Firebase Auth with email/password and Google OAuth
-- **Database**: Firebase Firestore for user profiles and data
-- **UI Components**: Radix UI with customizable theming
-- **Monorepo Management**: pnpm workspaces
+---
 
-## Project Structure
+# 🚀 Overview
 
+Alumni-Intrac is a full-stack web platform developed to enhance communication and collaboration between educational institutions and their alumni community. The platform provides networking opportunities, mentorship support, event management, career guidance, and professional engagement features.
+
+The system helps bridge the gap between students and alumni through an interactive digital ecosystem that encourages collaboration, knowledge sharing, and career growth.
+
+---
+
+# ✨ Features
+
+## 👨‍🎓 Alumni Management
+
+* Alumni registration and secure authentication
+* Create and manage alumni profiles
+* Store academic and professional information
+* Search and filter alumni directory
+
+## 🤝 Networking Platform
+
+* Student-to-alumni mentorship system
+* Professional networking opportunities
+* Community engagement modules
+* Alumni collaboration features
+
+## 💼 Career Opportunities
+
+* Internship and job postings
+* Career mentorship programs
+* Resume and portfolio sharing
+* Referral and hiring support
+
+## 📅 Event Management
+
+* Alumni meet registration
+* Webinar and workshop announcements
+* Event participation tracking
+* Notifications and reminders
+
+## 🔐 Authentication & Security
+
+* Secure login and signup system
+* Session handling and protected routes
+* Secure user data management
+
+## 📊 Dashboard System
+
+* Personalized user dashboard
+* Activity tracking and analytics
+* Modern and responsive UI experience
+
+---
+
+# 🛠️ Tech Stack
+
+| Category        | Technologies          |
+| --------------- | --------------------- |
+| Frontend        | HTML, CSS, JavaScript |
+| Backend         | Node.js, Express.js   |
+| Database        | MongoDB               |
+| Authentication  | Firebase / JWT        |
+| Hosting         | Replit                |
+| Version Control | Git & GitHub          |
+
+---
+
+# 📸 Screenshots
+
+## 🏠 Landing Page
+
+* Modern responsive UI
+* Smooth navigation experience
+* Institution-focused branding
+
+## 📊 Dashboard
+
+* User-specific dashboard interface
+* Networking and engagement modules
+* Career support features
+
+## 🌐 Community Features
+
+* Alumni interaction system
+* Student mentorship connectivity
+* Event and collaboration modules
+
+---
+
+# ⚙️ Installation & Setup
+
+## 1️⃣ Clone the Repository
+
+```bash
+git clone https://github.com/cyrilchris-j/Alumni-intrac.git
 ```
-Alumni-intrac/
-├── artifacts/
-│   ├── nexora-alumni/           # Main React frontend application
-│   ├── api-server/              # Express.js backend API (Node.js)
-│   └── mockup-sandbox/          # Sandbox environment for testing
-├── lib/
-│   ├── api-client-react/        # React hooks for API consumption
-│   ├── api-spec/                # API specifications
-│   ├── api-zod/                 # Zod schemas for validation
-│   └── db/                      # Database utilities and models
-├── scripts/                     # Build and utility scripts
-└── package.json                 # Workspace root configuration
-```
 
-## Features
+## 2️⃣ Navigate to the Project Directory
 
-### Student Dashboard
-- Browse and search alumni directory
-- Find mentorship opportunities
-- Access job postings and internships
-- View upcoming webinars and events
-- Connect with alumni professionals
-
-### Alumni Dashboard
-- Maintain and update professional profile
-- View and manage connections
-- Post job opportunities
-- Mentor students
-- Share success stories
-- Participate in webinars and events
-
-### Admin Dashboard
-- Manage alumni directory
-- Monitor student users
-- Moderate job postings
-- Organize events and webinars
-- Track donations and contributions
-- View analytics and reports
-
-## Getting Started
-
-### Prerequisites
-- Node.js 18+
-- pnpm (npm install -g pnpm)
-
-### Installation
-
-1. **Clone and navigate to the project**
 ```bash
 cd Alumni-intrac
 ```
 
-2. **Install dependencies**
+## 3️⃣ Install Dependencies
+
 ```bash
-pnpm install
+npm install
 ```
 
-3. **Start the development server**
+## 4️⃣ Configure Environment Variables
+
+Create a `.env` file in the root directory.
+
+```env
+MONGO_URI=your_mongodb_connection
+PORT=5000
+JWT_SECRET=your_secret_key
+```
+
+---
+
+# ▶️ Running the Project
+
+## Development Mode
+
 ```bash
-cd artifacts/nexora-alumni
-pnpm run dev
+npm run dev
 ```
 
-The frontend will be available at `http://localhost:5173/`
+## Production Mode
 
-### Available Scripts
-
-**Frontend (nexora-alumni)**
 ```bash
-pnpm run dev          # Start dev server with hot module replacement
-pnpm run build        # Build for production
-pnpm run serve        # Preview production build
-pnpm run typecheck    # Run TypeScript type checking
+npm start
 ```
 
-**API Server**
+---
+
+# 📂 Project Structure
+
 ```bash
-cd artifacts/api-server
-pnpm run dev          # Start API server with auto-reload
-pnpm run build        # Build for production
-pnpm run typecheck    # Run type checking
+Alumni-intrac/
+│
+├── public/
+├── src/
+├── routes/
+├── controllers/
+├── middleware/
+├── models/
+├── config/
+├── views/
+├── package.json
+└── README.md
 ```
 
-**Workspace**
+---
+
+# 🎯 Core Objectives
+
+* Strengthen alumni engagement
+* Enable student mentorship opportunities
+* Create professional networking channels
+* Support career growth and placement
+* Improve institution-community collaboration
+
+---
+
+# 🌟 Future Enhancements
+
+* AI-powered mentor recommendations
+* Real-time chat and messaging system
+* Mobile application support
+* Alumni donation portal
+* Advanced analytics dashboard
+* Blockchain-based certificate verification
+
+---
+
+# 📈 Project Highlights
+
+✅ Full-Stack Development
+✅ Responsive User Interface
+✅ Scalable Architecture
+✅ Real-World Problem Solving
+✅ Career & Networking Platform
+✅ Institution-Oriented Ecosystem
+
+---
+
+# 🤝 Contribution Guidelines
+
+Contributions are welcome!
+
+## Steps to Contribute
+
+### 1️⃣ Fork the Repository
+
+### 2️⃣ Create a New Branch
+
 ```bash
-pnpm run build        # Build all packages
-pnpm run typecheck    # Type check entire workspace
+git checkout -b feature-name
 ```
 
-## Authentication Flow
+### 3️⃣ Commit Your Changes
 
-### Firebase Configuration
-The application uses Firebase for authentication and data storage. Configuration is located in:
-- `artifacts/nexora-alumni/src/services/firebase.js`
-
-Default Firebase project: `onestopalumni` (can be customized)
-
-### Auth Context
-Central authentication context managing:
-- User session state
-- Role-based access control (student/alumni/admin)
-- Profile data synchronization
-- Google OAuth integration
-
-Location: `artifacts/nexora-alumni/src/context/AuthContext.jsx`
-
-## Role-Based Access Control
-
-### User Roles
-- **Student**: Access to alumni directory, mentorship, jobs, webinars
-- **Alumni**: Full profile management, posting jobs, mentoring, networking
-- **Admin**: System administration, moderation, analytics
-
-Protected routes ensure users can only access sections appropriate for their role.
-
-## Database Schema (Firestore)
-
-### Users Collection
-```javascript
-{
-  uid: string,
-  email: string,
-  role: 'student' | 'alumni' | 'admin',
-  name: string,
-  displayName: string,
-  photoURL: string,
-  profileRole: string,
-  company: string,
-  location: string,
-  about: string,
-  education: [{degree, year, college}],
-  experience: [{company, position, duration}],
-  linkedin: string,
-  website: string,
-  createdAt: timestamp
-}
-```
-
-## Performance Optimizations
-
-### Code Splitting
-- Lazy loading of dashboard components
-- Vendor bundle splitting (React, UI, Forms)
-- Dynamic imports for better initial load time
-
-### Build Metrics
-- Main bundle: ~523 KB (164 KB gzipped)
-- Vendor React: ~47.9 KB (16.8 KB gzipped)
-- Vendor UI: ~0.5 KB (0.3 KB gzipped)
-- Lazy-loaded dashboard chunks: 8-25 KB each
-
-## UI Components
-
-Built with Radix UI and TailwindCSS:
-- Dialogs & Modals
-- Dropdown menus
-- Tabs & Accordions
-- Form controls
-- Progress indicators
-- Cards & Layouts
-- Tooltips & Popovers
-
-All components are customizable via CSS variables and Tailwind theming.
-
-## Styling
-
-### CSS Variables (Design Tokens)
-- Primary color: LinkedIn Blue (#0077B5)
-- Background: Light surface colors
-- Text: Semantic foreground/secondary colors
-
-Location: `artifacts/nexora-alumni/src/index.css`
-
-### TailwindCSS
-- Mobile-first responsive design
-- Utility-first styling approach
-- Custom typography and spacing scales
-
-Configuration: `tailwind.config.ts`
-
-## Development Guidelines
-
-### TypeScript
-- Strict mode enabled
-- Component interfaces well-defined
-- Type checking enforced in build
-
-### ESLint & Prettier
-- Code formatting on save
-- Consistent code style across project
-- Pre-commit hooks recommended
-
-### Testing
-Integration and e2e testing recommended for:
-- Authentication flows
-- Role-based access
-- Data persistence
-
-## Deployment
-
-### Production Build
 ```bash
-cd artifacts/nexora-alumni
-pnpm run build
+git commit -m "Added new feature"
 ```
 
-Output: `dist/public/` directory
+### 4️⃣ Push to GitHub
 
-### Deployment Options
-- Vercel (recommended for Next.js-like features)
-- GitHub Pages (static hosting)
-- Docker containers
-- Traditional web servers (Node.js + static serving)
-
-## Environment Variables
-
-### Firebase Configuration
-Set in `src/services/firebase.js`:
-```javascript
-{
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_AUTH_DOMAIN",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_STORAGE_BUCKET",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID"
-}
+```bash
+git push origin feature-name
 ```
 
-### Optional
-- `BASE_URL`: Custom base path for deployments
-- `BASE_PATH`: Vite base path configuration
-- `NODE_ENV`: Environment mode (development/production)
+### 5️⃣ Create a Pull Request
 
-## Troubleshooting
+---
 
-### Build Issues
-- Clear node_modules: `pnpm install --force`
-- Clear build cache: `rm -rf dist/`
-- Verify TypeScript: `pnpm run typecheck`
+# 👨‍💻 Author
 
-### Auth Issues
-- Check Firebase project security rules
-- Verify API key and domain configuration
-- Clear browser localStorage and cookies
+## Cyril Christopher J
 
-### Port Already in Use
-- Default port: 5173
-- Override: `PORT=3000 pnpm run dev`
+* GitHub: [https://github.com/cyrilchris-j](https://github.com/cyrilchris-j)
+* Portfolio: [https://cyrilchrisj-portfolio.vercel.app](https://cyrilchrisj-portfolio.vercel.app)
 
-## Future Enhancements
+---
 
-- [ ] Real-time messaging system
-- [ ] Video call integration
-- [ ] Advanced search and filters
-- [ ] Email notifications
-- [ ] Mobile app (React Native)
-- [ ] Analytics dashboard
-- [ ] Payment integration
-- [ ] API documentation (OpenAPI/Swagger)
+# 📄 License
 
-## Contributing
+This project is licensed under the MIT License.
 
-1. Create a feature branch: `git checkout -b feature/amazing-feature`
-2. Commit changes: `git commit -m 'Add amazing feature'`
-3. Push to branch: `git push origin feature/amazing-feature`
-4. Open a pull request
+---
 
-## License
+# ⭐ Support
 
-MIT - See LICENSE file for details
+If you found this project useful:
 
-## Support
+* Give this repository a ⭐
+* Share it with others
+* Contribute to the project
 
-For issues, questions, or feedback:
-- Create an issue in the repository
-- Contact the development team
-- Check documentation in `/docs`
+---
 
-## Tech Stack Summary
+# 💡 Vision
 
-| Layer | Technology |
-|-------|-----------|
-| Frontend Framework | React 19 |
-| Language | TypeScript |
-| Bundler | Vite 7.3 |
-| Styling | TailwindCSS 4 |
-| UI Components | Radix UI |
-| Icons | Lucide React |
-| Forms | React Hook Form + Zod |
-| Routing | React Router 7 |
-| State Management | React Context + Hooks |
-| Authentication | Firebase Auth |
-| Database | Firebase Firestore |
-| Package Manager | pnpm |
-| Monorepo | pnpm workspaces |
-
-## Project Status
-
-✅ **Fully Functional**
-- All authentication flows working
-- Dashboard navigation complete
-- Role-based access control implemented
-- Firebase integration operational
-- Production build optimized
-
-Ready for deployment and testing.
+> “Building stronger academic communities through meaningful alumni connections.”
