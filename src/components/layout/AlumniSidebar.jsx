@@ -1,7 +1,7 @@
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, Link, useNavigate } from 'react-router-dom';
 import {
-  LayoutDashboard, UserCircle, Link2, BookOpen, MessageSquare,
-  Briefcase, Calendar, FileText, Bell, Settings, LogOut
+  LayoutDashboard, Link2, BookOpen, MessageSquare,
+  Briefcase, Calendar, FileText, Settings, LogOut
 } from 'lucide-react';
 import { signOutUser } from '../../firebase/auth';
 import { useAuth } from '../../context/AuthContext';
@@ -10,13 +10,11 @@ import Badge from '../ui/Badge';
 
 const navItems = [
   { to: '/alumni/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-  { to: '/alumni/profile', icon: UserCircle, label: 'My Profile' },
   { to: '/alumni/connections', icon: Link2, label: 'Connections' },
   { to: '/alumni/mentorship', icon: BookOpen, label: 'Mentorship' },
   { to: '/alumni/messages', icon: MessageSquare, label: 'Messages' },
   { to: '/alumni/opportunities', icon: Briefcase, label: 'Opportunities' },
   { to: '/alumni/events', icon: Calendar, label: 'Events' },
-  { to: '/alumni/notifications', icon: Bell, label: 'Notifications' },
 ];
 
 const AlumniSidebar = ({ onClose }) => {
@@ -47,7 +45,11 @@ const AlumniSidebar = ({ onClose }) => {
       </div>
 
       {/* User info */}
-      <div className="px-4 py-4 border-b border-border flex-shrink-0">
+      <Link
+        to="/alumni/profile"
+        onClick={onClose}
+        className="px-4 py-4 border-b border-border flex-shrink-0 hover:bg-gray-50 transition-colors block"
+      >
         <div className="flex items-center gap-3">
           <Avatar src={userProfile?.photoURL} name={userProfile?.fullName || currentUser?.displayName} size="sm" />
           <div className="min-w-0">
@@ -67,7 +69,7 @@ const AlumniSidebar = ({ onClose }) => {
             <Badge variant="warning" dot>Verification Pending</Badge>
           </div>
         )}
-      </div>
+      </Link>
 
       {/* Nav items */}
       <nav className="flex-1 px-3 py-3 overflow-y-auto space-y-0.5">

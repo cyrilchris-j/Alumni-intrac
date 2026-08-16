@@ -5,6 +5,7 @@ import {
   getDocs,
   setDoc,
   updateDoc,
+  deleteDoc,
   collection,
   query,
   where,
@@ -384,3 +385,29 @@ export const getAllUsers = async () => {
 
   return mockStore.getUsers();
 };
+
+/**
+ * Delete a user account and associated profiles (admin)
+ */
+export const deleteUserAccount = async (uid) => {
+  if (!uid) return;
+  if (isFirebaseConfigured) {
+    try {
+      await deleteDoc(doc(db, 'users', uid));
+      try { await deleteDoc(doc(db, 'studentProfiles', uid)); } catch (e) {}
+      try { await deleteDoc(doc(db, 'alumniProfiles', uid)); } catch (e) {}
+      return;
+    } catch (e) {
+      console.warn('Firebase deleteUserAccount fallback:', e);
+    }
+  }
+
+  const users = mockStore.getUsers();
+  mockStore.setUsers(users.filter((u) => u.uid !== uid && u.id !== uid));
+  const students = mockStore.getStudents();
+  mockStore.setStudents(students.filter((s) => s.uid !== uid && s.id !== uid));
+  const alumni = mockStore.getAlumni();
+  mockStore.setAlumni(alumni.filter((a) => a.uid !== uid && a.id !== uid));
+};
+
+

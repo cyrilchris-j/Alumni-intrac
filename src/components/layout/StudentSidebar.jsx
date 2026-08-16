@@ -1,7 +1,7 @@
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, Link, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, Users, BookOpen, Link2, MessageSquare,
-  Briefcase, Calendar, Bell, UserCircle, Settings, LogOut,
+  Briefcase, Calendar, Settings, LogOut,
   Megaphone
 } from 'lucide-react';
 import { signOutUser } from '../../firebase/auth';
@@ -17,11 +17,9 @@ const navItems = [
   { to: '/student/opportunities', icon: Briefcase, label: 'Opportunities' },
   { to: '/student/events', icon: Calendar, label: 'Events' },
   { to: '/student/announcements', icon: Megaphone, label: 'Announcements' },
-  { to: '/student/notifications', icon: Bell, label: 'Notifications' },
 ];
 
 const bottomItems = [
-  { to: '/student/profile', icon: UserCircle, label: 'My Profile' },
   { to: '/student/settings', icon: Settings, label: 'Settings' },
 ];
 
@@ -51,7 +49,11 @@ const StudentSidebar = ({ onClose }) => {
       </div>
 
       {/* User info */}
-      <div className="px-4 py-4 border-b border-border flex items-center gap-3 flex-shrink-0">
+      <Link
+        to="/student/profile"
+        onClick={onClose}
+        className="px-4 py-4 border-b border-border flex items-center gap-3 flex-shrink-0 hover:bg-gray-50 transition-colors"
+      >
         <Avatar src={userProfile?.photoURL} name={userProfile?.fullName || currentUser?.displayName} size="sm" />
         <div className="min-w-0">
           <p className="text-sm font-medium text-text-primary truncate">
@@ -59,7 +61,7 @@ const StudentSidebar = ({ onClose }) => {
           </p>
           <p className="text-xs text-text-secondary truncate">{userProfile?.department}</p>
         </div>
-      </div>
+      </Link>
 
       {/* Nav items */}
       <nav className="flex-1 px-3 py-3 overflow-y-auto space-y-0.5">

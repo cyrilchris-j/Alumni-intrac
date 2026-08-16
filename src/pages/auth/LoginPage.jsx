@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import {
   Mail, Lock, Link2, Eye, EyeOff, GraduationCap,
   UserCheck, ShieldCheck, Sparkles
 } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
 import { signInWithEmail, signInWithGoogle, signUpWithEmail } from '../../firebase/auth';
 import {
   getUserDocument,
@@ -43,6 +44,7 @@ const DEMO_ACCOUNTS = {
 };
 
 const LoginPage = () => {
+  const { currentUser, userRole, loading: authLoading } = useAuth();
   const [form, setForm] = useState({ email: '', password: '' });
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -61,6 +63,12 @@ const LoginPage = () => {
       navigate(`/${role}/dashboard`, { replace: true });
     }
   };
+
+  useEffect(() => {
+    if (!authLoading && currentUser && userRole) {
+      redirectByRole(userRole);
+    }
+  }, [currentUser, userRole, authLoading]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

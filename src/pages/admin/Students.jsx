@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import {
   GraduationCap, Search, Mail, Phone, Building2,
-  BookOpen, Eye, X
+  BookOpen, Eye, X, Trash2
 } from 'lucide-react';
 import DashboardLayout from '../../components/layout/DashboardLayout';
 import Avatar from '../../components/ui/Avatar';
@@ -10,7 +10,8 @@ import Button from '../../components/ui/Button';
 import Modal from '../../components/ui/Modal';
 import EmptyState from '../../components/ui/EmptyState';
 import { SkeletonTable } from '../../components/ui/Skeleton';
-import { getAllStudents } from '../../services/userService';
+import DeleteConfirmModal from '../../components/ui/DeleteConfirmModal';
+import { getAllStudents, deleteUserAccount } from '../../services/userService';
 import { DEPARTMENTS, STUDENT_YEARS } from '../../utils/constants';
 
 const Students = () => {
@@ -20,6 +21,8 @@ const Students = () => {
   const [deptFilter, setDeptFilter] = useState('all');
   const [yearFilter, setYearFilter] = useState('all');
   const [selectedStudent, setSelectedStudent] = useState(null);
+  const [studentToDelete, setStudentToDelete] = useState(null);
+  const [deleting, setDeleting] = useState(false);
 
   const loadStudents = async () => {
     setLoading(true);
@@ -36,6 +39,24 @@ const Students = () => {
   useEffect(() => {
     loadStudents();
   }, []);
+
+  const handleConfirmDelete = async () => {
+    if (!studentToDelete) return;
+    const targetUid = studentToDelete.uid || studentToDelete.id;
+    setDeleting(true);
+    try {
+      await deleteUserAccount(targetUid);
+      setStudents((prev) => prev.filter((s) => (s.uid || s.id) !== targetUid));
+      if (selectedStudent && (selectedStudent.uid || selectedStudent.id) === targetUid) {
+        setSelectedStudent(null);
+      }
+      setStudentToDelete(null);
+    } catch (err) {
+      alert('Failed to remove student');
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   const filteredStudents = students.filter((s) => {
     if (deptFilter !== 'all' && s.department !== deptFilter) return false;
@@ -122,7 +143,7 @@ const Students = () => {
                   <th className="px-6 py-4 font-semibold">Department</th>
                   <th className="px-6 py-4 font-semibold">Year & Sec</th>
                   <th className="px-6 py-4 font-semibold">Skills / Focus</th>
-                  <th className="px-6 py-4 font-semibold text-right">Details</th>
+                  <th className="px-6 py-4 font-semibold text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
@@ -152,13 +173,25 @@ const Students = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4 text-right">
-                      <Button
-                        size="sm"
-                        variant="secondary"
-                        onClick={() => setSelectedStudent(s)}
-                      >
-                        Inspect
-                      </Button>
+                      <div className="flex items-center justify-end gap-1.5">
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          onClick={() => setSelectedStudent(s)}
+                        >
+                          Inspect
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="text-red-600 hover:bg-red-50 hover:text-red-700"
+                          onClick={() => setStudentToDelete(s)}
+                          title="Remove Student"
+                        >
+                          <Trash2 size={15} />
+                          Remove
+                        </Button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -174,6 +207,23 @@ const Students = () => {
         onClose={() => setSelectedStudent(null)}
         title="Student Details"
         size="md"
+        footer={
+          selectedStudent ? (
+            <div className="flex items-center justify-between w-full">
+              <Button
+                variant="ghost"
+                className="text-red-600 hover:bg-red-50 hover:text-red-700"
+                onClick={() => setStudentToDelete(selectedStudent)}
+              >
+                <Trash2 size={15} />
+                Remove Student
+              </Button>
+              <Button variant="secondary" onClick={() => setSelectedStudent(null)}>
+                Close
+              </Button>
+            </div>
+          ) : null
+        }
       >
         {selectedStudent && (
           <div className="space-y-4">
@@ -214,6 +264,18 @@ const Students = () => {
           </div>
         )}
       </Modal>
+
+      {/* Delete Confirmation Modal */}
+      <DeleteConfirmModal
+        isOpen={!!studentToDelete}
+        onClose={() => setStudentToDelete(null)}
+        onConfirm={handleConfirmDelete}
+        title="Remove Student Account"
+        itemName={`${studentToDelete?.fullName || 'Student'} (${studentToDelete?.email || ''})`}
+        itemType="student account"
+        requiredWord="confirm"
+        loading={deleting}
+      />
     </DashboardLayout>
   );
 };
