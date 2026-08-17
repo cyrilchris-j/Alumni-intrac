@@ -19,7 +19,7 @@ const Select = forwardRef(({
   return (
     <div className={cn('w-full', containerClassName)}>
       {label && (
-        <label className="block text-sm font-medium text-text-primary mb-1.5">
+        <label className="block text-xs font-semibold text-slate-700 mb-1.5 uppercase tracking-wider">
           {label}
           {required && <span className="text-red-500 ml-1">*</span>}
         </label>
@@ -28,11 +28,11 @@ const Select = forwardRef(({
         <select
           ref={ref}
           className={cn(
-            'w-full px-3 py-2.5 text-sm border border-border rounded-lg',
+            'w-full px-3.5 py-2.5 text-sm border border-slate-200 rounded-xl shadow-xs',
             'bg-white text-text-primary appearance-none',
-            'focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500',
-            'transition-colors duration-200 disabled:bg-gray-50 cursor-pointer',
-            error && 'border-red-400 focus:ring-red-400 focus:border-red-400',
+            'focus:outline-none focus:ring-2 focus:ring-primary-600/20 focus:border-primary-600',
+            'transition-all duration-200 disabled:bg-slate-50 cursor-pointer',
+            error && 'border-red-400 focus:ring-red-400/20 focus:border-red-400',
             className
           )}
           {...props}

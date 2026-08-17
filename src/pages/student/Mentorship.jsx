@@ -1,99 +1,209 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { BookOpen, Clock, CheckCircle, XCircle, Users } from 'lucide-react';
+import {
+  BookOpen, Clock, CheckCircle, XCircle, Users, MessageSquare,
+  Plus, Search, Building2, Sparkles, Send, MapPin
+} from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import DashboardLayout from '../../components/layout/DashboardLayout';
 import Avatar from '../../components/ui/Avatar';
 import Badge from '../../components/ui/Badge';
 import Button from '../../components/ui/Button';
 import EmptyState from '../../components/ui/EmptyState';
+import Modal from '../../components/ui/Modal';
+import Input from '../../components/ui/Input';
+import Select from '../../components/ui/Select';
 import { SkeletonCard } from '../../components/ui/Skeleton';
-import { getStudentMentorshipRequests } from '../../services/mentorshipService';
-import { getAlumniProfile } from '../../services/userService';
-import { formatDate, timeAgo } from '../../utils/formatters';
-import { MENTORSHIP_STATUS } from '../../utils/constants';
+import { getStudentMentorshipRequests, sendMentorshipRequest } from '../../services/mentorshipService';
+import { getAlumniProfile, searchAlumni } from '../../services/userService';
+import { getOrCreateConversation } from '../../services/messageService';
+import { formatDate, timeAgo, formatFirebaseError } from '../../utils/formatters';
+import { MENTORSHIP_STATUS, MENTORSHIP_AREAS } from '../../utils/constants';
 
 const statusConfig = {
   pending: { label: 'Pending', variant: 'warning', icon: Clock },
   accepted: { label: 'Active', variant: 'success', icon: CheckCircle },
   rejected: { label: 'Declined', variant: 'danger', icon: XCircle },
-  completed: { label: 'Completed', variant: 'default', icon: CheckCircle },
 };
 
 const StudentMentorship = () => {
-  const { currentUser } = useAuth();
+  const { currentUser, userProfile } = useAuth();
   const navigate = useNavigate();
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [alumniProfiles, setAlumniProfiles] = useState({});
-  const [activeTab, setActiveTab] = useState('all');
+  const [activeTab, setActiveTab] = useState('all'); // 'all' | 'pending' | 'accepted'
+
+  // Find a mentor modal state
+  const [showFindModal, setShowFindModal] = useState(false);
+  const [mentorSearch, setMentorSearch] = useState('');
+  const [availableAlumni, setAvailableAlumni] = useState([]);
+  const [selectedAlumni, setSelectedAlumni] = useState(null);
+  const [mentorshipForm, setMentorshipForm] = useState({
+    topic: '',
+    preferredArea: 'Career Guidance',
+    message: '',
+  });
+  const [sendingRequest, setSendingRequest] = useState(false);
+
+  const loadData = async () => {
+    if (!currentUser) return;
+    setLoading(true);
+    try {
+      const reqs = await getStudentMentorshipRequests(currentUser.uid);
+      setRequests(reqs);
+
+      const profiles = {};
+      await Promise.all(
+        reqs.map(async (r) => {
+          if (!profiles[r.alumniId]) {
+            const p = await getAlumniProfile(r.alumniId);
+            if (p) profiles[r.alumniId] = p;
+          }
+        })
+      );
+      setAlumniProfiles(profiles);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    if (!currentUser) return;
-    const load = async () => {
-      try {
-        const reqs = await getStudentMentorshipRequests(currentUser.uid);
-        setRequests(reqs);
-
-        const profiles = {};
-        await Promise.all(
-          reqs.map(async (r) => {
-            if (!profiles[r.alumniId]) {
-              const p = await getAlumniProfile(r.alumniId);
-              if (p) profiles[r.alumniId] = p;
-            }
-          })
-        );
-        setAlumniProfiles(profiles);
-      } catch (e) {
-        console.error(e);
-      } finally {
-        setLoading(false);
-      }
-    };
-    load();
+    loadData();
   }, [currentUser]);
 
-  const filtered = requests.filter((r) =>
-    activeTab === 'all' ? true : r.status === activeTab
-  );
+  const handleOpenFindModal = async () => {
+    setShowFindModal(true);
+    try {
+      const list = await searchAlumni('');
+      setAvailableAlumni(list);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const handleSelectAlumni = (alumni) => {
+    setSelectedAlumni(alumni);
+    setMentorshipForm({
+      topic: '',
+      preferredArea: 'Career Guidance',
+      message: `Hi ${alumni.fullName}, I would love some mentorship guidance on my career preparation and skills roadmap.`,
+    });
+  };
+
+  const handleSubmitRequest = async (e) => {
+    e.preventDefault();
+    if (!selectedAlumni || !mentorshipForm.topic || !mentorshipForm.message) {
+      alert('Please select a mentor and complete the topic and message.');
+      return;
+    }
+    setSendingRequest(true);
+    try {
+      await sendMentorshipRequest(
+        currentUser.uid,
+        selectedAlumni.id || selectedAlumni.uid,
+        mentorshipForm,
+        userProfile?.fullName || 'Student'
+      );
+      setShowFindModal(false);
+      setSelectedAlumni(null);
+      await loadData();
+      alert(`Mentorship request sent to ${selectedAlumni.fullName}!`);
+    } catch (err) {
+      alert(formatFirebaseError(err));
+    } finally {
+      setSendingRequest(false);
+    }
+  };
+
+  const handleSendMessage = async (alumniId, alumniName) => {
+    try {
+      await getOrCreateConversation(currentUser.uid, alumniId, {
+        [currentUser.uid]: userProfile?.fullName || 'Student',
+        [alumniId]: alumniName,
+      });
+      navigate('/student/messages', { state: { conversationWith: alumniId } });
+    } catch (e) {
+      alert('Failed to start chat');
+    }
+  };
+
+  const filtered = requests.filter((r) => {
+    if (activeTab === 'all') return true;
+    if (activeTab === 'pending') return r.status === MENTORSHIP_STATUS.PENDING;
+    if (activeTab === 'accepted') return r.status === MENTORSHIP_STATUS.ACCEPTED;
+    return true;
+  });
 
   const tabs = [
-    { id: 'all', label: 'All Requests' },
-    { id: MENTORSHIP_STATUS.PENDING, label: 'Pending' },
-    { id: MENTORSHIP_STATUS.ACCEPTED, label: 'Active' },
-    { id: MENTORSHIP_STATUS.COMPLETED, label: 'Completed' },
+    { id: 'all', label: 'All Requests', count: requests.length },
+    {
+      id: 'pending',
+      label: 'Pending',
+      count: requests.filter((r) => r.status === MENTORSHIP_STATUS.PENDING).length,
+    },
+    {
+      id: 'accepted',
+      label: 'Accepted',
+      count: requests.filter((r) => r.status === MENTORSHIP_STATUS.ACCEPTED).length,
+    },
   ];
+
+  const filteredAlumniSearch = availableAlumni.filter((a) => {
+    if (!mentorSearch) return true;
+    const lower = mentorSearch.toLowerCase();
+    return (
+      a.fullName?.toLowerCase().includes(lower) ||
+      a.company?.toLowerCase().includes(lower) ||
+      a.jobRole?.toLowerCase().includes(lower) ||
+      a.skills?.some((s) => s.toLowerCase().includes(lower))
+    );
+  });
 
   return (
     <DashboardLayout>
-      <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      {/* Header */}
+      <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-heading font-bold text-text-primary">Mentorship</h1>
-          <p className="text-text-secondary text-sm mt-1">Track your mentorship requests and active mentors.</p>
+          <span className="text-xs font-crest font-bold text-gold-600 uppercase tracking-widest bg-gold-100/60 px-2.5 py-0.5 rounded-full border border-gold-200/80">
+            Advisory Council
+          </span>
+          <h1 className="text-3xl font-serif font-bold text-slate-900 tracking-tight mt-1.5">
+            Mentorship & Advisory Program
+          </h1>
+          <p className="text-slate-500 text-sm mt-1">
+            Connect with accomplished alumni leaders for 1-on-1 career guidance, portfolio reviews, and graduate strategy.
+          </p>
         </div>
-        <Button onClick={() => navigate('/student/alumni')}>
-          <Users size={16} />
-          Find a Mentor
+        <Button variant="gold" onClick={handleOpenFindModal} leftIcon={Sparkles} className="shadow-gold-glow text-xs font-bold">
+          Request a Mentor
         </Button>
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 bg-gray-100 p-1 rounded-xl mb-6 w-fit">
+      <div className="flex gap-1 bg-slate-100 p-1 rounded-xl mb-6 w-fit border border-slate-200/60">
         {tabs.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+            className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all duration-200 flex items-center gap-2 ${
               activeTab === tab.id
-                ? 'bg-white text-text-primary shadow-sm'
-                : 'text-text-secondary hover:text-text-primary'
+                ? 'bg-white text-primary-950 shadow-xs border border-slate-200/80'
+                : 'text-slate-500 hover:text-slate-900'
             }`}
           >
             {tab.label}
-            {tab.id !== 'all' && (
-              <span className="ml-1.5 text-xs text-text-muted">
-                ({requests.filter((r) => r.status === tab.id).length})
+            {tab.count > 0 && (
+              <span
+                className={`text-[10px] rounded-full px-2 py-0.5 font-bold ${
+                  activeTab === tab.id
+                    ? 'bg-gold-100 text-gold-900 border border-gold-300/80'
+                    : 'bg-slate-200 text-slate-700'
+                }`}
+              >
+                {tab.count}
               </span>
             )}
           </button>
@@ -108,52 +218,82 @@ const StudentMentorship = () => {
       ) : filtered.length === 0 ? (
         <EmptyState
           icon={BookOpen}
-          title={activeTab === 'all' ? "No mentorship requests yet" : `No ${activeTab} requests`}
-          description="Connect with alumni and request mentorship to get started."
-          action={() => navigate('/student/alumni')}
-          actionLabel="Find a Mentor"
+          title={
+            activeTab === 'all'
+              ? 'No mentorship requests yet'
+              : `No ${activeTab} mentorship requests`
+          }
+          description="Find a verified alumni mentor in your field to accelerate your career growth."
+          action={handleOpenFindModal}
+          actionLabel="Find an Advisory Mentor"
         />
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-4 max-w-4xl">
           {filtered.map((request) => {
             const alumni = alumniProfiles[request.alumniId];
             const config = statusConfig[request.status] || statusConfig.pending;
             const StatusIcon = config.icon;
             return (
-              <div key={request.id} className="bg-white rounded-xl border border-border p-5">
+              <div
+                key={request.id}
+                className="bg-white rounded-2xl border border-slate-200/90 p-6 shadow-card hover:shadow-card-hover transition-all duration-200"
+              >
                 <div className="flex items-start gap-4">
-                  <Avatar src={alumni?.photoURL} name={alumni?.fullName} size="md" />
+                  <Avatar src={alumni?.photoURL} name={alumni?.fullName} size="lg" />
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between gap-4">
+                    <div className="flex items-start justify-between gap-4 flex-wrap">
                       <div>
-                        <h3 className="font-semibold text-text-primary">{alumni?.fullName || 'Unknown Alumni'}</h3>
-                        <p className="text-sm text-text-secondary">{alumni?.jobRole} {alumni?.company && `• ${alumni.company}`}</p>
+                        <div className="flex items-center gap-2">
+                          <h3 className="font-bold text-text-primary text-base">
+                            {alumni?.fullName || 'Alumni Mentor'}
+                          </h3>
+                          {alumni?.verificationStatus === 'verified' && (
+                            <Badge variant="success" className="text-[10px]">
+                              ✓ Verified
+                            </Badge>
+                          )}
+                        </div>
+                        <p className="text-xs text-text-secondary mt-0.5">
+                          {alumni?.jobRole} {alumni?.company && `at ${alumni.company}`}
+                        </p>
                       </div>
-                      <Badge variant={config.variant}>
-                        <StatusIcon size={11} />
+                      <Badge variant={config.variant} className="capitalize">
+                        <StatusIcon size={12} />
                         {config.label}
                       </Badge>
                     </div>
 
-                    <div className="mt-3 p-3 bg-gray-50 rounded-lg">
-                      <p className="text-xs text-text-secondary font-medium mb-1">Topic</p>
-                      <p className="text-sm text-text-primary">{request.topic}</p>
-                      {request.preferredArea && (
-                        <p className="text-xs text-text-secondary mt-1">Area: {request.preferredArea}</p>
-                      )}
+                    {/* Topic Box */}
+                    <div className="mt-3.5 p-3.5 bg-gradient-to-r from-gray-50 to-primary-50/30 rounded-xl border border-border/80">
+                      <div className="flex items-center justify-between gap-2 mb-1">
+                        <span className="text-[11px] font-bold text-primary-700 uppercase tracking-wider">
+                          Mentorship Topic
+                        </span>
+                        {request.preferredArea && (
+                          <span className="text-xs bg-white text-text-secondary px-2 py-0.5 rounded-md border border-border font-medium">
+                            {request.preferredArea}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-sm font-semibold text-text-primary">{request.topic}</p>
                     </div>
 
                     {request.message && (
-                      <p className="text-sm text-text-secondary mt-2 line-clamp-2">{request.message}</p>
+                      <p className="text-xs text-text-secondary mt-3 leading-relaxed bg-gray-50/50 p-3 rounded-lg border border-dashed border-border">
+                        "{request.message}"
+                      </p>
                     )}
 
-                    <div className="flex items-center justify-between mt-3">
-                      <p className="text-xs text-text-muted">{timeAgo(request.createdAt)}</p>
+                    <div className="flex items-center justify-between mt-4 pt-3 border-t border-border">
+                      <span className="text-xs text-text-muted">
+                        Requested {timeAgo(request.createdAt)}
+                      </span>
                       {request.status === MENTORSHIP_STATUS.ACCEPTED && (
                         <Button
                           size="sm"
-                          variant="secondary"
-                          onClick={() => navigate('/student/messages')}
+                          variant="primary"
+                          leftIcon={MessageSquare}
+                          onClick={() => handleSendMessage(request.alumniId, alumni?.fullName)}
                         >
                           Send Message
                         </Button>
@@ -166,6 +306,154 @@ const StudentMentorship = () => {
           })}
         </div>
       )}
+
+      {/* Find a Mentor Modal */}
+      <Modal
+        isOpen={showFindModal}
+        onClose={() => {
+          setShowFindModal(false);
+          setSelectedAlumni(null);
+        }}
+        title="Find an Alumni Mentor"
+        size="lg"
+        footer={
+          selectedAlumni ? (
+            <div className="flex gap-2 w-full justify-end">
+              <Button
+                variant="ghost"
+                onClick={() => setSelectedAlumni(null)}
+                disabled={sendingRequest}
+              >
+                Back to Mentors
+              </Button>
+              <Button
+                loading={sendingRequest}
+                onClick={handleSubmitRequest}
+                leftIcon={Send}
+              >
+                Submit Mentorship Request
+              </Button>
+            </div>
+          ) : (
+            <Button variant="ghost" onClick={() => setShowFindModal(false)}>
+              Close
+            </Button>
+          )
+        }
+      >
+        {!selectedAlumni ? (
+          <div className="space-y-4">
+            <div className="relative">
+              <Search
+                size={16}
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted"
+              />
+              <input
+                type="text"
+                placeholder="Search alumni by name, company, job role, or skill..."
+                value={mentorSearch}
+                onChange={(e) => setMentorSearch(e.target.value)}
+                className="w-full pl-9 pr-4 py-2.5 text-sm border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500"
+              />
+            </div>
+
+            <div className="max-h-96 overflow-y-auto space-y-3 pr-1">
+              {filteredAlumniSearch.length === 0 ? (
+                <EmptyState
+                  icon={Users}
+                  title="No mentors found"
+                  description="Try adjusting your search keywords."
+                />
+              ) : (
+                filteredAlumniSearch.map((alumni) => (
+                  <div
+                    key={alumni.id || alumni.uid}
+                    className="p-4 rounded-xl border border-border hover:border-primary-500 hover:bg-primary-50/30 transition-all flex items-center justify-between gap-4"
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      <Avatar src={alumni.photoURL} name={alumni.fullName} size="md" />
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-1.5">
+                          <h4 className="font-semibold text-text-primary text-sm truncate">
+                            {alumni.fullName}
+                          </h4>
+                          {alumni.verificationStatus === 'verified' && (
+                            <Badge variant="success" className="text-[10px] px-1 py-0.2">
+                              ✓
+                            </Badge>
+                          )}
+                        </div>
+                        <p className="text-xs text-text-secondary truncate">
+                          {alumni.jobRole} • {alumni.company}
+                        </p>
+                        {alumni.skills?.length > 0 && (
+                          <div className="flex gap-1 mt-1.5 flex-wrap">
+                            {alumni.skills.slice(0, 3).map((sk) => (
+                              <span key={sk} className="tag text-[10px] py-0.2 px-1.5">
+                                {sk}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    <Button
+                      size="sm"
+                      onClick={() => handleSelectAlumni(alumni)}
+                      className="flex-shrink-0 text-xs"
+                    >
+                      Request
+                    </Button>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmitRequest} className="space-y-4">
+            <div className="p-3 bg-primary-50 rounded-xl border border-primary-100 flex items-center gap-3">
+              <Avatar src={selectedAlumni.photoURL} name={selectedAlumni.fullName} size="sm" />
+              <div>
+                <p className="text-sm font-bold text-text-primary">
+                  Requesting Mentorship with {selectedAlumni.fullName}
+                </p>
+                <p className="text-xs text-text-secondary">
+                  {selectedAlumni.jobRole} at {selectedAlumni.company}
+                </p>
+              </div>
+            </div>
+
+            <Input
+              label="Mentorship Topic / Objective"
+              placeholder="e.g. Guidance on PM interviews and building SaaS portfolio"
+              value={mentorshipForm.topic}
+              onChange={(e) => setMentorshipForm((f) => ({ ...f, topic: e.target.value }))}
+              required
+            />
+
+            <Select
+              label="Preferred Focus Area"
+              options={MENTORSHIP_AREAS}
+              value={mentorshipForm.preferredArea}
+              onChange={(e) => setMentorshipForm((f) => ({ ...f, preferredArea: e.target.value }))}
+            />
+
+            <div>
+              <label className="block text-xs font-semibold text-text-secondary mb-1">
+                Your Message & Questions
+              </label>
+              <textarea
+                rows={4}
+                value={mentorshipForm.message}
+                onChange={(e) => setMentorshipForm((f) => ({ ...f, message: e.target.value }))}
+                placeholder="Introduce yourself and specify what questions or areas you would like help with..."
+                className="w-full px-3 py-2 text-sm border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500"
+                required
+              />
+            </div>
+          </form>
+        )}
+      </Modal>
     </DashboardLayout>
   );
 };

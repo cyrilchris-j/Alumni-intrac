@@ -22,6 +22,7 @@ const STORAGE_KEYS = {
   MENTORSHIPS: 'alumlink_mentorships',
   OPPORTUNITIES: 'alumlink_opportunities',
   SAVED_OPPORTUNITIES: 'alumlink_saved_opportunities',
+  APPLIED_OPPORTUNITIES: 'alumlink_applied_opportunities',
   EVENTS: 'alumlink_events',
   EVENT_REGISTRATIONS: 'alumlink_event_registrations',
   ANNOUNCEMENTS: 'alumlink_announcements',
@@ -293,6 +294,9 @@ export const mockStore = {
 
   getSavedOpportunities: () => getItem(STORAGE_KEYS.SAVED_OPPORTUNITIES),
   setSavedOpportunities: (val) => setItem(STORAGE_KEYS.SAVED_OPPORTUNITIES, val),
+
+  getAppliedOpportunities: () => getItem(STORAGE_KEYS.APPLIED_OPPORTUNITIES),
+  setAppliedOpportunities: (val) => setItem(STORAGE_KEYS.APPLIED_OPPORTUNITIES, val),
 
   getEvents: () => getItem(STORAGE_KEYS.EVENTS),
   setEvents: (val) => setItem(STORAGE_KEYS.EVENTS, val),

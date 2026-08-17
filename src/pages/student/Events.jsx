@@ -78,26 +78,33 @@ const Events = () => {
 
   return (
     <DashboardLayout>
-      <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-heading font-bold text-text-primary">Campus & Alumni Events</h1>
-          <p className="text-text-secondary text-sm mt-1">
-            Join alumni meets, webinars, guest lectures, and networking sessions.
+          <span className="text-xs font-mono font-bold text-blue-700 uppercase tracking-widest bg-blue-50 px-2.5 py-0.5 rounded-full border border-blue-200">
+            Campus & Alumni Events
+          </span>
+          <h1 className="text-3xl font-heading font-bold text-slate-900 tracking-tight mt-1.5">
+            Colloquiums, Meets & Workshops
+          </h1>
+          <p className="text-slate-500 text-sm mt-1">
+            Participate in webinars, networking meets, and skill workshops hosted by industry leaders.
           </p>
         </div>
         <div className="flex gap-2">
           <Button
-            variant={activeFilter === 'all' ? 'primary' : 'outline'}
+            variant={activeFilter === 'all' ? 'primary' : 'secondary'}
             size="sm"
             onClick={() => setActiveFilter('all')}
+            className="text-xs font-semibold"
           >
             All Events
           </Button>
           <Button
-            variant={activeFilter === 'registered' ? 'primary' : 'outline'}
+            variant={activeFilter === 'registered' ? 'gold' : 'secondary'}
             size="sm"
             leftIcon={CheckCircle}
             onClick={() => setActiveFilter('registered')}
+            className="text-xs font-semibold"
           >
             My Registrations ({registeredEventIds.size})
           </Button>
@@ -111,8 +118,8 @@ const Events = () => {
       ) : filteredEvents.length === 0 ? (
         <EmptyState
           icon={Calendar}
-          title={activeFilter === 'registered' ? "No registrations yet" : "No events scheduled"}
-          description={activeFilter === 'registered' ? "You haven't registered for any upcoming events." : "Check back later for newly announced webinars and meets."}
+          title={activeFilter === 'registered' ? "No active registrations" : "No scheduled events"}
+          description={activeFilter === 'registered' ? "You haven't reserved seating for any upcoming gatherings." : "New colloquiums and keynote sessions will be published here."}
         />
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -121,27 +128,27 @@ const Events = () => {
             return (
               <div
                 key={event.id}
-                className="bg-white rounded-2xl border border-border overflow-hidden hover:shadow-card-hover transition-all duration-200 flex flex-col"
+                className="bg-white rounded-2xl border border-slate-200/90 overflow-hidden hover:shadow-card-hover hover:border-blue-200 transition-all duration-200 flex flex-col group shadow-card"
               >
-                <div className="h-3 bg-primary-600 w-full" />
+                <div className="h-2.5 bg-gradient-to-r from-blue-600 via-blue-500 to-cyan-500 w-full" />
                 <div className="p-6 flex-1 flex flex-col justify-between">
                   <div>
                     <div className="flex items-center justify-between gap-2 mb-3">
-                      <Badge variant="primary">{event.type || 'Event'}</Badge>
+                      <Badge variant="primary">{event.type || 'Colloquium'}</Badge>
                       {isRegistered && (
-                        <Badge variant="success" dot>Registered</Badge>
+                        <Badge variant="emerald" dot>Registered</Badge>
                       )}
                     </div>
 
-                    <h3 className="text-lg font-heading font-bold text-text-primary mb-2 line-clamp-2">
+                    <h3 className="text-lg font-heading font-bold text-slate-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
                       {event.title}
                     </h3>
 
-                    <p className="text-sm text-text-secondary line-clamp-3 mb-4 leading-relaxed">
+                    <p className="text-xs text-slate-500 line-clamp-3 mb-4 leading-relaxed font-sans">
                       {event.description}
                     </p>
 
-                    <div className="space-y-2 text-xs text-text-secondary mb-6 border-t border-border pt-4">
+                    <div className="space-y-2 text-xs text-slate-600 mb-6 border-t border-slate-100 pt-4">
                       <div className="flex items-center gap-2">
                         <Calendar size={14} className="text-primary-600" />
                         <span>{formatDate(event.date)}</span>

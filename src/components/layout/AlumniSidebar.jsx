@@ -33,87 +33,114 @@ const AlumniSidebar = ({ onClose }) => {
   const isVerified = userProfile?.verificationStatus === 'verified';
 
   return (
-    <aside className="w-64 h-full bg-white border-r border-border flex flex-col">
-      {/* Logo */}
-      <div className="h-16 flex items-center px-5 border-b border-border flex-shrink-0">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center">
-            <Link2 size={18} className="text-white" />
+    <aside className="w-64 h-full bg-white text-slate-700 border-r border-slate-200/80 flex flex-col shadow-xs">
+      {/* Light Blue Logo Header */}
+      <div className="h-18 flex items-center px-6 border-b border-slate-200/80 flex-shrink-0 bg-blue-50/50">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-cyan-500 flex items-center justify-center shadow-sm flex-shrink-0">
+            <Link2 size={20} className="text-white stroke-[2.5]" />
           </div>
-          <span className="text-xl font-heading font-bold text-text-primary">AlumLink</span>
+          <div>
+            <span className="text-xl font-heading font-bold text-slate-900 tracking-wide block leading-none">
+              AlumLink
+            </span>
+            <span className="text-[10px] font-mono font-semibold tracking-widest text-blue-600 uppercase block mt-1">
+              Alumni Portal
+            </span>
+          </div>
         </div>
       </div>
 
-      {/* User info */}
-      <Link
-        to="/alumni/profile"
-        onClick={onClose}
-        className="px-4 py-4 border-b border-border flex-shrink-0 hover:bg-gray-50 transition-colors block"
-      >
-        <div className="flex items-center gap-3">
-          <Avatar src={userProfile?.photoURL} name={userProfile?.fullName || currentUser?.displayName} size="sm" />
-          <div className="min-w-0">
-            <p className="text-sm font-medium text-text-primary truncate">
-              {userProfile?.fullName || currentUser?.displayName || 'Alumni'}
-            </p>
-            <p className="text-xs text-text-secondary truncate">{userProfile?.jobRole}</p>
+      {/* User Info Profile Pill */}
+      <div className="p-3.5 flex-shrink-0">
+        <Link
+          to="/alumni/profile"
+          onClick={onClose}
+          className="p-3 rounded-xl bg-slate-50 hover:bg-blue-50/70 border border-slate-200/80 block transition-all duration-200 group shadow-2xs"
+        >
+          <div className="flex items-center gap-3">
+            <Avatar 
+              src={userProfile?.photoURL} 
+              name={userProfile?.fullName || currentUser?.displayName} 
+              size="sm" 
+              ring 
+            />
+            <div className="min-w-0 flex-1">
+              <p className="text-xs font-bold text-slate-900 truncate group-hover:text-blue-600 transition-colors">
+                {userProfile?.fullName || currentUser?.displayName || 'Alumni Member'}
+              </p>
+              <p className="text-[11px] text-slate-500 truncate mt-0.5">
+                {userProfile?.jobRole || userProfile?.company || 'Alumni Member'}
+              </p>
+            </div>
           </div>
-        </div>
-        {isVerified && (
-          <div className="mt-2">
-            <Badge variant="success" dot>Verified Alumni</Badge>
-          </div>
-        )}
-        {userProfile?.verificationStatus === 'pending' && (
-          <div className="mt-2">
-            <Badge variant="warning" dot>Verification Pending</Badge>
-          </div>
-        )}
-      </Link>
+          {isVerified && (
+            <div className="mt-2.5">
+              <Badge variant="emerald" dot className="text-[10px] py-0.5 bg-emerald-50 text-emerald-700 border-emerald-200">
+                Verified Alumni
+              </Badge>
+            </div>
+          )}
+          {userProfile?.verificationStatus === 'pending' && (
+            <div className="mt-2.5">
+              <Badge variant="warning" dot className="text-[10px] py-0.5 bg-amber-50 text-amber-700 border-amber-200">
+                Verification Pending
+              </Badge>
+            </div>
+          )}
+        </Link>
+      </div>
 
       {/* Nav items */}
-      <nav className="flex-1 px-3 py-3 overflow-y-auto space-y-0.5">
+      <nav className="flex-1 px-3 py-2 overflow-y-auto space-y-1 scrollbar-none">
+        <p className="px-3 pt-2 pb-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+          Main Navigation
+        </p>
         {navItems.map(({ to, icon: Icon, label }) => (
           <NavLink
             key={to}
             to={to}
             onClick={onClose}
             className={({ isActive }) =>
-              `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
+              `flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all duration-200 ${
                 isActive
-                  ? 'bg-primary-50 text-primary-700'
-                  : 'text-text-secondary hover:bg-gray-50 hover:text-text-primary'
+                  ? 'bg-blue-50 text-blue-700 border-l-4 border-blue-600 shadow-2xs'
+                  : 'text-slate-600 hover:text-blue-600 hover:bg-slate-50'
               }`
             }
           >
-            <Icon size={18} />
-            {label}
+            {({ isActive }) => (
+              <>
+                <Icon size={17} className={isActive ? 'text-blue-600' : 'text-slate-400'} />
+                <span>{label}</span>
+              </>
+            )}
           </NavLink>
         ))}
       </nav>
 
       {/* Bottom */}
-      <div className="px-3 py-3 border-t border-border space-y-0.5 flex-shrink-0">
+      <div className="px-3 py-3 border-t border-slate-200/80 space-y-1 bg-slate-50/50 flex-shrink-0">
         <NavLink
           to="/alumni/settings"
           onClick={onClose}
           className={({ isActive }) =>
-            `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
+            `flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all duration-200 ${
               isActive
-                ? 'bg-primary-50 text-primary-700'
-                : 'text-text-secondary hover:bg-gray-50 hover:text-text-primary'
+                ? 'bg-blue-50 text-blue-700 border-l-4 border-blue-600'
+                : 'text-slate-600 hover:text-blue-600 hover:bg-slate-50'
             }`
           }
         >
-          <Settings size={18} />
+          <Settings size={16} />
           Settings
         </NavLink>
         <button
           onClick={handleLogout}
-          className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-text-secondary hover:bg-red-50 hover:text-red-600 transition-all duration-200 w-full"
+          className="flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-red-50 hover:text-red-600 transition-all duration-200 w-full"
         >
-          <LogOut size={18} />
-          Logout
+          <LogOut size={16} />
+          Sign Out
         </button>
       </div>
     </aside>

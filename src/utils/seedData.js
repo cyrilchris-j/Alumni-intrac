@@ -332,6 +332,30 @@ export const SAMPLE_OPPORTUNITIES = [
     externalLink: 'https://www.atlassian.com/company/careers',
     postedByName: 'Deepa Balasubramanian',
   },
+  {
+    title: 'Smart India Next-Gen Hackathon 2026',
+    company: 'PSG Tech Innovation Hub & Google Cloud',
+    type: 'Hackathon',
+    workMode: 'Hybrid',
+    location: 'Campus & Online',
+    description: '36-hour flagship hackathon for student teams solving real-world challenges in AI, FinTech, Clean Energy, and Healthcare. Cash prizes up to ₹5,00,000 and direct internship interviews with alumni sponsors.',
+    skills: ['AI/ML', 'React', 'Python', 'Cloud Solutions', 'System Design'],
+    deadline: '2026-10-20',
+    externalLink: 'https://hackathon.psgtech.edu',
+    postedByName: 'Priya Menon',
+  },
+  {
+    title: 'Junior Frontend Engineer Vacancy',
+    company: 'Flipkart',
+    type: 'Job Vacancy',
+    workMode: 'On-site',
+    location: 'Bangalore, Karnataka',
+    description: 'Immediate vacancy for ambitious graduates with strong React and TypeScript background. You will join the Core Shopping Experience engineering team.',
+    skills: ['React', 'TypeScript', 'Tailwind CSS', 'Redux', 'REST APIs'],
+    deadline: '2026-11-15',
+    externalLink: 'https://flipkartcareers.com',
+    postedByName: 'Meenakshi Iyer',
+  },
 ];
 
 export const SAMPLE_EVENTS = [

@@ -37,6 +37,8 @@ export const ACCOUNT_STATUS = {
 // Opportunity Types
 export const OPPORTUNITY_TYPES = [
   'Internship',
+  'Job Vacancy',
+  'Hackathon',
   'Full-time',
   'Part-time',
   'Referral',

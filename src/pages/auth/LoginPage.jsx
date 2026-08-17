@@ -172,75 +172,83 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-bg flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-sky-50 to-white flex items-center justify-center p-4 selection:bg-blue-600 selection:text-white">
       <div className="w-full max-w-md">
-        {/* Logo */}
+        {/* Modern Logo Header */}
         <div className="text-center mb-8">
-          <Link to="/" className="inline-flex items-center gap-2 mb-6">
-            <div className="w-9 h-9 bg-primary-600 rounded-xl flex items-center justify-center">
-              <Link2 size={20} className="text-white" />
+          <Link to="/" className="inline-flex flex-col items-center gap-2 mb-4 group">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-600 to-cyan-500 flex items-center justify-center shadow-lg flex-shrink-0 group-hover:scale-105 transition-transform duration-200">
+              <Link2 size={24} className="text-white stroke-[2.5]" />
             </div>
-            <span className="text-2xl font-heading font-bold text-text-primary">AlumLink</span>
+            <span className="text-3xl font-heading font-bold text-slate-900 tracking-wider block">
+              AlumLink
+            </span>
+            <span className="text-xs font-mono font-semibold tracking-widest text-blue-600 uppercase">
+              Collegiate Networking Portal
+            </span>
           </Link>
-          <h1 className="text-2xl font-heading font-bold text-text-primary">Welcome back</h1>
-          <p className="text-text-secondary mt-1 text-sm">Sign in to your account to continue</p>
+          <h1 className="text-2xl font-heading font-bold text-slate-900 mt-2">Welcome to the Network</h1>
+          <p className="text-slate-500 mt-1 text-xs">Sign in to access your institutional network</p>
         </div>
 
         {/* Card */}
-        <div className="bg-white rounded-2xl border border-border shadow-card p-8">
+        <div className="bg-white/95 backdrop-blur-md rounded-3xl border border-white/20 shadow-modal p-8 sm:p-9">
           {error && (
-            <div className="mb-5 p-3.5 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
+            <div className="mb-5 p-3.5 bg-red-50 border border-red-200 rounded-xl text-xs font-medium text-red-700">
               {error}
             </div>
           )}
 
           {/* Quick Demo Credentials Selector */}
-          <div className="mb-6 p-4 bg-primary-50/60 rounded-xl border border-primary-100">
-            <p className="text-xs font-semibold text-primary-900 mb-2">
-              ⚡ Quick Demo Login (Default password: <code className="bg-white px-1.5 py-0.5 rounded border border-primary-200 text-primary-700 font-mono text-[11px]">password123</code>)
-            </p>
+          <div className="mb-6 p-4 bg-gradient-to-br from-gold-50/80 to-slate-50 rounded-2xl border border-gold-200/60 shadow-xs">
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-[11px] font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1">
+                <Sparkles size={13} className="text-gold-600" /> Quick Demo Access
+              </p>
+              <span className="text-[10px] text-slate-500 font-mono">pwd: password123</span>
+            </div>
             <div className="grid grid-cols-3 gap-2">
               <Button
                 type="button"
                 variant="secondary"
                 size="sm"
-                className="text-xs bg-white py-1.5"
+                className="text-xs bg-white py-1.5 border-slate-200"
                 loading={demoLoading === 'student'}
                 onClick={() => handleQuickDemoLogin('student')}
               >
-                <GraduationCap size={13} />
+                <GraduationCap size={13} className="text-primary-800" />
                 Student
               </Button>
               <Button
                 type="button"
                 variant="secondary"
                 size="sm"
-                className="text-xs bg-white py-1.5"
+                className="text-xs bg-white py-1.5 border-slate-200"
                 loading={demoLoading === 'alumni'}
                 onClick={() => handleQuickDemoLogin('alumni')}
               >
-                <UserCheck size={13} />
+                <UserCheck size={13} className="text-emerald-700" />
                 Alumni
               </Button>
               <Button
                 type="button"
                 variant="secondary"
                 size="sm"
-                className="text-xs bg-white py-1.5"
+                className="text-xs bg-white py-1.5 border-slate-200"
                 loading={demoLoading === 'admin'}
                 onClick={() => handleQuickDemoLogin('admin')}
               >
-                <ShieldCheck size={13} />
+                <ShieldCheck size={13} className="text-gold-700" />
                 Admin
               </Button>
             </div>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-4">
             <Input
-              label="Email address"
+              label="Institutional Email"
               type="email"
-              placeholder="you@college.edu"
+              placeholder="member@college.edu"
               leftIcon={Mail}
               value={form.email}
               onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
@@ -250,71 +258,71 @@ const LoginPage = () => {
 
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <label className="text-sm font-medium text-text-primary">Password</label>
+                <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider">Password</label>
                 <Link
                   to="/forgot-password"
-                  className="text-xs text-primary-600 hover:text-primary-700 font-medium"
+                  className="text-xs text-primary-800 hover:text-gold-700 font-semibold transition-colors"
                 >
                   Forgot password?
                 </Link>
               </div>
               <div className="relative">
-                <Lock size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted" />
+                <Lock size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
                 <input
                   type={showPassword ? 'text' : 'password'}
-                  placeholder="Enter your password"
+                  placeholder="••••••••••••"
                   value={form.password}
                   onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
                   required
                   autoComplete="current-password"
-                  className="w-full pl-9 pr-10 py-2.5 text-sm border border-border rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                  className="w-full pl-10 pr-10 py-2.5 text-xs font-medium border border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-primary-600/20 focus:border-primary-600 shadow-xs"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword((v) => !v)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-secondary"
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700"
                 >
                   {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               </div>
             </div>
 
-            <Button type="submit" fullWidth size="lg" loading={loading}>
-              Sign In
+            <Button type="submit" fullWidth size="md" variant="primary" loading={loading} className="mt-2 shadow-md">
+              Sign In to Portal
             </Button>
           </form>
 
           {/* Divider */}
           <div className="relative my-5">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-border" />
+              <div className="w-full border-t border-slate-200" />
             </div>
             <div className="relative flex justify-center">
-              <span className="px-3 bg-white text-xs text-text-muted">or continue with</span>
+              <span className="px-3 bg-white text-[11px] font-semibold text-slate-400 uppercase tracking-wider">or verify with</span>
             </div>
           </div>
 
           {/* Google sign-in */}
           <Button
-            variant="outline"
+            variant="secondary"
             fullWidth
-            size="lg"
+            size="md"
             loading={googleLoading}
             onClick={handleGoogleSignIn}
-            className="border-border"
+            className="border-slate-200 shadow-xs text-xs font-semibold text-slate-700"
           >
             <img
               src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
               alt="Google"
-              className="w-5 h-5"
+              className="w-4 h-4"
             />
-            Continue with Google
+            Continue with Institutional Google ID
           </Button>
 
-          <p className="text-center text-sm text-text-secondary mt-6">
-            Don't have an account?{' '}
-            <Link to="/signup" className="text-primary-600 font-medium hover:text-primary-700">
-              Create account
+          <p className="text-center text-xs text-slate-500 mt-6 font-medium">
+            New to the network?{' '}
+            <Link to="/signup" className="text-primary-800 font-bold hover:text-gold-700 transition-colors">
+              Create an Account
             </Link>
           </p>
         </div>

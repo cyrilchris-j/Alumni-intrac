@@ -295,6 +295,123 @@ export const searchAlumni = async (searchQuery = '', filters = {}) => {
 };
 
 /**
+ * Search students by name & filters (for peer student discovery & connection)
+ */
+export const searchStudents = async (searchQuery = '', filters = {}) => {
+  let results = [];
+  if (isFirebaseConfigured) {
+    try {
+      const q = query(collection(db, 'studentProfiles'), orderBy('createdAt', 'desc'), limit(100));
+      const snap = await getDocs(q);
+      results = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    } catch (e) {
+      results = mockStore.getStudents();
+    }
+  } else {
+    results = mockStore.getStudents();
+  }
+
+  if (searchQuery) {
+    const lower = searchQuery.toLowerCase();
+    results = results.filter(
+      (s) =>
+        s.fullName?.toLowerCase().includes(lower) ||
+        s.department?.toLowerCase().includes(lower) ||
+        s.skills?.some((sk) => sk.toLowerCase().includes(lower)) ||
+        s.interests?.some((it) => it.toLowerCase().includes(lower))
+    );
+  }
+
+  if (filters.department) {
+    results = results.filter((s) => s.department === filters.department);
+  }
+  if (filters.year) {
+    results = results.filter((s) => s.year === filters.year);
+  }
+
+  return results;
+};
+
+/**
+ * Intelligent recommendation for Alumni based on Student's skills and interests
+ */
+export const getRecommendedAlumni = async (userSkills = [], userInterests = [], lim = 6) => {
+  const allAlumni = await searchAlumni('', {});
+  const userSkillSet = new Set((userSkills || []).map((s) => s.toLowerCase().trim()));
+  const userInterestSet = new Set((userInterests || []).map((i) => i.toLowerCase().trim()));
+
+  const scored = allAlumni.map((alumni) => {
+    const alumniSkills = alumni.skills || [];
+    const matchedSkills = alumniSkills.filter((s) => userSkillSet.has(s.toLowerCase().trim()));
+
+    // Also match interests with jobRole, company, bio, skills
+    let interestMatches = 0;
+    const alumniText = `${alumni.jobRole || ''} ${alumni.company || ''} ${alumni.bio || ''}`.toLowerCase();
+    userInterestSet.forEach((interest) => {
+      if (interest && alumniText.includes(interest)) {
+        interestMatches += 1;
+      }
+    });
+
+    const score = matchedSkills.length * 3 + interestMatches * 2;
+    // Calculate a realistic match percentage (65% to 98%)
+    const baseMatch = 65;
+    const bonus = Math.min(33, (matchedSkills.length * 10) + (interestMatches * 8));
+    const matchPercentage = userSkills.length === 0 && userInterests.length === 0
+      ? 80 + Math.floor(Math.random() * 15)
+      : Math.min(99, baseMatch + bonus);
+
+    return {
+      ...alumni,
+      matchScore: score,
+      matchPercentage,
+      matchedSkills,
+      matchedInterestsCount: interestMatches,
+    };
+  });
+
+  // Sort by match score descending
+  scored.sort((a, b) => b.matchScore - a.matchScore);
+  return scored.slice(0, lim);
+};
+
+/**
+ * Intelligent recommendation for Fellow Students based on overlapping skills & interests
+ */
+export const getRecommendedStudents = async (currentUid, userSkills = [], userInterests = [], lim = 6) => {
+  const allStudents = await getAllStudents();
+  const others = allStudents.filter((s) => s.id !== currentUid && s.uid !== currentUid);
+  const userSkillSet = new Set((userSkills || []).map((s) => s.toLowerCase().trim()));
+  const userInterestSet = new Set((userInterests || []).map((i) => i.toLowerCase().trim()));
+
+  const scored = others.map((student) => {
+    const studentSkills = student.skills || [];
+    const studentInterests = student.interests || [];
+
+    const matchedSkills = studentSkills.filter((s) => userSkillSet.has(s.toLowerCase().trim()));
+    const matchedInterests = studentInterests.filter((i) => userInterestSet.has(i.toLowerCase().trim()));
+
+    const score = matchedSkills.length * 3 + matchedInterests.length * 3;
+    const baseMatch = 70;
+    const bonus = Math.min(28, (matchedSkills.length * 8) + (matchedInterests.length * 8));
+    const matchPercentage = userSkills.length === 0 && userInterests.length === 0
+      ? 82 + Math.floor(Math.random() * 14)
+      : Math.min(99, baseMatch + bonus);
+
+    return {
+      ...student,
+      matchScore: score,
+      matchPercentage,
+      matchedSkills,
+      matchedInterests,
+    };
+  });
+
+  scored.sort((a, b) => b.matchScore - a.matchScore);
+  return scored.slice(0, lim);
+};
+
+/**
  * Get all students (admin)
  */
 export const getAllStudents = async () => {

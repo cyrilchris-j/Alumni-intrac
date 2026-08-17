@@ -203,3 +203,64 @@ export const getSavedOpportunities = async (studentId) => {
   const saved = mockStore.getSavedOpportunities();
   return saved.filter((s) => s.studentId === studentId).map((s) => s.opportunityId);
 };
+
+/**
+ * Apply to an opportunity
+ */
+export const applyOpportunity = async (studentId, opportunityId, applicationData = {}) => {
+  if (isFirebaseConfigured) {
+    try {
+      await setDoc(doc(db, 'appliedOpportunities', `${studentId}_${opportunityId}`), {
+        studentId,
+        opportunityId,
+        ...applicationData,
+        appliedAt: serverTimestamp(),
+      });
+      return;
+    } catch (e) {
+      console.warn('Firebase applyOpportunity fallback:', e);
+    }
+  }
+
+  const applied = mockStore.getAppliedOpportunities();
+  if (!applied.some((a) => a.studentId === studentId && a.opportunityId === opportunityId)) {
+    mockStore.setAppliedOpportunities([
+      ...applied,
+      {
+        id: `${studentId}_${opportunityId}`,
+        studentId,
+        opportunityId,
+        ...applicationData,
+        appliedAt: new Date().toISOString(),
+      },
+    ]);
+  }
+};
+
+/**
+ * Get all opportunities applied to by a student
+ */
+export const getAppliedOpportunities = async (studentId) => {
+  if (isFirebaseConfigured) {
+    try {
+      const snap = await getDocs(
+        query(collection(db, 'appliedOpportunities'), where('studentId', '==', studentId))
+      );
+      return snap.docs.map((d) => d.data().opportunityId);
+    } catch (e) {
+      // Fallback
+    }
+  }
+
+  const applied = mockStore.getAppliedOpportunities();
+  return applied.filter((a) => a.studentId === studentId).map((a) => a.opportunityId);
+};
+
+/**
+ * Check if student has applied to an opportunity
+ */
+export const hasAppliedOpportunity = async (studentId, opportunityId) => {
+  const list = await getAppliedOpportunities(studentId);
+  return list.includes(opportunityId);
+};
+
