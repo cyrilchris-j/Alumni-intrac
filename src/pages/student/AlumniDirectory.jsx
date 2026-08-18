@@ -22,15 +22,12 @@ const AlumniDirectory = () => {
   const { currentUser, userProfile } = useAuth();
   const navigate = useNavigate();
 
-  const [activeTab, setActiveTab] = useState('alumni'); // 'alumni' | 'students'
   const [alumni, setAlumni] = useState([]);
-  const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [filters, setFilters] = useState({
     department: '',
     graduationYear: '',
-    year: '',
     company: '',
     location: '',
   });
@@ -38,71 +35,54 @@ const AlumniDirectory = () => {
   const [connectionStatuses, setConnectionStatuses] = useState({});
   const [actioning, setActioning] = useState(null);
 
-  const loadData = useCallback(async (query = '', filts = {}, tab = activeTab) => {
+  const loadData = useCallback(async (query = '', filts = {}) => {
     setLoading(true);
     try {
-      if (tab === 'alumni') {
-        const results = await searchAlumni(query, filts);
-        setAlumni(results);
+      const results = await searchAlumni(query, filts);
+      setAlumni(results);
 
-        if (currentUser) {
-          const statusMap = {};
-          await Promise.all(
-            results.map(async (a) => {
-              const conn = await getConnectionStatus(currentUser.uid, a.id || a.uid);
-              if (conn) statusMap[a.id || a.uid] = conn;
-            })
-          );
-          setConnectionStatuses((prev) => ({ ...prev, ...statusMap }));
-        }
-      } else {
-        const results = await searchStudents(query, filts);
-        const others = results.filter((s) => s.id !== currentUser?.uid && s.uid !== currentUser?.uid);
-        setStudents(others);
-
-        if (currentUser) {
-          const statusMap = {};
-          await Promise.all(
-            others.map(async (s) => {
-              const conn = await getConnectionStatus(currentUser.uid, s.id || s.uid);
-              if (conn) statusMap[s.id || s.uid] = conn;
-            })
-          );
-          setConnectionStatuses((prev) => ({ ...prev, ...statusMap }));
-        }
+      if (currentUser) {
+        const statusMap = {};
+        await Promise.all(
+          results.map(async (a) => {
+            const conn = await getConnectionStatus(currentUser.uid, a.id || a.uid);
+            if (conn) statusMap[a.id || a.uid] = conn;
+          })
+        );
+        setConnectionStatuses((prev) => ({ ...prev, ...statusMap }));
       }
     } catch (e) {
       console.error('Error loading directory:', e);
     } finally {
       setLoading(false);
     }
-  }, [activeTab, currentUser]);
+  }, [currentUser]);
 
   useEffect(() => {
-    loadData(searchQuery, filters, activeTab);
-  }, [activeTab, loadData]);
+    loadData(searchQuery, filters);
+  }, [loadData]);
 
   const debouncedSearch = useCallback(
-    debounce((query, filts, tab) => loadData(query, filts, tab), 350),
+    debounce((query, filts) => loadData(query, filts), 350),
     [loadData]
   );
 
   const handleSearch = (e) => {
     const value = e.target.value;
     setSearchQuery(value);
-    debouncedSearch(value, filters, activeTab);
+    debouncedSearch(value, filters);
   };
 
   const handleFilterChange = (key, value) => {
     const newFilters = { ...filters, [key]: value };
     setFilters(newFilters);
-    debouncedSearch(searchQuery, newFilters, activeTab);
+    debouncedSearch(searchQuery, newFilters);
   };
 
   const clearFilters = () => {
-    const cleared = { department: '', graduationYear: '', year: '', company: '', location: '' };
+    const cleared = { department: '', graduationYear: '', company: '', location: '' };
     setFilters(cleared);
-    loadData(searchQuery, cleared, activeTab);
+    loadData(searchQuery, cleared);
   };
 
   const hasFilters = Object.values(filters).some(Boolean);
@@ -163,7 +143,7 @@ const AlumniDirectory = () => {
     return { label: 'Connect', disabled: false, variant: 'primary', isConnected: false };
   };
 
-  const currentList = activeTab === 'alumni' ? alumni : students;
+  const currentList = alumni;
 
   return (
     <DashboardLayout>
@@ -174,37 +154,11 @@ const AlumniDirectory = () => {
             Institutional Registry
           </span>
           <h1 className="text-3xl font-heading font-bold text-slate-900 tracking-tight mt-1.5">
-            Directory & Peer Network
+            Alumni Directory
           </h1>
           <p className="text-slate-500 text-sm mt-1">
-            Discover and connect with distinguished alumni leaders and fellow collegiate scholars.
+            Discover and connect with distinguished alumni leaders across industries.
           </p>
-        </div>
-
-        {/* Directory Toggle Tabs */}
-        <div className="flex bg-slate-100 p-1 rounded-xl w-fit border border-slate-200/60">
-          <button
-            onClick={() => setActiveTab('alumni')}
-            className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all flex items-center gap-2 ${
-              activeTab === 'alumni'
-                ? 'bg-white text-primary-950 shadow-xs border border-slate-200/80'
-                : 'text-slate-500 hover:text-slate-900'
-            }`}
-          >
-            <Building2 size={15} />
-            Alumni Directory
-          </button>
-          <button
-            onClick={() => setActiveTab('students')}
-            className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all flex items-center gap-2 ${
-              activeTab === 'students'
-                ? 'bg-white text-primary-950 shadow-xs border border-slate-200/80'
-                : 'text-slate-500 hover:text-slate-900'
-            }`}
-          >
-            <Users size={15} />
-            Student Peers
-          </button>
         </div>
       </div>
 
@@ -215,11 +169,7 @@ const AlumniDirectory = () => {
             <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
             <input
               type="text"
-              placeholder={
-                activeTab === 'alumni'
-                  ? 'Search alumni by name, company, leadership role, or expertise...'
-                  : 'Search fellow scholars by name, department, skills...'
-              }
+              placeholder="Search alumni by name, company, leadership role, or expertise..."
               value={searchQuery}
               onChange={handleSearch}
               className="w-full pl-10 pr-4 py-2.5 text-xs font-medium border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-600/20 focus:border-primary-600 shadow-xs"
@@ -247,29 +197,18 @@ const AlumniDirectory = () => {
               value={filters.department}
               onChange={(e) => handleFilterChange('department', e.target.value)}
             />
-            {activeTab === 'alumni' ? (
-              <Select
-                placeholder="Graduation Year"
-                options={GRADUATION_YEARS.slice(0, 20)}
-                value={filters.graduationYear}
-                onChange={(e) => handleFilterChange('graduationYear', e.target.value)}
-              />
-            ) : (
-              <Select
-                placeholder="Study Year"
-                options={STUDENT_YEARS}
-                value={filters.year}
-                onChange={(e) => handleFilterChange('year', e.target.value)}
-              />
-            )}
-            {activeTab === 'alumni' && (
-              <input
-                placeholder="Company (e.g. Google)"
-                value={filters.company}
-                onChange={(e) => handleFilterChange('company', e.target.value)}
-                className="px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-600/20 focus:border-primary-600 shadow-xs"
-              />
-            )}
+            <Select
+              placeholder="Graduation Year"
+              options={GRADUATION_YEARS.slice(0, 20)}
+              value={filters.graduationYear}
+              onChange={(e) => handleFilterChange('graduationYear', e.target.value)}
+            />
+            <input
+              placeholder="Company (e.g. Google)"
+              value={filters.company}
+              onChange={(e) => handleFilterChange('company', e.target.value)}
+              className="px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-600/20 focus:border-primary-600 shadow-xs"
+            />
             <input
               placeholder="Location (e.g. Bangalore)"
               value={filters.location}
@@ -292,7 +231,7 @@ const AlumniDirectory = () => {
       {!loading && (
         <div className="flex items-center justify-between mb-4">
           <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
-            Showing <span className="font-bold text-slate-900 font-serif text-sm">{currentList.length}</span> {activeTab === 'alumni' ? 'distinguished alumni' : 'scholar peers'}
+            Showing <span className="font-bold text-slate-900 font-serif text-sm">{alumni.length}</span> distinguished alumni
           </p>
         </div>
       )}
@@ -302,10 +241,10 @@ const AlumniDirectory = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} />)}
         </div>
-      ) : currentList.length === 0 ? (
+      ) : alumni.length === 0 ? (
         <EmptyState
           icon={Users}
-          title={activeTab === 'alumni' ? 'No alumni matches found' : 'No student peers found'}
+          title="No alumni matches found"
           description={
             searchQuery || hasFilters
               ? 'Try adjusting your search query or criteria.'
@@ -316,10 +255,9 @@ const AlumniDirectory = () => {
         />
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {currentList.map((person) => {
+          {alumni.map((person) => {
             const targetId = person.id || person.uid;
             const btnProps = getConnectionButtonProps(targetId);
-            const isAlumni = activeTab === 'alumni';
 
             return (
               <div
@@ -342,9 +280,9 @@ const AlumniDirectory = () => {
                         )}
                       </div>
                       <p className="text-xs text-slate-600 mt-0.5 line-clamp-1 font-medium">
-                        {isAlumni ? person.jobRole : `${person.department} • ${person.year || 'Scholar'}`}
+                        {person.jobRole}
                       </p>
-                      {isAlumni && person.company && (
+                      {person.company && (
                         <p className="text-xs text-blue-700 font-semibold mt-0.5 flex items-center gap-1">
                           <Building2 size={11} className="flex-shrink-0 text-blue-600" />
                           <span className="truncate">{person.company}</span>
@@ -361,19 +299,14 @@ const AlumniDirectory = () => {
                         {person.location}
                       </p>
                     )}
-                    {isAlumni && person.graduationYear && (
+                    {person.graduationYear && (
                       <p className="flex items-center gap-1.5 truncate text-slate-600 font-medium">
                         <GraduationCap size={12} className="flex-shrink-0 text-blue-600" />
                         Class of {person.graduationYear}
                       </p>
                     )}
-                    {isAlumni && person.department && (
+                    {person.department && (
                       <p className="truncate text-slate-500 font-medium">{person.department}</p>
-                    )}
-                    {!isAlumni && person.interests?.length > 0 && (
-                      <p className="truncate text-slate-600 font-medium">
-                        <span className="font-bold text-slate-900 font-heading">Interests:</span> {person.interests.join(', ')}
-                      </p>
                     )}
                   </div>
 
@@ -420,26 +353,15 @@ const AlumniDirectory = () => {
                     </Button>
                   )}
 
-                  {isAlumni ? (
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => navigate(`/student/alumni/${targetId}`)}
-                      title="View Profile"
-                      className="text-xs px-2.5"
-                    >
-                      Profile
-                    </Button>
-                  ) : (
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => navigate('/student/connections')}
-                      className="text-xs px-2.5"
-                    >
-                      View
-                    </Button>
-                  )}
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => navigate(`/student/alumni/${targetId}`)}
+                    title="View Profile"
+                    className="text-xs px-2.5"
+                  >
+                    Profile
+                  </Button>
                 </div>
               </div>
             );

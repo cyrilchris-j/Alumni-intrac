@@ -101,6 +101,7 @@ export const initMockStore = () => {
         id: 'demo_student_default',
         uid: 'demo_student_default',
         fullName: 'Rahul Sharma',
+        registerNo: '217101',
         email: 'student@psgtech.edu',
         college: 'PSG College of Technology',
         department: 'Computer Science & Engineering',

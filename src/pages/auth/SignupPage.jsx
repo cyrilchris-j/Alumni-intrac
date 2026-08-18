@@ -21,11 +21,12 @@ const SignupPage = () => {
     college: 'PSG College of Technology',
     department: '', phone: '', skills: '',
     // Student specific
-    year: '', section: '', interests: '',
+    registerNo: '', year: '', section: '', interests: '',
     // Alumni specific
     graduationYear: '', company: '', jobRole: '',
     location: '', experience: '', linkedinUrl: '',
   });
+
   const [profilePhoto, setProfilePhoto] = useState(null);
   const [photoPreview, setPhotoPreview] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
@@ -83,6 +84,7 @@ const SignupPage = () => {
       if (role === 'student') {
         await createStudentProfile(user.uid, {
           fullName: form.fullName,
+          registerNo: form.registerNo,
           email: form.email,
           college: form.college,
           department: form.department,
@@ -303,20 +305,29 @@ const SignupPage = () => {
 
             {/* Student-specific fields */}
             {role === 'student' && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <Select
-                  label="Year of Study"
-                  options={STUDENT_YEARS}
-                  value={form.year}
-                  onChange={handleChange('year')}
+              <div className="space-y-4">
+                <Input
+                  label="Register Number"
+                  placeholder="e.g., 217101"
+                  value={form.registerNo}
+                  onChange={handleChange('registerNo')}
                   required
                 />
-                <Input
-                  label="Section"
-                  placeholder="e.g., A, B, C"
-                  value={form.section}
-                  onChange={handleChange('section')}
-                />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <Select
+                    label="Year of Study"
+                    options={STUDENT_YEARS}
+                    value={form.year}
+                    onChange={handleChange('year')}
+                    required
+                  />
+                  <Input
+                    label="Section"
+                    placeholder="e.g., A, B, C"
+                    value={form.section}
+                    onChange={handleChange('section')}
+                  />
+                </div>
               </div>
             )}
 

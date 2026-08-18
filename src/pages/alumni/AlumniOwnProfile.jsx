@@ -111,16 +111,46 @@ const AlumniOwnProfile = () => {
 
   return (
     <DashboardLayout>
-      <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-heading font-bold text-text-primary">My Professional Profile</h1>
-          <p className="text-text-secondary text-sm mt-1">
-            Keep your professional experience and contact links up to date.
-          </p>
+      {/* Horizontal Profile Header Card */}
+      <div className="bg-white rounded-2xl border border-slate-200/90 p-5 sm:p-6 mb-6 flex items-center justify-between gap-4 shadow-card">
+        <div className="flex items-center gap-4 min-w-0">
+          <div className="relative flex-shrink-0">
+            <Avatar
+              src={photoPreview || userProfile.photoURL}
+              name={userProfile.fullName}
+              size="lg"
+              ring
+              className="w-14 h-14 sm:w-16 sm:h-16 flex-shrink-0"
+            />
+            {editing && (
+              <label className="absolute -bottom-1 -right-1 p-1.5 bg-blue-600 text-white rounded-full cursor-pointer hover:bg-blue-700 shadow-md">
+                <Upload size={12} />
+                <input type="file" accept="image/*" onChange={handlePhotoChange} className="hidden" />
+              </label>
+            )}
+          </div>
+          <div className="min-w-0">
+            <div className="flex items-center gap-2 flex-wrap">
+              <h1 className="text-xl sm:text-2xl font-heading font-bold text-slate-900 truncate">
+                {userProfile.fullName || 'Alumni Profile'}
+              </h1>
+              {isVerified ? (
+                <Badge variant="success" dot>Verified Alumni</Badge>
+              ) : (
+                <Badge variant="warning" dot>Verification Pending</Badge>
+              )}
+            </div>
+            <p className="text-sm text-slate-500 font-medium truncate mt-0.5">
+              {userProfile.jobRole || 'Alumni'} {userProfile.company ? `at ${userProfile.company}` : ''}
+              {userProfile.graduationYear ? ` • Class of ${userProfile.graduationYear}` : ''}
+            </p>
+          </div>
         </div>
+
         <Button
           variant={editing ? 'ghost' : 'primary'}
           onClick={() => setEditing((prev) => !prev)}
+          className="rounded-xl px-5 py-2.5 text-sm font-semibold flex-shrink-0 bg-blue-600 hover:bg-blue-700 text-white shadow-xs"
         >
           {editing ? 'Cancel' : 'Edit Profile'}
         </Button>
@@ -132,204 +162,172 @@ const AlumniOwnProfile = () => {
         </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Profile Card */}
-        <div className="lg:col-span-1 bg-white rounded-2xl border border-border p-6 text-center shadow-sm">
-          <div className="relative w-28 h-28 mx-auto mb-4">
-            <Avatar
-              src={photoPreview || userProfile.photoURL}
-              name={userProfile.fullName}
-              size="2xl"
-              className="w-28 h-28 mx-auto"
+      {/* Details / Edit Form (Full Width) */}
+      <div className="bg-white rounded-2xl border border-border p-6 shadow-sm">
+        {editing ? (
+          <form onSubmit={handleSave} className="space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Input
+                label="Full Name"
+                value={form.fullName}
+                onChange={(e) => setForm((f) => ({ ...f, fullName: e.target.value }))}
+                required
+              />
+              <Input
+                label="Phone Number"
+                value={form.phone}
+                onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))}
+              />
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Input
+                label="Current Company"
+                placeholder="Google, Microsoft, Zoho..."
+                value={form.company}
+                onChange={(e) => setForm((f) => ({ ...f, company: e.target.value }))}
+                required
+              />
+              <Input
+                label="Job Role / Title"
+                placeholder="Senior Software Engineer, PM..."
+                value={form.jobRole}
+                onChange={(e) => setForm((f) => ({ ...f, jobRole: e.target.value }))}
+                required
+              />
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Select
+                label="Department"
+                options={DEPARTMENTS}
+                value={form.department}
+                onChange={(e) => setForm((f) => ({ ...f, department: e.target.value }))}
+                required
+              />
+              <Select
+                label="Graduation Year"
+                options={GRADUATION_YEARS}
+                value={form.graduationYear}
+                onChange={(e) => setForm((f) => ({ ...f, graduationYear: e.target.value }))}
+                required
+              />
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Input
+                label="Location"
+                placeholder="Chennai, Bangalore, Remote..."
+                value={form.location}
+                onChange={(e) => setForm((f) => ({ ...f, location: e.target.value }))}
+              />
+              <Input
+                label="Experience (Summary)"
+                placeholder="5+ years in full-stack web development"
+                value={form.experience}
+                onChange={(e) => setForm((f) => ({ ...f, experience: e.target.value }))}
+              />
+            </div>
+
+            <Input
+              label="LinkedIn Profile URL"
+              placeholder="https://linkedin.com/in/username"
+              value={form.linkedinUrl}
+              onChange={(e) => setForm((f) => ({ ...f, linkedinUrl: e.target.value }))}
             />
-            {editing && (
-              <label className="absolute bottom-0 right-0 p-2 bg-primary-600 text-white rounded-full cursor-pointer hover:bg-primary-700 shadow-md">
-                <Upload size={14} />
-                <input type="file" accept="image/*" onChange={handlePhotoChange} className="hidden" />
-              </label>
-            )}
-          </div>
 
-          <div className="flex items-center justify-center gap-1.5 mb-1">
-            <h2 className="text-xl font-heading font-bold text-text-primary">
-              {userProfile.fullName}
-            </h2>
-          </div>
+            <Input
+              label="Key Skills (Comma-separated)"
+              placeholder="React, Node.js, System Design, Cloud Architecture"
+              value={form.skills}
+              onChange={(e) => setForm((f) => ({ ...f, skills: e.target.value }))}
+            />
 
-          <p className="text-sm font-medium text-text-secondary mb-1">{userProfile.jobRole}</p>
-          <p className="text-xs text-primary-600 font-semibold mb-3">{userProfile.company}</p>
-
-          <div className="mb-4">
-            {isVerified ? (
-              <Badge variant="success" dot>Verified Alumni</Badge>
-            ) : (
-              <Badge variant="warning" dot>Verification Pending</Badge>
-            )}
-          </div>
-
-          <div className="border-t border-border pt-4 text-left space-y-3 text-sm">
-            <div className="flex items-center gap-3 text-text-secondary">
-              <GraduationCap size={16} className="text-primary-600 flex-shrink-0" />
-              <span>Class of {userProfile.graduationYear} • {userProfile.department}</span>
-            </div>
-            <div className="flex items-center gap-3 text-text-secondary">
-              <Building2 size={16} className="text-primary-600 flex-shrink-0" />
-              <span className="truncate">{userProfile.college || 'PSG College of Technology'}</span>
-            </div>
-            {userProfile.location && (
-              <div className="flex items-center gap-3 text-text-secondary">
-                <MapPin size={16} className="text-primary-600 flex-shrink-0" />
-                <span>{userProfile.location}</span>
-              </div>
-            )}
-            <div className="flex items-center gap-3 text-text-secondary">
-              <Mail size={16} className="text-primary-600 flex-shrink-0" />
-              <span className="truncate">{currentUser?.email}</span>
-            </div>
-            {userProfile.linkedinUrl && (
-              <div className="flex items-center gap-3 text-primary-600">
-                <LinkedInIcon size={16} className="flex-shrink-0" />
-                <a href={userProfile.linkedinUrl} target="_blank" rel="noopener noreferrer" className="truncate hover:underline">
-                  LinkedIn Profile
-                </a>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Form or View */}
-        <div className="lg:col-span-2 bg-white rounded-2xl border border-border p-6 shadow-sm">
-          {editing ? (
-            <form onSubmit={handleSave} className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <Input
-                  label="Full Name"
-                  value={form.fullName}
-                  onChange={(e) => setForm((f) => ({ ...f, fullName: e.target.value }))}
-                  required
-                />
-                <Input
-                  label="Phone Number"
-                  value={form.phone}
-                  onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))}
-                />
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <Input
-                  label="Current Company"
-                  placeholder="Google, Microsoft, Zoho..."
-                  value={form.company}
-                  onChange={(e) => setForm((f) => ({ ...f, company: e.target.value }))}
-                  required
-                />
-                <Input
-                  label="Job Role / Title"
-                  placeholder="Senior Software Engineer, PM..."
-                  value={form.jobRole}
-                  onChange={(e) => setForm((f) => ({ ...f, jobRole: e.target.value }))}
-                  required
-                />
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <Select
-                  label="Department"
-                  options={DEPARTMENTS}
-                  value={form.department}
-                  onChange={(e) => setForm((f) => ({ ...f, department: e.target.value }))}
-                  required
-                />
-                <Select
-                  label="Graduation Year"
-                  options={GRADUATION_YEARS}
-                  value={form.graduationYear}
-                  onChange={(e) => setForm((f) => ({ ...f, graduationYear: e.target.value }))}
-                  required
-                />
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <Input
-                  label="Location"
-                  placeholder="Chennai, Bangalore, Remote..."
-                  value={form.location}
-                  onChange={(e) => setForm((f) => ({ ...f, location: e.target.value }))}
-                />
-                <Input
-                  label="Experience (Summary)"
-                  placeholder="5+ years in full-stack web development"
-                  value={form.experience}
-                  onChange={(e) => setForm((f) => ({ ...f, experience: e.target.value }))}
-                />
-              </div>
-
-              <Input
-                label="LinkedIn Profile URL"
-                placeholder="https://linkedin.com/in/username"
-                value={form.linkedinUrl}
-                onChange={(e) => setForm((f) => ({ ...f, linkedinUrl: e.target.value }))}
+            <div>
+              <label className="form-label">Professional Bio</label>
+              <textarea
+                className="form-input h-24 resize-none"
+                placeholder="Share a brief overview of your career journey, achievements, and mentorship focus."
+                value={form.bio}
+                onChange={(e) => setForm((f) => ({ ...f, bio: e.target.value }))}
               />
+            </div>
 
-              <Input
-                label="Key Skills (Comma-separated)"
-                placeholder="React, Node.js, System Design, Cloud Architecture"
-                value={form.skills}
-                onChange={(e) => setForm((f) => ({ ...f, skills: e.target.value }))}
-              />
-
-              <div>
-                <label className="form-label">Professional Bio</label>
-                <textarea
-                  className="form-input h-24 resize-none"
-                  placeholder="Share a brief overview of your career journey, achievements, and mentorship focus."
-                  value={form.bio}
-                  onChange={(e) => setForm((f) => ({ ...f, bio: e.target.value }))}
-                />
-              </div>
-
-              <div className="pt-2 flex justify-end gap-3">
-                <Button type="button" variant="ghost" onClick={() => setEditing(false)}>
-                  Cancel
-                </Button>
-                <Button type="submit" loading={saving} leftIcon={Save}>
-                  Save Profile
-                </Button>
-              </div>
-            </form>
-          ) : (
-            <div className="space-y-6">
-              <div>
-                <h3 className="font-heading font-semibold text-text-primary text-base mb-2">About & Bio</h3>
-                <p className="text-sm text-text-secondary leading-relaxed">
-                  {userProfile.bio || "No professional bio added yet. Click 'Edit Profile' to introduce yourself to prospective mentees."}
-                </p>
-              </div>
-
-              {userProfile.experience && (
+            <div className="pt-2 flex justify-end gap-3">
+              <Button type="button" variant="ghost" onClick={() => setEditing(false)}>
+                Cancel
+              </Button>
+              <Button type="submit" loading={saving} leftIcon={Save}>
+                Save Profile
+              </Button>
+            </div>
+          </form>
+        ) : (
+          <div className="space-y-6">
+            {/* Quick Credentials Summary Bar */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 p-4 bg-slate-50/80 rounded-xl border border-slate-200/80 text-xs text-slate-600">
+              <div className="flex items-center gap-2.5">
+                <GraduationCap size={16} className="text-blue-600 flex-shrink-0" />
                 <div>
-                  <h3 className="font-heading font-semibold text-text-primary text-base mb-2">Experience Overview</h3>
-                  <p className="text-sm text-text-secondary">{userProfile.experience}</p>
+                  <span className="text-[10px] text-slate-400 font-medium block">Education</span>
+                  <span className="font-semibold text-slate-800">Class of {userProfile.graduationYear || '2020'} • {userProfile.department}</span>
+                </div>
+              </div>
+              <div className="flex items-center gap-2.5">
+                <Building2 size={16} className="text-blue-600 flex-shrink-0" />
+                <div className="min-w-0">
+                  <span className="text-[10px] text-slate-400 font-medium block">Institution</span>
+                  <span className="font-semibold text-slate-800 truncate block">{userProfile.college || 'PSG College of Technology'}</span>
+                </div>
+              </div>
+              {userProfile.location && (
+                <div className="flex items-center gap-2.5">
+                  <MapPin size={16} className="text-blue-600 flex-shrink-0" />
+                  <div>
+                    <span className="text-[10px] text-slate-400 font-medium block">Location</span>
+                    <span className="font-semibold text-slate-800">{userProfile.location}</span>
+                  </div>
                 </div>
               )}
-
-              <div>
-                <h3 className="font-heading font-semibold text-text-primary text-base mb-2">Skills & Expertise</h3>
-                {userProfile.skills && userProfile.skills.length > 0 ? (
-                  <div className="flex flex-wrap gap-2">
-                    {userProfile.skills.map((skill) => (
-                      <span key={skill} className="px-3 py-1 bg-primary-50 text-primary-700 text-sm font-medium rounded-lg border border-primary-100">
-                        {skill}
-                      </span>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-sm text-text-muted">No skills listed yet.</p>
-                )}
+              <div className="flex items-center gap-2.5">
+                <Mail size={16} className="text-blue-600 flex-shrink-0" />
+                <div className="min-w-0">
+                  <span className="text-[10px] text-slate-400 font-medium block">Email Address</span>
+                  <span className="font-semibold text-slate-800 truncate block">{currentUser?.email}</span>
+                </div>
               </div>
             </div>
-          )}
-        </div>
+
+            <div>
+              <h3 className="font-heading font-semibold text-text-primary text-base mb-2">About & Bio</h3>
+              <p className="text-sm text-text-secondary leading-relaxed">
+                {userProfile.bio || "No professional bio added yet. Click 'Edit Profile' to introduce yourself to prospective mentees."}
+              </p>
+            </div>
+
+            {userProfile.experience && (
+              <div>
+                <h3 className="font-heading font-semibold text-text-primary text-base mb-2">Experience Overview</h3>
+                <p className="text-sm text-text-secondary">{userProfile.experience}</p>
+              </div>
+            )}
+
+            <div>
+              <h3 className="font-heading font-semibold text-text-primary text-base mb-2">Skills & Expertise</h3>
+              {userProfile.skills && userProfile.skills.length > 0 ? (
+                <div className="flex flex-wrap gap-2">
+                  {userProfile.skills.map((skill) => (
+                    <span key={skill} className="px-3 py-1 bg-primary-50 text-primary-700 text-sm font-medium rounded-lg border border-primary-100">
+                      {skill}
+                    </span>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-text-muted">No skills listed yet.</p>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </DashboardLayout>
   );

@@ -22,6 +22,13 @@ export const sendConnectionRequest = async (senderId, receiverId, senderName) =>
     throw new Error('A connection request already exists between these users.');
   }
 
+  const users = mockStore.getUsers();
+  const senderUser = users.find((u) => u.uid === senderId || u.id === senderId);
+  const receiverUser = users.find((u) => u.uid === receiverId || u.id === receiverId);
+  if (senderUser?.role === 'student' && receiverUser?.role === 'student') {
+    throw new Error('Student to student connections are disabled.');
+  }
+
   if (isFirebaseConfigured) {
     try {
       const docRef = await addDoc(collection(db, 'connections'), {

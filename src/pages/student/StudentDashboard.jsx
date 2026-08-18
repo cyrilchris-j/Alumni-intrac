@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import {
   Users, Calendar, Briefcase, ArrowRight, Send,
   MapPin, Building2, Sparkles, GraduationCap, CheckCircle,
-  Award, ShieldCheck, ChevronRight
+  Award, ShieldCheck, ChevronRight, Video, ExternalLink
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import DashboardLayout from '../../components/layout/DashboardLayout';
@@ -12,6 +12,7 @@ import Avatar from '../../components/ui/Avatar';
 import Badge from '../../components/ui/Badge';
 import Button from '../../components/ui/Button';
 import EmptyState from '../../components/ui/EmptyState';
+import Modal from '../../components/ui/Modal';
 import {
   getUserConnections,
   getSentRequests,
@@ -22,6 +23,7 @@ import {
   getUpcomingEvents,
   getUserEventRegistrations,
   registerForEvent,
+  cancelEventRegistration,
 } from '../../services/eventService';
 import {
   getOpportunities,
@@ -79,7 +81,14 @@ const StudentDashboard = () => {
   const [recommendedStudents, setRecommendedStudents] = useState([]);
   const [connectionStatuses, setConnectionStatuses] = useState({});
   const [connectingId, setConnectingId] = useState(null);
-  const [registeringEventId, setRegisteringEventId] = useState(null);
+
+  // Event modal states
+  const [selectedEventModal, setSelectedEventModal] = useState(null);
+  const [confirmModalEvent, setConfirmModalEvent] = useState(null);
+  const [confirmInput, setConfirmInput] = useState('');
+  const [confirming, setConfirming] = useState(false);
+  const [confirmError, setConfirmError] = useState('');
+  const [actioningId, setActioningId] = useState(null);
 
   useEffect(() => {
     if (!currentUser) return;
@@ -155,16 +164,59 @@ const StudentDashboard = () => {
     }
   };
 
-  const handleEventRegister = async (event) => {
-    if (!currentUser) return;
-    setRegisteringEventId(event.id);
+  const handleOpenConfirmModal = (event) => {
+    setConfirmModalEvent(event);
+    setConfirmInput('');
+    setConfirmError('');
+  };
+
+  const handleConfirmRegistration = async (e) => {
+    if (e) e.preventDefault();
+    if (!confirmModalEvent || !currentUser) return;
+
+    if (confirmInput.trim().toLowerCase() !== 'confirm') {
+      setConfirmError("Please type 'confirm' to verify your registration.");
+      return;
+    }
+
+    setConfirming(true);
     try {
-      await registerForEvent(event.id, currentUser.uid, userProfile?.fullName || 'Student');
-      setRegisteredEventIds((prev) => new Set(prev).add(event.id));
+      await registerForEvent(confirmModalEvent.id, currentUser.uid, userProfile?.fullName || 'Student');
+      setRegisteredEventIds((prev) => new Set(prev).add(confirmModalEvent.id));
+
+      const extLink = confirmModalEvent.registrationLink || confirmModalEvent.externalLink;
+      if (extLink) {
+        window.open(extLink, '_blank', 'noopener,noreferrer');
+      }
+
+      setConfirmModalEvent(null);
+      if (selectedEventModal?.id === confirmModalEvent.id) {
+        setSelectedEventModal(null);
+      }
     } catch (e) {
       alert('Failed to register for event');
     } finally {
-      setRegisteringEventId(null);
+      setConfirming(false);
+    }
+  };
+
+  const handleCancelRegistration = async (event) => {
+    if (!currentUser) return;
+    setActioningId(event.id);
+    try {
+      await cancelEventRegistration(event.id, currentUser.uid);
+      setRegisteredEventIds((prev) => {
+        const next = new Set(prev);
+        next.delete(event.id);
+        return next;
+      });
+      if (selectedEventModal?.id === event.id) {
+        setSelectedEventModal(null);
+      }
+    } catch (err) {
+      alert('Failed to cancel registration.');
+    } finally {
+      setActioningId(null);
     }
   };
 
@@ -275,218 +327,107 @@ const StudentDashboard = () => {
                   Curated matches aligned with your fields: {userProfile?.skills?.slice(0, 3).join(', ') || 'Technology & Engineering'}
                 </p>
               </div>
-
-              {/* Toggle Tab */}
-              <div className="flex bg-slate-100 p-1 rounded-xl w-fit border border-slate-200/60">
-                <button
-                  onClick={() => setRecommendationTab('alumni')}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                    recommendationTab === 'alumni'
-                      ? 'bg-white text-blue-600 shadow-xs'
-                      : 'text-slate-500 hover:text-slate-800'
-                  }`}
-                >
-                  Distinguished Alumni ({recommendedAlumni.length})
-                </button>
-                <button
-                  onClick={() => setRecommendationTab('students')}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                    recommendationTab === 'students'
-                      ? 'bg-white text-blue-600 shadow-xs'
-                      : 'text-slate-500 hover:text-slate-800'
-                  }`}
-                >
-                  Fellow Scholars ({recommendedStudents.length})
-                </button>
-              </div>
             </div>
 
             {/* Recommended Alumni Grid */}
-            {recommendationTab === 'alumni' && (
-              recommendedAlumni.length === 0 ? (
-                <EmptyState
-                  icon={Users}
-                  title="No alumni matches found yet"
-                  description="Check the alumni directory to discover mentors across all departments."
-                  action={() => navigate('/student/alumni')}
-                  actionLabel="Explore Alumni Directory"
-                />
-              ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {recommendedAlumni.map((alumni) => {
-                    const targetId = alumni.id || alumni.uid;
-                    const btnProps = getConnectionBtn(targetId);
-                    return (
-                      <div
-                        key={targetId}
-                        className="border border-slate-200/90 rounded-2xl p-4.5 hover:shadow-card-hover hover:border-blue-300 transition-all duration-200 bg-gradient-to-b from-white to-slate-50/40 flex flex-col justify-between group"
-                      >
-                        <div>
-                          <div className="flex items-start justify-between gap-3 mb-3">
-                            <div className="flex items-start gap-3 min-w-0">
-                              <Avatar src={alumni.photoURL} name={alumni.fullName} size="md" ring />
-                              <div className="min-w-0">
-                                <div className="flex items-center gap-1.5">
-                                  <h4 className="font-heading font-bold text-slate-900 text-sm truncate group-hover:text-blue-600 transition-colors">
-                                    {alumni.fullName}
-                                  </h4>
-                                  {alumni.verificationStatus === 'verified' && (
-                                    <span title="Verified Alumni" className="text-emerald-600 flex-shrink-0">
-                                      <ShieldCheck size={14} className="fill-emerald-100 text-emerald-700" />
-                                    </span>
-                                  )}
-                                </div>
-                                <p className="text-xs text-slate-600 truncate mt-0.5 font-medium">
-                                  {alumni.jobRole}
-                                </p>
-                                {alumni.company && (
-                                  <p className="text-xs text-blue-700 font-semibold truncate flex items-center gap-1 mt-0.5">
-                                    <Building2 size={11} className="text-blue-600" />
-                                    {alumni.company}
-                                  </p>
+            {recommendedAlumni.length === 0 ? (
+              <EmptyState
+                icon={Users}
+                title="No alumni matches found yet"
+                description="Check the alumni directory to discover mentors across all departments."
+                action={() => navigate('/student/alumni')}
+                actionLabel="Explore Alumni Directory"
+              />
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {recommendedAlumni.map((alumni) => {
+                  const targetId = alumni.id || alumni.uid;
+                  const btnProps = getConnectionBtn(targetId);
+                  return (
+                    <div
+                      key={targetId}
+                      className="border border-slate-200/90 rounded-2xl p-4.5 hover:shadow-card-hover hover:border-blue-300 transition-all duration-200 bg-gradient-to-b from-white to-slate-50/40 flex flex-col justify-between group"
+                    >
+                      <div>
+                        <div className="flex items-start justify-between gap-3 mb-3">
+                          <div className="flex items-start gap-3 min-w-0">
+                            <Avatar src={alumni.photoURL} name={alumni.fullName} size="md" ring />
+                            <div className="min-w-0">
+                              <div className="flex items-center gap-1.5">
+                                <h4 className="font-heading font-bold text-slate-900 text-sm truncate group-hover:text-blue-600 transition-colors">
+                                  {alumni.fullName}
+                                </h4>
+                                {alumni.verificationStatus === 'verified' && (
+                                  <span title="Verified Alumni" className="text-emerald-600 flex-shrink-0">
+                                    <ShieldCheck size={14} className="fill-emerald-100 text-emerald-700" />
+                                  </span>
                                 )}
                               </div>
-                            </div>
-                            <span className="bg-blue-50 text-blue-700 text-[11px] font-bold px-2.5 py-0.5 rounded-full flex-shrink-0 border border-blue-200 shadow-xs">
-                              {alumni.matchPercentage || 92}% Match
-                            </span>
-                          </div>
-
-                          {alumni.location && (
-                            <p className="text-[11px] text-slate-400 flex items-center gap-1 mb-2.5 font-medium">
-                              <MapPin size={11} />
-                              {alumni.location}
-                            </p>
-                          )}
-
-                          {alumni.skills?.length > 0 && (
-                            <div className="flex flex-wrap gap-1 mb-3.5">
-                              {alumni.skills.slice(0, 3).map((skill) => (
-                                <span
-                                  key={skill}
-                                  className={`tag text-[10px] py-0.5 px-2 ${
-                                    userProfile?.skills?.includes(skill)
-                                      ? 'bg-blue-50 text-blue-700 border-blue-200 font-semibold'
-                                      : ''
-                                  }`}
-                                >
-                                  {skill}
-                                </span>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-
-                        <div className="flex gap-2 pt-2.5 border-t border-slate-100">
-                          <Button
-                            size="sm"
-                            variant={btnProps.variant}
-                            disabled={btnProps.disabled}
-                            loading={connectingId === targetId}
-                            onClick={() => handleConnect(alumni)}
-                            className="flex-1 text-xs"
-                          >
-                            {btnProps.label}
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="secondary"
-                            onClick={() => navigate(`/student/alumni/${targetId}`)}
-                            className="flex-1 text-xs"
-                          >
-                            Profile
-                          </Button>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )
-            )}
-
-            {/* Recommended Fellow Students Grid */}
-            {recommendationTab === 'students' && (
-              recommendedStudents.length === 0 ? (
-                <EmptyState
-                  icon={Users}
-                  title="No student peers found"
-                  description="Check back as more classmates update their profiles with skills."
-                />
-              ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {recommendedStudents.map((student) => {
-                    const targetId = student.id || student.uid;
-                    const btnProps = getConnectionBtn(targetId);
-                    return (
-                      <div
-                        key={targetId}
-                        className="border border-slate-200/90 rounded-2xl p-4.5 hover:shadow-card-hover transition-all duration-200 bg-gradient-to-b from-white to-slate-50/40 flex flex-col justify-between"
-                      >
-                        <div>
-                          <div className="flex items-start justify-between gap-3 mb-3">
-                            <div className="flex items-start gap-3 min-w-0">
-                              <Avatar src={student.photoURL} name={student.fullName} size="md" />
-                              <div className="min-w-0">
-                                <h4 className="font-serif font-bold text-slate-900 text-sm truncate">
-                                  {student.fullName}
-                                </h4>
-                                <p className="text-xs text-slate-600 truncate mt-0.5">
-                                  {student.department}
+                              <p className="text-xs text-slate-600 truncate mt-0.5 font-medium">
+                                {alumni.jobRole}
+                              </p>
+                              {alumni.company && (
+                                <p className="text-xs text-blue-700 font-semibold truncate flex items-center gap-1 mt-0.5">
+                                  <Building2 size={11} className="text-blue-600" />
+                                  {alumni.company}
                                 </p>
-                                <p className="text-xs text-purple-700 font-semibold truncate flex items-center gap-1 mt-0.5">
-                                  <GraduationCap size={11} />
-                                  {student.year || 'Student Scholar'}
-                                </p>
-                              </div>
+                              )}
                             </div>
-                            <span className="bg-purple-50 text-purple-800 text-[11px] font-bold px-2.5 py-0.5 rounded-full flex-shrink-0 border border-purple-200">
-                              {student.matchPercentage || 88}% Match
-                            </span>
                           </div>
-
-                          {student.skills?.length > 0 && (
-                            <div className="flex flex-wrap gap-1 mb-3.5">
-                              {student.skills.slice(0, 3).map((skill) => (
-                                <span
-                                  key={skill}
-                                  className={`tag text-[10px] py-0.5 px-2 ${
-                                    userProfile?.skills?.includes(skill)
-                                      ? 'bg-purple-50 text-purple-800 border-purple-200 font-semibold'
-                                      : ''
-                                  }`}
-                                >
-                                  {skill}
-                                </span>
-                              ))}
-                            </div>
-                          )}
+                          <span className="bg-blue-50 text-blue-700 text-[11px] font-bold px-2.5 py-0.5 rounded-full flex-shrink-0 border border-blue-200 shadow-xs">
+                            {alumni.matchPercentage || 92}% Match
+                          </span>
                         </div>
 
-                        <div className="flex gap-2 pt-2.5 border-t border-slate-100">
-                          <Button
-                            size="sm"
-                            variant={btnProps.variant}
-                            disabled={btnProps.disabled}
-                            loading={connectingId === targetId}
-                            onClick={() => handleConnect(student)}
-                            className="flex-1 text-xs"
-                          >
-                            {btnProps.label}
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="secondary"
-                            onClick={() => navigate('/student/connections')}
-                            className="flex-1 text-xs"
-                          >
-                            View
-                          </Button>
-                        </div>
+                        {alumni.location && (
+                          <p className="text-[11px] text-slate-400 flex items-center gap-1 mb-2.5 font-medium">
+                            <MapPin size={11} />
+                            {alumni.location}
+                          </p>
+                        )}
+
+                        {alumni.skills?.length > 0 && (
+                          <div className="flex flex-wrap gap-1 mb-3.5">
+                            {alumni.skills.slice(0, 3).map((skill) => (
+                              <span
+                                key={skill}
+                                className={`tag text-[10px] py-0.5 px-2 ${
+                                  userProfile?.skills?.includes(skill)
+                                    ? 'bg-blue-50 text-blue-700 border-blue-200 font-semibold'
+                                    : ''
+                                }`}
+                              >
+                                {skill}
+                              </span>
+                            ))}
+                          </div>
+                        )}
                       </div>
-                    );
-                  })}
-                </div>
-              )
+
+                      <div className="flex gap-2 pt-2.5 border-t border-slate-100">
+                        <Button
+                          size="sm"
+                          variant={btnProps.variant}
+                          disabled={btnProps.disabled}
+                          loading={connectingId === targetId}
+                          onClick={() => handleConnect(alumni)}
+                          className="flex-1 text-xs"
+                        >
+                          {btnProps.label}
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          onClick={() => navigate(`/student/alumni/${targetId}`)}
+                          className="flex-1 text-xs"
+                        >
+                          Profile
+                        </Button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             )}
           </div>
 
@@ -570,6 +511,17 @@ const StudentDashboard = () => {
                       </div>
 
                       <div className="flex items-center gap-2 flex-shrink-0">
+                        {(opp.externalLink || opp.registrationLink) && (
+                          <a
+                            href={opp.externalLink || opp.registrationLink}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="btn-secondary btn-sm text-xs p-2 rounded-lg text-blue-700 flex items-center gap-1 font-semibold"
+                            title="Open Application Form / Website Link"
+                          >
+                            Form Link →
+                          </a>
+                        )}
                         <Button
                           size="sm"
                           variant="secondary"
@@ -648,15 +600,14 @@ const StudentDashboard = () => {
                           <Button
                             size="xs"
                             variant="primary"
-                            loading={registeringEventId === event.id}
-                            onClick={() => handleEventRegister(event)}
+                            onClick={() => handleOpenConfirmModal(event)}
                           >
                             Register
                           </Button>
                         )}
                         <button
-                          onClick={() => navigate('/student/events')}
-                          className="text-[11px] text-slate-500 hover:text-slate-900 font-semibold"
+                          onClick={() => setSelectedEventModal(event)}
+                          className="text-[11px] text-slate-500 hover:text-slate-900 font-semibold whitespace-nowrap flex-shrink-0"
                         >
                           View Info →
                         </button>
@@ -694,6 +645,155 @@ const StudentDashboard = () => {
           </div>
         </div>
       </div>
+
+      {/* Event Details / View Info Modal */}
+      <Modal
+        isOpen={!!selectedEventModal}
+        onClose={() => setSelectedEventModal(null)}
+        title={selectedEventModal?.title}
+        size="lg"
+      >
+        {selectedEventModal && (
+          <div className="space-y-5">
+            <div className="flex items-center justify-between gap-2 flex-wrap pb-3 border-b border-slate-100">
+              <Badge variant="primary">{selectedEventModal.type || 'Colloquium'}</Badge>
+              {registeredEventIds.has(selectedEventModal.id) && (
+                <Badge variant="emerald" dot>Registered</Badge>
+              )}
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-slate-50 rounded-xl text-xs border border-slate-200">
+              <div>
+                <span className="text-slate-500 block mb-0.5 font-medium">Date & Time</span>
+                <span className="font-semibold text-slate-800 flex items-center gap-1.5">
+                  <Calendar size={13} className="text-primary-600" />
+                  {formatDate(selectedEventModal.date)} {selectedEventModal.time && `• ${selectedEventModal.time}`}
+                </span>
+              </div>
+              <div>
+                <span className="text-slate-500 block mb-0.5 font-medium">Venue / Platform</span>
+                <span className="font-semibold text-slate-800 flex items-center gap-1.5 truncate">
+                  {selectedEventModal.meetingLink ? (
+                    <>
+                      <Video size={13} className="text-primary-600" />
+                      Online Meeting
+                    </>
+                  ) : (
+                    <>
+                      <MapPin size={13} className="text-primary-600" />
+                      {selectedEventModal.location || 'College Campus'}
+                    </>
+                  )}
+                </span>
+              </div>
+              {selectedEventModal.organizer && (
+                <div className="sm:col-span-2">
+                  <span className="text-slate-500 block mb-0.5 font-medium">Host / Organizer</span>
+                  <span className="font-semibold text-slate-800 flex items-center gap-1.5">
+                    <Users size={13} className="text-primary-600" />
+                    {selectedEventModal.organizer}
+                  </span>
+                </div>
+              )}
+            </div>
+
+            <div>
+              <h4 className="font-bold text-slate-900 text-sm mb-2">Event Description</h4>
+              <p className="text-sm text-slate-600 leading-relaxed whitespace-pre-line">
+                {selectedEventModal.description}
+              </p>
+            </div>
+
+            {/* Google Form / External Registration Link Banner */}
+            <div className="p-4 bg-gradient-to-r from-blue-50 to-cyan-50 border border-blue-200 rounded-2xl text-xs flex items-center justify-between gap-3 shadow-xs">
+              <div className="min-w-0 flex-1">
+                <p className="font-bold text-blue-900 text-sm flex items-center gap-1.5">
+                  <ExternalLink size={15} className="text-blue-600 flex-shrink-0" />
+                  Official Google Form / Registration Link
+                </p>
+                <p className="text-blue-700 text-xs mt-1">
+                  Click below to open the official registration form or event portal website.
+                </p>
+              </div>
+              <a
+                href={selectedEventModal.registrationLink || selectedEventModal.externalLink || 'https://forms.google.com/demo-event-registration'}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-primary btn-sm text-xs px-3.5 py-2 flex items-center gap-1.5 flex-shrink-0 font-bold bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-xs"
+              >
+                Open Link <ExternalLink size={13} />
+              </a>
+            </div>
+
+            {selectedEventModal.meetingLink && registeredEventIds.has(selectedEventModal.id) && (
+              <div className="p-3.5 bg-emerald-50 border border-emerald-200 rounded-xl text-xs flex items-center justify-between gap-3">
+                <div>
+                  <p className="font-bold text-emerald-900">Online Meeting Link</p>
+                  <p className="text-emerald-700 text-[11px] mt-0.5">Use this link to join the live virtual session.</p>
+                </div>
+                <a
+                  href={selectedEventModal.meetingLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn-emerald btn-sm text-xs px-3 py-1.5 flex items-center gap-1.5 flex-shrink-0 font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg"
+                >
+                  Join Meeting <ExternalLink size={13} />
+                </a>
+              </div>
+            )}
+          </div>
+        )}
+      </Modal>
+
+      {/* Registration Confirmation Modal */}
+      <Modal
+        isOpen={!!confirmModalEvent}
+        onClose={() => setConfirmModalEvent(null)}
+        title="Confirm Event Registration"
+        size="md"
+        footer={
+          <div className="flex gap-2 justify-end w-full">
+            <Button variant="ghost" onClick={() => setConfirmModalEvent(null)}>
+              Cancel
+            </Button>
+            <Button
+              variant="success"
+              loading={confirming}
+              disabled={confirmInput.trim().toLowerCase() !== 'confirm' || confirming}
+              onClick={handleConfirmRegistration}
+            >
+              Confirm Registration
+            </Button>
+          </div>
+        }
+      >
+        <form onSubmit={handleConfirmRegistration} className="space-y-4">
+          <p className="text-sm text-slate-600 leading-relaxed">
+            Please confirm your registration for{' '}
+            <strong className="text-slate-900">{confirmModalEvent?.title}</strong>.
+          </p>
+
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+              To confirm registration, please type <code className="bg-slate-100 text-blue-700 px-1.5 py-0.5 rounded font-mono font-bold">confirm</code> below:
+            </label>
+            <input
+              type="text"
+              value={confirmInput}
+              onChange={(e) => {
+                setConfirmInput(e.target.value);
+                if (confirmError) setConfirmError('');
+              }}
+              placeholder="Type 'confirm' to verify"
+              className="w-full px-3.5 py-2.5 text-sm border border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-primary-500 font-medium"
+              autoFocus
+            />
+            {confirmError && (
+              <p className="text-xs text-red-600 font-medium mt-1">{confirmError}</p>
+            )}
+          </div>
+        </form>
+      </Modal>
     </DashboardLayout>
   );
 };

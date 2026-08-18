@@ -316,6 +316,7 @@ export const searchStudents = async (searchQuery = '', filters = {}) => {
     results = results.filter(
       (s) =>
         s.fullName?.toLowerCase().includes(lower) ||
+        s.registerNo?.toLowerCase().includes(lower) ||
         s.department?.toLowerCase().includes(lower) ||
         s.skills?.some((sk) => sk.toLowerCase().includes(lower)) ||
         s.interests?.some((it) => it.toLowerCase().includes(lower))

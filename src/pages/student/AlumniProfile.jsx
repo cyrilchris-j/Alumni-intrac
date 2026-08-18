@@ -74,6 +74,10 @@ const AlumniProfile = () => {
   };
 
   const handleMessage = async () => {
+    if (connectionStatus?.status !== 'accepted') {
+      alert('Direct messaging is available only after the alumni accepts your connection request.');
+      return;
+    }
     setMessaging(true);
     try {
       await getOrCreateConversation(currentUser.uid, alumniId, {
@@ -186,6 +190,12 @@ const AlumniProfile = () => {
               <Button
                 leftIcon={MessageSquare}
                 variant="secondary"
+                disabled={connectionStatus?.status !== 'accepted'}
+                title={
+                  connectionStatus?.status === 'accepted'
+                    ? 'Send Direct Message'
+                    : 'Messaging available after alumni accepts connection request'
+                }
                 loading={messaging}
                 onClick={handleMessage}
               >
@@ -193,7 +203,7 @@ const AlumniProfile = () => {
               </Button>
               <Button
                 leftIcon={BookOpen}
-                variant="secondary"
+                variant="gold"
                 onClick={() => setShowMentorshipModal(true)}
               >
                 Request Mentorship
@@ -340,51 +350,58 @@ const AlumniProfile = () => {
       <Modal
         isOpen={showMentorshipModal}
         onClose={() => setShowMentorshipModal(false)}
-        title="Request Mentorship"
+        title={`Request Mentorship with ${alumni.fullName}`}
+        size="md"
         footer={
           <>
             <Button variant="ghost" onClick={() => setShowMentorshipModal(false)}>
               Cancel
             </Button>
-            <Button loading={mentorshipLoading} onClick={handleMentorshipRequest}>
-              Send Request
+            <Button variant="gold" loading={mentorshipLoading} onClick={handleMentorshipRequest}>
+              Send Mentorship Request
             </Button>
           </>
         }
       >
         <div className="space-y-4">
+          <div className="p-3.5 bg-blue-50 border border-blue-200 rounded-xl text-xs text-blue-900 leading-relaxed font-medium">
+            💡 <strong>Note:</strong> You can send a mentorship request anytime without requiring a prior accepted connection. Describe your topic and specific questions below so the alumni can review your request.
+          </div>
+
           <div>
-            <label className="form-label">Topic <span className="text-red-500">*</span></label>
+            <label className="form-label">Mentorship Topic / Focus Title <span className="text-red-500">*</span></label>
             <input
-              className="form-input"
-              placeholder="e.g., Career transition to product management"
+              className="form-input text-xs"
+              placeholder="e.g., Cloud Architecture Roadmap & System Design Advice"
               value={mentorshipForm.topic}
               onChange={(e) => setMentorshipForm((f) => ({ ...f, topic: e.target.value }))}
+              required
             />
           </div>
           <div>
-            <label className="form-label">Preferred Area</label>
+            <label className="form-label">Preferred Focus Area</label>
             <Select
               options={MENTORSHIP_AREAS}
               value={mentorshipForm.preferredArea}
               onChange={(e) => setMentorshipForm((f) => ({ ...f, preferredArea: e.target.value }))}
-              placeholder="Select an area"
+              placeholder="Select guidance area"
             />
           </div>
           <div>
-            <label className="form-label">Message <span className="text-red-500">*</span></label>
+            <label className="form-label">Describe Your Topic & Questions (Message) <span className="text-red-500">*</span></label>
             <textarea
-              className="form-input h-28 resize-none"
-              placeholder="Introduce yourself and describe what guidance you're looking for..."
+              className="form-input h-28 resize-none text-xs"
+              placeholder="Introduce yourself, describe your background, and outline the specific questions or guidance you are seeking from this mentor..."
               value={mentorshipForm.message}
               onChange={(e) => setMentorshipForm((f) => ({ ...f, message: e.target.value }))}
+              required
             />
           </div>
           <div>
             <label className="form-label">Preferred Availability (Optional)</label>
             <input
-              className="form-input"
-              placeholder="e.g., Weekends, Evenings after 6pm"
+              className="form-input text-xs"
+              placeholder="e.g., Weekends, Evenings after 6 PM IST"
               value={mentorshipForm.availability}
               onChange={(e) => setMentorshipForm((f) => ({ ...f, availability: e.target.value }))}
             />

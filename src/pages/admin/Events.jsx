@@ -42,6 +42,7 @@ const AdminEvents = () => {
     time: '',
     location: '',
     meetingLink: '',
+    registrationLink: '',
     organizer: 'Alumni Relations Cell',
   });
 
@@ -72,6 +73,7 @@ const AdminEvents = () => {
         time: ev.time || '',
         location: ev.location || '',
         meetingLink: ev.meetingLink || '',
+        registrationLink: ev.registrationLink || '',
         organizer: ev.organizer || 'Alumni Relations Cell',
       });
     } else {
@@ -84,6 +86,7 @@ const AdminEvents = () => {
         time: '',
         location: '',
         meetingLink: '',
+        registrationLink: '',
         organizer: 'Alumni Relations Cell',
       });
     }
@@ -204,6 +207,12 @@ const AdminEvents = () => {
                       </>
                     )}
                   </div>
+                  {ev.registrationLink && (
+                    <div className="flex items-center gap-2 text-blue-700 font-medium">
+                      <ExternalLink size={13} className="text-blue-600 flex-shrink-0" />
+                      <span className="truncate">Google Form / External Registration</span>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -301,6 +310,14 @@ const AdminEvents = () => {
               onChange={(e) => setForm((f) => ({ ...f, meetingLink: e.target.value }))}
             />
           </div>
+
+          <Input
+            label="Registration Link (Google Form / Website Link)"
+            placeholder="https://forms.google.com/your-form-link or https://website.com/register"
+            value={form.registrationLink}
+            onChange={(e) => setForm((f) => ({ ...f, registrationLink: e.target.value }))}
+            hint="Students clicking 'Register' will open this Google Form or website link."
+          />
 
           <div>
             <label className="form-label">Event Description <span className="text-red-500">*</span></label>

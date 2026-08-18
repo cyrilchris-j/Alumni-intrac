@@ -65,6 +65,7 @@ const Students = () => {
       const q = search.toLowerCase();
       return (
         s.fullName?.toLowerCase().includes(q) ||
+        s.registerNo?.toLowerCase().includes(q) ||
         s.email?.toLowerCase().includes(q) ||
         s.department?.toLowerCase().includes(q)
       );
@@ -78,7 +79,7 @@ const Students = () => {
         <div>
           <h1 className="text-2xl font-heading font-bold text-text-primary">Students Directory</h1>
           <p className="text-text-secondary text-sm mt-1">
-            Browse and inspect all registered college students.
+            Browse, search by name or register number, and inspect all registered college students.
           </p>
         </div>
         <div className="text-sm font-semibold text-text-secondary bg-white px-3 py-1.5 rounded-lg border border-border">
@@ -92,7 +93,7 @@ const Students = () => {
           <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted" />
           <input
             type="text"
-            placeholder="Search student by name, department, or email..."
+            placeholder="Search student by name or register number..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="w-full pl-9 pr-4 py-2 text-sm border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
@@ -131,7 +132,7 @@ const Students = () => {
         <EmptyState
           icon={GraduationCap}
           title="No students found"
-          description="Try changing the department or year filter."
+          description="Try changing the search query, department, or year filter."
         />
       ) : (
         <div className="bg-white rounded-2xl border border-border overflow-hidden shadow-sm">
@@ -140,6 +141,7 @@ const Students = () => {
               <thead className="bg-gray-50 border-b border-border text-xs uppercase text-text-secondary">
                 <tr>
                   <th className="px-6 py-4 font-semibold">Student</th>
+                  <th className="px-6 py-4 font-semibold">Reg No</th>
                   <th className="px-6 py-4 font-semibold">Department</th>
                   <th className="px-6 py-4 font-semibold">Year & Sec</th>
                   <th className="px-6 py-4 font-semibold">Skills / Focus</th>
@@ -157,6 +159,9 @@ const Students = () => {
                           <p className="text-xs text-text-secondary">{s.email}</p>
                         </div>
                       </div>
+                    </td>
+                    <td className="px-6 py-4 text-xs font-mono font-bold text-blue-700">
+                      {s.registerNo || 'N/A'}
                     </td>
                     <td className="px-6 py-4 text-xs text-text-secondary font-medium">
                       {s.department}
@@ -231,12 +236,17 @@ const Students = () => {
               <Avatar src={selectedStudent.photoURL} name={selectedStudent.fullName} size="xl" />
               <div>
                 <h3 className="font-heading font-bold text-lg text-text-primary">{selectedStudent.fullName}</h3>
+                <p className="text-xs font-mono font-bold text-blue-700 mt-0.5">Reg No: {selectedStudent.registerNo || 'N/A'}</p>
                 <p className="text-sm text-text-secondary">{selectedStudent.department}</p>
                 <p className="text-xs text-primary-600 font-medium">{selectedStudent.year} (Sec {selectedStudent.section || 'N/A'})</p>
               </div>
             </div>
 
             <div className="space-y-2 text-sm">
+              <div className="flex justify-between py-1 border-b border-gray-100">
+                <span className="text-text-muted">Register Number</span>
+                <span className="font-medium font-mono text-blue-700">{selectedStudent.registerNo || 'Not provided'}</span>
+              </div>
               <div className="flex justify-between py-1 border-b border-gray-100">
                 <span className="text-text-muted">Email</span>
                 <span className="font-medium text-text-primary">{selectedStudent.email}</span>

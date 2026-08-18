@@ -36,6 +36,11 @@ const Opportunities = () => {
   const [onlySaved, setOnlySaved] = useState(false);
   const [selectedOpp, setSelectedOpp] = useState(null);
 
+  const [confirmModalOpp, setConfirmModalOpp] = useState(null);
+  const [confirmInput, setConfirmInput] = useState('');
+  const [confirming, setConfirming] = useState(false);
+  const [confirmError, setConfirmError] = useState('');
+
   // Post opportunity modal (Alumni & Admin)
   const [showPostModal, setShowPostModal] = useState(false);
   const [posting, setPosting] = useState(false);
@@ -103,17 +108,33 @@ const Opportunities = () => {
     }
   };
 
-  const handleApply = async (opp) => {
-    if (!currentUser) return;
+  const handleOpenConfirmModal = (opp) => {
+    setConfirmModalOpp(opp);
+    setConfirmInput('');
+    setConfirmError('');
+  };
+
+  const handleConfirmSubmit = async (e) => {
+    if (e) e.preventDefault();
+    if (!confirmModalOpp || !currentUser) return;
+
+    if (confirmInput.trim().toLowerCase() !== 'confirm') {
+      setConfirmError("Please type 'confirm' to verify your application.");
+      return;
+    }
+
+    setConfirming(true);
     try {
-      await applyOpportunity(currentUser.uid, opp.id, {
+      await applyOpportunity(currentUser.uid, confirmModalOpp.id, {
         studentName: userProfile?.fullName || 'Student',
         studentEmail: userProfile?.email || currentUser.email,
       });
-      setAppliedIds((prev) => new Set(prev).add(opp.id));
-      alert(`Application submitted for ${opp.title}!`);
+      setAppliedIds((prev) => new Set(prev).add(confirmModalOpp.id));
+      setConfirmModalOpp(null);
     } catch (err) {
-      alert('Failed to submit application');
+      alert('Failed to submit application.');
+    } finally {
+      setConfirming(false);
     }
   };
 
@@ -366,29 +387,29 @@ const Opportunities = () => {
                     </Button>
 
                     {appliedIds.has(selectedOpp.id) ? (
-                      <Button size="sm" variant="success" disabled>
-                        <CheckCircle size={15} /> Application Sent
-                      </Button>
+                      <Badge variant="emerald" className="px-3.5 py-2 text-xs font-bold flex items-center gap-1.5 rounded-xl border border-emerald-300 bg-emerald-50 text-emerald-700">
+                        <CheckCircle size={15} /> Applied
+                      </Badge>
                     ) : (
                       <Button
                         size="sm"
                         variant="primary"
-                        onClick={() => handleApply(selectedOpp)}
+                        onClick={() => handleOpenConfirmModal(selectedOpp)}
                         leftIcon={Sparkles}
                       >
-                        Apply Now
+                        Applied
                       </Button>
                     )}
 
-                    {selectedOpp.externalLink && (
+                    {(selectedOpp.externalLink || selectedOpp.registrationLink) && (
                       <a
-                        href={selectedOpp.externalLink}
+                        href={selectedOpp.externalLink || selectedOpp.registrationLink}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="btn-secondary btn-sm rounded-xl flex items-center gap-1.5"
-                        title="External Link"
+                        title="External Application / Website Link"
                       >
-                        Website
+                        Website / Form Link
                         <ExternalLink size={13} />
                       </a>
                     )}
@@ -548,6 +569,70 @@ const Opportunities = () => {
               className="w-full px-3 py-2 text-sm border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500"
               required
             />
+          </div>
+        </form>
+      </Modal>
+
+      {/* Application Confirmation Modal */}
+      <Modal
+        isOpen={!!confirmModalOpp}
+        onClose={() => setConfirmModalOpp(null)}
+        title="Confirm Application Registration"
+        size="md"
+        footer={
+          <div className="flex gap-2 justify-end w-full">
+            <Button variant="ghost" onClick={() => setConfirmModalOpp(null)}>
+              Cancel
+            </Button>
+            <Button
+              variant="success"
+              loading={confirming}
+              disabled={confirmInput.trim().toLowerCase() !== 'confirm' || confirming}
+              onClick={handleConfirmSubmit}
+            >
+              Confirm Application
+            </Button>
+          </div>
+        }
+      >
+        <form onSubmit={handleConfirmSubmit} className="space-y-4">
+          <p className="text-sm text-text-secondary leading-relaxed">
+            Please confirm that you have submitted your application or completed registration for{' '}
+            <strong className="text-text-primary">{confirmModalOpp?.title}</strong> ({confirmModalOpp?.company}).
+          </p>
+
+          {(confirmModalOpp?.externalLink || confirmModalOpp?.registrationLink) && (
+            <div className="p-3 bg-blue-50 border border-blue-200 rounded-xl text-xs flex items-center justify-between gap-2">
+              <span className="text-blue-900 font-medium">Google Form / External Link:</span>
+              <a
+                href={confirmModalOpp.externalLink || confirmModalOpp.registrationLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-700 font-bold hover:underline flex items-center gap-1 flex-shrink-0"
+              >
+                Open Link <ExternalLink size={13} />
+              </a>
+            </div>
+          )}
+
+          <div>
+            <label className="block text-xs font-semibold text-text-secondary mb-1.5">
+              To confirm registration, please type <code className="bg-slate-100 text-blue-700 px-1.5 py-0.5 rounded font-mono font-bold">confirm</code> below:
+            </label>
+            <input
+              type="text"
+              value={confirmInput}
+              onChange={(e) => {
+                setConfirmInput(e.target.value);
+                if (confirmError) setConfirmError('');
+              }}
+              placeholder="Type 'confirm' to verify"
+              className="w-full px-3.5 py-2.5 text-sm border border-border rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-primary-500 font-medium"
+              autoFocus
+            />
+            {confirmError && (
+              <p className="text-xs text-red-600 font-medium mt-1">{confirmError}</p>
+            )}
           </div>
         </form>
       </Modal>

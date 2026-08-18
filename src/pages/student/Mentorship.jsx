@@ -423,9 +423,13 @@ const StudentMentorship = () => {
               </div>
             </div>
 
+            <div className="p-3 bg-blue-50 border border-blue-200 rounded-xl text-xs text-blue-900 leading-relaxed font-medium">
+              💡 <strong>Note:</strong> You can request mentorship directly from any alumni. Describe your specific topic, goals, and questions below for the mentor to review.
+            </div>
+
             <Input
-              label="Mentorship Topic / Objective"
-              placeholder="e.g. Guidance on PM interviews and building SaaS portfolio"
+              label="Mentorship Topic / Focus Title *"
+              placeholder="e.g. Guidance on Cloud Architecture & System Design roadmap"
               value={mentorshipForm.topic}
               onChange={(e) => setMentorshipForm((f) => ({ ...f, topic: e.target.value }))}
               required
@@ -440,13 +444,13 @@ const StudentMentorship = () => {
 
             <div>
               <label className="block text-xs font-semibold text-text-secondary mb-1">
-                Your Message & Questions
+                Describe Your Topic & Questions (Message) *
               </label>
               <textarea
                 rows={4}
                 value={mentorshipForm.message}
                 onChange={(e) => setMentorshipForm((f) => ({ ...f, message: e.target.value }))}
-                placeholder="Introduce yourself and specify what questions or areas you would like help with..."
+                placeholder="Introduce yourself and specify what questions or guidance you would like help with..."
                 className="w-full px-3 py-2 text-sm border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500"
                 required
               />

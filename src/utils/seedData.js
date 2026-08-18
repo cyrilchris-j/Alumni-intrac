@@ -7,6 +7,7 @@ export const SAMPLE_STUDENTS = [
   {
     id: 'demo_student_1',
     fullName: 'Rahul Sharma',
+    registerNo: '217101',
     email: 'rahul.sharma@psgtech.edu',
     college: 'PSG College of Technology',
     department: 'Computer Science & Engineering',
@@ -20,6 +21,7 @@ export const SAMPLE_STUDENTS = [
   {
     id: 'demo_student_2',
     fullName: 'Ananya Krishnan',
+    registerNo: '217102',
     email: 'ananya.k@psgtech.edu',
     college: 'PSG College of Technology',
     department: 'Information Technology',
@@ -33,6 +35,7 @@ export const SAMPLE_STUDENTS = [
   {
     id: 'demo_student_3',
     fullName: 'Karthik Venkatesh',
+    registerNo: '217103',
     email: 'karthik.v@psgtech.edu',
     college: 'PSG College of Technology',
     department: 'Electronics & Communication',
@@ -46,6 +49,7 @@ export const SAMPLE_STUDENTS = [
   {
     id: 'demo_student_4',
     fullName: 'Sneha Patel',
+    registerNo: '217104',
     email: 'sneha.patel@psgtech.edu',
     college: 'PSG College of Technology',
     department: 'Computer Science & Engineering',
@@ -59,6 +63,7 @@ export const SAMPLE_STUDENTS = [
   {
     id: 'demo_student_5',
     fullName: 'Aditya Verma',
+    registerNo: '217105',
     email: 'aditya.v@psgtech.edu',
     college: 'PSG College of Technology',
     department: 'Mechanical Engineering',
@@ -72,6 +77,7 @@ export const SAMPLE_STUDENTS = [
   {
     id: 'demo_student_6',
     fullName: 'Divya Sundaram',
+    registerNo: '217106',
     email: 'divya.s@psgtech.edu',
     college: 'PSG College of Technology',
     department: 'Information Technology',
@@ -85,6 +91,7 @@ export const SAMPLE_STUDENTS = [
   {
     id: 'demo_student_7',
     fullName: 'Goutham Raj',
+    registerNo: '217107',
     email: 'goutham.raj@psgtech.edu',
     college: 'PSG College of Technology',
     department: 'Electrical Engineering',
@@ -98,6 +105,7 @@ export const SAMPLE_STUDENTS = [
   {
     id: 'demo_student_8',
     fullName: 'Meera Nambiar',
+    registerNo: '217108',
     email: 'meera.n@psgtech.edu',
     college: 'PSG College of Technology',
     department: 'Biotechnology',
@@ -367,6 +375,7 @@ export const SAMPLE_EVENTS = [
     time: '06:00 PM',
     location: 'Campus Main Auditorium & Lawn, PSG College of Technology',
     meetingLink: '',
+    registrationLink: 'https://forms.google.com/demo-alumni-meet-2026',
     organizer: 'Alumni Relations Cell & PSG Tech Management',
   },
   {
@@ -377,6 +386,7 @@ export const SAMPLE_EVENTS = [
     time: '07:30 PM',
     location: 'Online',
     meetingLink: 'https://meet.google.com/demo-alumlink-webinar',
+    registrationLink: 'https://forms.google.com/demo-tech-careers-webinar',
     organizer: 'CSE Alumni Association',
   },
   {
@@ -387,7 +397,41 @@ export const SAMPLE_EVENTS = [
     time: '10:00 AM',
     location: 'Computer Center Lab 3, Campus',
     meetingLink: '',
+    registrationLink: 'https://forms.google.com/demo-cloud-devops-workshop',
     organizer: 'Department of Information Technology',
+  },
+  {
+    title: 'AI & Generative Models Masterclass 2026',
+    description: 'Explore state-of-the-art Large Language Models, fine-tuning techniques, and practical AI applications with lead research scientists.',
+    type: 'Masterclass',
+    date: '2026-10-25',
+    time: '04:00 PM',
+    location: 'Online',
+    meetingLink: 'https://meet.google.com/demo-ai-masterclass',
+    registrationLink: 'https://forms.google.com/demo-ai-masterclass',
+    organizer: 'Data Science & AI Club',
+  },
+  {
+    title: 'Entrepreneurship & Startup Incubation Panel',
+    description: 'Hear from successful founder alumni on pitching to VCs, seed funding strategies, building initial MVP, and scaling tech startups.',
+    type: 'Panel Discussion',
+    date: '2026-11-02',
+    time: '02:30 PM',
+    location: 'GRD Auditorium, Campus',
+    meetingLink: '',
+    registrationLink: 'https://forms.google.com/demo-startup-panel',
+    organizer: 'PSG Tech Entrepreneurship Cell',
+  },
+  {
+    title: 'Executive Leadership & Placement Prep Bootcamp',
+    description: 'A comprehensive weekend bootcamp focusing on technical interview prep, system design, salary negotiation, and resume optimization.',
+    type: 'Bootcamp',
+    date: '2026-11-20',
+    time: '09:00 AM',
+    location: 'Seminar Hall 2, Campus',
+    meetingLink: '',
+    registrationLink: 'https://forms.google.com/demo-placement-bootcamp',
+    organizer: 'Placement & Career Development Cell',
   },
 ];
 
