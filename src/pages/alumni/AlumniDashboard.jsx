@@ -302,27 +302,6 @@ const AlumniDashboard = () => {
             )}
           </div>
 
-          {/* Share Opportunity CTA Banner */}
-          <div className="relative overflow-hidden bg-gradient-to-r from-blue-600 via-blue-600 to-cyan-600 rounded-3xl p-6 sm:p-7 text-white flex flex-col sm:flex-row items-center justify-between gap-4 shadow-md border border-blue-400/30">
-            <div className="relative z-10">
-              <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-cyan-200 mb-1 block">
-                Alma Mater Initiative
-              </span>
-              <h3 className="text-xl font-heading font-bold mb-1.5 text-white">
-                Have a fellowship or leadership vacancy?
-              </h3>
-              <p className="text-blue-50 text-xs max-w-lg leading-relaxed">
-                Connect talented students from your alma mater directly with industry opportunities, internships, and corporate referrals.
-              </p>
-            </div>
-            <Button
-              variant="secondary"
-              className="flex-shrink-0 text-xs font-bold bg-white text-blue-700 hover:bg-blue-50 border-0 shadow-sm relative z-10"
-              onClick={() => navigate('/alumni/opportunities')}
-            >
-              Post Opportunity
-            </Button>
-          </div>
         </div>
 
         {/* Right Side: Impact Overview Chart */}

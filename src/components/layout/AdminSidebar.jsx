@@ -48,18 +48,7 @@ const AdminSidebar = ({ onClose }) => {
         </div>
       </div>
 
-      {/* Admin badge */}
-      <div className="p-3.5 flex-shrink-0">
-        <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/80 flex items-center gap-3 shadow-2xs">
-          <div className="w-9 h-9 bg-gradient-to-br from-blue-600 to-cyan-600 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm text-white">
-            <span className="text-xs font-bold font-mono">ADM</span>
-          </div>
-          <div className="min-w-0">
-            <p className="text-xs font-bold text-slate-900 truncate">College Administrator</p>
-            <p className="text-[10px] text-blue-600 font-semibold tracking-wider uppercase">Executive Access</p>
-          </div>
-        </div>
-      </div>
+
 
       {/* Nav */}
       <nav className="flex-1 px-3 py-2 overflow-y-auto space-y-1 scrollbar-none">
