@@ -1,18 +1,20 @@
 import { useState, useEffect } from 'react';
 import {
   UserCheck, Search, Building2,
-  GraduationCap, Mail, Eye, MapPin, Trash2
+  GraduationCap, Mail, Eye, MapPin, Trash2, UserPlus
 } from 'lucide-react';
 import { LinkedInIcon } from '../../components/ui/Icons';
 import DashboardLayout from '../../components/layout/DashboardLayout';
 import Avatar from '../../components/ui/Avatar';
 import Badge from '../../components/ui/Badge';
 import Button from '../../components/ui/Button';
+import Input from '../../components/ui/Input';
+import Select from '../../components/ui/Select';
 import Modal from '../../components/ui/Modal';
 import EmptyState from '../../components/ui/EmptyState';
 import { SkeletonTable } from '../../components/ui/Skeleton';
 import DeleteConfirmModal from '../../components/ui/DeleteConfirmModal';
-import { getAllAlumni, deleteUserAccount } from '../../services/userService';
+import { getAllAlumni, deleteUserAccount, adminAddAlumni } from '../../services/userService';
 import { DEPARTMENTS, GRADUATION_YEARS } from '../../utils/constants';
 
 const Alumni = () => {
@@ -23,6 +25,23 @@ const Alumni = () => {
   const [selectedAlumni, setSelectedAlumni] = useState(null);
   const [alumniToDelete, setAlumniToDelete] = useState(null);
   const [deleting, setDeleting] = useState(false);
+
+  // Add Alumni State
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [adding, setAdding] = useState(false);
+  const [addForm, setAddForm] = useState({
+    fullName: '',
+    email: '',
+    password: 'password123',
+    department: 'Computer Science and Engineering',
+    graduationYear: '2024',
+    company: '',
+    jobRole: '',
+    location: '',
+    phone: '',
+    skills: '',
+    verificationStatus: 'verified',
+  });
 
   const loadAlumni = async () => {
     setLoading(true);
@@ -39,6 +58,34 @@ const Alumni = () => {
   useEffect(() => {
     loadAlumni();
   }, []);
+
+  const handleCreateAlumni = async (e) => {
+    e.preventDefault();
+    setAdding(true);
+    try {
+      await adminAddAlumni(addForm);
+      await loadAlumni();
+      setShowAddModal(false);
+      setAddForm({
+        fullName: '',
+        email: '',
+        password: 'password123',
+        department: 'Computer Science and Engineering',
+        graduationYear: '2024',
+        company: '',
+        jobRole: '',
+        location: '',
+        phone: '',
+        skills: '',
+        verificationStatus: 'verified',
+      });
+      alert('Alumni account provisioned successfully!');
+    } catch (err) {
+      alert(err.message || 'Failed to add alumni');
+    } finally {
+      setAdding(false);
+    }
+  };
 
   const handleConfirmDelete = async () => {
     if (!alumniToDelete) return;
@@ -78,11 +125,16 @@ const Alumni = () => {
         <div>
           <h1 className="text-2xl font-heading font-bold text-text-primary">Alumni Management</h1>
           <p className="text-text-secondary text-sm mt-1">
-            Browse, inspect, and manage registered alumni from your college.
+            Provision, inspect, and manage verified alumni accounts for your college.
           </p>
         </div>
-        <div className="text-sm font-semibold text-text-secondary bg-white px-3 py-1.5 rounded-lg border border-border">
-          Total Alumni: {alumni.length}
+        <div className="flex items-center gap-3">
+          <div className="text-xs font-semibold text-text-secondary bg-white px-3 py-2 rounded-xl border border-border">
+            Total Alumni: {alumni.length}
+          </div>
+          <Button leftIcon={UserPlus} onClick={() => setShowAddModal(true)}>
+            Add New Alumni
+          </Button>
         </div>
       </div>
 
@@ -119,7 +171,9 @@ const Alumni = () => {
         <EmptyState
           icon={UserCheck}
           title="No alumni found"
-          description="Try changing the department filter or search query."
+          description="Add a new alumni user or adjust search filters."
+          action={() => setShowAddModal(true)}
+          actionLabel="Add New Alumni"
         />
       ) : (
         <div className="bg-white rounded-2xl border border-border overflow-hidden shadow-sm">
@@ -183,6 +237,110 @@ const Alumni = () => {
           </div>
         </div>
       )}
+
+      {/* Add Alumni Modal */}
+      <Modal
+        isOpen={showAddModal}
+        onClose={() => setShowAddModal(false)}
+        title="Provision New Alumni Account"
+        size="md"
+        footer={
+          <div className="flex gap-2 justify-end w-full">
+            <Button variant="ghost" onClick={() => setShowAddModal(false)}>
+              Cancel
+            </Button>
+            <Button loading={adding} onClick={handleCreateAlumni}>
+              Provision Alumni
+            </Button>
+          </div>
+        }
+      >
+        <form onSubmit={handleCreateAlumni} className="space-y-4">
+          <Input
+            label="Full Name"
+            placeholder="e.g. Priya Menon"
+            value={addForm.fullName}
+            onChange={(e) => setAddForm((f) => ({ ...f, fullName: e.target.value }))}
+            required
+          />
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <Input
+              label="Alumni Email"
+              type="email"
+              placeholder="alumni@ksrce.ac.in"
+              value={addForm.email}
+              onChange={(e) => setAddForm((f) => ({ ...f, email: e.target.value }))}
+              required
+            />
+            <Input
+              label="Assigned Password"
+              type="text"
+              placeholder="password123"
+              value={addForm.password}
+              onChange={(e) => setAddForm((f) => ({ ...f, password: e.target.value }))}
+              required
+            />
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <Select
+              label="Department"
+              options={DEPARTMENTS}
+              value={addForm.department}
+              onChange={(e) => setAddForm((f) => ({ ...f, department: e.target.value }))}
+              required
+            />
+            <Select
+              label="Graduation Year"
+              options={GRADUATION_YEARS}
+              value={addForm.graduationYear}
+              onChange={(e) => setAddForm((f) => ({ ...f, graduationYear: e.target.value }))}
+              required
+            />
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <Input
+              label="Company Name"
+              placeholder="Google, TCS, Microsoft..."
+              value={addForm.company}
+              onChange={(e) => setAddForm((f) => ({ ...f, company: e.target.value }))}
+              required
+            />
+            <Input
+              label="Job Role / Title"
+              placeholder="Senior Software Engineer"
+              value={addForm.jobRole}
+              onChange={(e) => setAddForm((f) => ({ ...f, jobRole: e.target.value }))}
+              required
+            />
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <Input
+              label="Location"
+              placeholder="Bangalore, Chennai..."
+              value={addForm.location}
+              onChange={(e) => setAddForm((f) => ({ ...f, location: e.target.value }))}
+            />
+            <Input
+              label="Phone Number"
+              type="tel"
+              placeholder="+91 98765 43210"
+              value={addForm.phone}
+              onChange={(e) => setAddForm((f) => ({ ...f, phone: e.target.value }))}
+            />
+          </div>
+
+          <Input
+            label="Key Skills (Comma-separated)"
+            placeholder="Cloud Solutions, System Design, Product Strategy"
+            value={addForm.skills}
+            onChange={(e) => setAddForm((f) => ({ ...f, skills: e.target.value }))}
+          />
+        </form>
+      </Modal>
 
       {/* Inspect Modal */}
       <Modal

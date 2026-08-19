@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import {
   Mail, Lock, Link2, Eye, EyeOff, GraduationCap,
-  UserCheck, ShieldCheck, Sparkles
+  UserCheck, ShieldCheck, Sparkles, QrCode, MessageCircle
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { signInWithEmail, signInWithGoogle, signUpWithEmail } from '../../firebase/auth';
@@ -172,102 +172,115 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-sky-50 to-white flex items-center justify-center p-4 selection:bg-blue-600 selection:text-white">
-      <div className="w-full max-w-md">
-        {/* Modern Logo Header */}
-        <div className="text-center mb-8">
-          <Link to="/" className="inline-flex flex-col items-center gap-2 mb-4 group">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-600 to-cyan-500 flex items-center justify-center shadow-lg flex-shrink-0 group-hover:scale-105 transition-transform duration-200">
-              <Link2 size={24} className="text-white stroke-[2.5]" />
-            </div>
-            <span className="text-3xl font-heading font-bold text-slate-900 tracking-wider block">
-              AlumLink
-            </span>
-            <span className="text-xs font-mono font-semibold tracking-widest text-blue-600 uppercase">
-              Collegiate Networking Portal
-            </span>
-          </Link>
-          <h1 className="text-2xl font-heading font-bold text-slate-900 mt-2">Welcome to the Network</h1>
-          <p className="text-slate-500 mt-1 text-xs">Sign in to access your institutional network</p>
+    <div className="min-h-screen w-full flex flex-col lg:flex-row bg-white overflow-hidden font-sans selection:bg-blue-600 selection:text-white">
+      {/* Left Column (Desktop only): Light Blue Background with Official Emblem Logo */}
+      <div className="hidden lg:flex lg:w-1/2 bg-[#EBF3FE] flex-col items-center justify-center p-12 min-h-screen border-r border-blue-100/70">
+        <div className="flex flex-col items-center justify-center text-center max-w-lg">
+          <img
+            src="/college_logo.png"
+            alt="K.S.R. College of Engineering"
+            className="w-64 h-64 object-contain drop-shadow-md transition-transform hover:scale-105 duration-300"
+          />
+          <h2 className="mt-8 text-base md:text-lg font-serif font-extrabold text-[#1e293b] tracking-wider uppercase leading-relaxed max-w-md">
+            COMPUTER SCIENCE AND ENGINEERING
+          </h2>
         </div>
+      </div>
 
-        {/* Card */}
-        <div className="bg-white/95 backdrop-blur-md rounded-3xl border border-white/20 shadow-modal p-8 sm:p-9">
+      {/* Right / Main Content Column */}
+      <div className="w-full lg:w-1/2 flex flex-col items-center justify-start lg:justify-center py-3 px-6 sm:py-6 sm:px-10 min-h-screen bg-white">
+        <div className="w-full max-w-md">
+          {/* Mobile Header (Mobile only): Emblem Logo & Department Name on clean white background */}
+          <div className="flex lg:hidden flex-col items-center text-center mb-4 pt-1">
+            <img
+              src="/college_logo.png"
+              alt="K.S.R. College of Engineering"
+              className="w-24 h-24 sm:w-28 sm:h-28 object-contain drop-shadow-xs"
+            />
+            <h2 className="mt-3 text-xs sm:text-sm font-serif font-extrabold text-[#1e293b] tracking-wider uppercase">
+              COMPUTER SCIENCE AND ENGINEERING
+            </h2>
+          </div>
+
+          {/* Welcome Header */}
+          <div className="text-center mb-6">
+            <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 font-heading">
+              Welcome back
+            </h1>
+            <p className="text-xs sm:text-sm text-slate-500 mt-1 font-medium">
+              Sign in to your account to continue.
+            </p>
+          </div>
+
           {error && (
-            <div className="mb-5 p-3.5 bg-red-50 border border-red-200 rounded-xl text-xs font-medium text-red-700">
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl text-xs font-medium text-red-700">
               {error}
             </div>
           )}
 
-          {/* Quick Demo Credentials Selector */}
-          <div className="mb-6 p-4 bg-gradient-to-br from-gold-50/80 to-slate-50 rounded-2xl border border-gold-200/60 shadow-xs">
+          {/* Quick Demo Access Bar */}
+          <div className="mb-5 p-3 bg-blue-50/70 rounded-2xl border border-blue-100">
             <div className="flex items-center justify-between mb-2">
-              <p className="text-[11px] font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1">
-                <Sparkles size={13} className="text-gold-600" /> Quick Demo Access
-              </p>
+              <span className="text-[10px] font-bold text-blue-900 uppercase tracking-wider flex items-center gap-1">
+                <Sparkles size={12} className="text-blue-600" /> Quick Demo Access
+              </span>
               <span className="text-[10px] text-slate-500 font-mono">pwd: password123</span>
             </div>
-            <div className="grid grid-cols-3 gap-2">
-              <Button
+            <div className="grid grid-cols-3 gap-1.5">
+              <button
                 type="button"
-                variant="secondary"
-                size="sm"
-                className="text-xs bg-white py-1.5 border-slate-200"
-                loading={demoLoading === 'student'}
                 onClick={() => handleQuickDemoLogin('student')}
+                disabled={!!demoLoading}
+                className="py-1.5 px-2 bg-white hover:bg-blue-100/50 text-slate-700 rounded-lg border border-blue-200 text-[11px] font-semibold flex items-center justify-center gap-1 transition-colors"
               >
-                <GraduationCap size={13} className="text-primary-800" />
+                <GraduationCap size={12} className="text-blue-600" />
                 Student
-              </Button>
-              <Button
+              </button>
+              <button
                 type="button"
-                variant="secondary"
-                size="sm"
-                className="text-xs bg-white py-1.5 border-slate-200"
-                loading={demoLoading === 'alumni'}
                 onClick={() => handleQuickDemoLogin('alumni')}
+                disabled={!!demoLoading}
+                className="py-1.5 px-2 bg-white hover:bg-blue-100/50 text-slate-700 rounded-lg border border-blue-200 text-[11px] font-semibold flex items-center justify-center gap-1 transition-colors"
               >
-                <UserCheck size={13} className="text-emerald-700" />
+                <UserCheck size={12} className="text-emerald-600" />
                 Alumni
-              </Button>
-              <Button
+              </button>
+              <button
                 type="button"
-                variant="secondary"
-                size="sm"
-                className="text-xs bg-white py-1.5 border-slate-200"
-                loading={demoLoading === 'admin'}
                 onClick={() => handleQuickDemoLogin('admin')}
+                disabled={!!demoLoading}
+                className="py-1.5 px-2 bg-white hover:bg-blue-100/50 text-slate-700 rounded-lg border border-blue-200 text-[11px] font-semibold flex items-center justify-center gap-1 transition-colors"
               >
-                <ShieldCheck size={13} className="text-gold-700" />
+                <ShieldCheck size={12} className="text-amber-600" />
                 Admin
-              </Button>
+              </button>
             </div>
           </div>
 
+          {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
-            <Input
-              label="Institutional Email"
-              type="email"
-              placeholder="member@college.edu"
-              leftIcon={Mail}
-              value={form.email}
-              onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
-              required
-              autoComplete="email"
-            />
-
+            {/* College Email */}
             <div>
-              <div className="flex items-center justify-between mb-1.5">
-                <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider">Password</label>
-                <Link
-                  to="/forgot-password"
-                  className="text-xs text-primary-800 hover:text-gold-700 font-semibold transition-colors"
-                >
-                  Forgot password?
-                </Link>
-              </div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                College Email
+              </label>
+              <input
+                type="email"
+                placeholder="cyrilchristopherj28cse24_27@ksrce.ac.in"
+                value={form.email}
+                onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
+                required
+                autoComplete="email"
+                className="w-full px-3.5 py-3 text-xs sm:text-sm font-medium bg-[#edf4fe] border border-blue-100 rounded-xl text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all placeholder:text-slate-400"
+              />
+            </div>
+
+            {/* Password */}
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                Password
+              </label>
               <div className="relative">
-                <Lock size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
                 <input
                   type={showPassword ? 'text' : 'password'}
                   placeholder="••••••••••••"
@@ -275,56 +288,49 @@ const LoginPage = () => {
                   onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
                   required
                   autoComplete="current-password"
-                  className="w-full pl-10 pr-10 py-2.5 text-xs font-medium border border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-primary-600/20 focus:border-primary-600 shadow-xs"
+                  className="w-full pl-3.5 pr-10 py-3 text-xs sm:text-sm font-medium bg-white border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all placeholder:text-slate-400"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword((v) => !v)}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700"
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 p-1"
                 >
                   {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               </div>
             </div>
 
-            <Button type="submit" fullWidth size="md" variant="primary" loading={loading} className="mt-2 shadow-md">
-              Sign In to Portal
-            </Button>
+            {/* Remember me & Forgot Password */}
+            <div className="flex items-center justify-between pt-1">
+              <label className="flex items-center gap-2 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                />
+                <span className="text-xs text-slate-600 font-medium">Remember me</span>
+              </label>
+              <Link
+                to="/forgot-password"
+                className="text-xs text-blue-600 hover:text-blue-700 font-semibold"
+              >
+                Forgot password?
+              </Link>
+            </div>
+
+            {/* Sign in Button */}
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full py-3 bg-[#2563eb] hover:bg-blue-700 text-white font-bold rounded-xl text-xs sm:text-sm shadow-xs transition-all flex items-center justify-center gap-2 mt-3 disabled:opacity-50"
+            >
+              {loading ? 'Signing in...' : 'Sign in →'}
+            </button>
           </form>
 
-          {/* Divider */}
-          <div className="relative my-5">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-slate-200" />
-            </div>
-            <div className="relative flex justify-center">
-              <span className="px-3 bg-white text-[11px] font-semibold text-slate-400 uppercase tracking-wider">or verify with</span>
-            </div>
-          </div>
-
-          {/* Google sign-in */}
-          <Button
-            variant="secondary"
-            fullWidth
-            size="md"
-            loading={googleLoading}
-            onClick={handleGoogleSignIn}
-            className="border-slate-200 shadow-xs text-xs font-semibold text-slate-700"
-          >
-            <img
-              src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
-              alt="Google"
-              className="w-4 h-4"
-            />
-            Continue with Institutional Google ID
-          </Button>
-
-          <p className="text-center text-xs text-slate-500 mt-6 font-medium">
-            New to the network?{' '}
-            <Link to="/signup" className="text-primary-800 font-bold hover:text-gold-700 transition-colors">
-              Create an Account
-            </Link>
-          </p>
+            <p className="text-center text-xs text-slate-500 mt-6 font-medium">
+              Need access? Student & Alumni accounts are provisioned by{' '}
+              <span className="text-blue-600 font-semibold">College Administration</span>.
+            </p>
         </div>
       </div>
     </div>

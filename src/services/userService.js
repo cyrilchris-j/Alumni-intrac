@@ -528,4 +528,101 @@ export const deleteUserAccount = async (uid) => {
   mockStore.setAlumni(alumni.filter((a) => a.uid !== uid && a.id !== uid));
 };
 
+/**
+ * Admin: Manually add a new Student user and profile
+ */
+export const adminAddStudent = async (studentData) => {
+  const uid = `student_${Date.now()}`;
+  const {
+    email,
+    fullName,
+    registerNo = '',
+    department = 'Computer Science and Engineering',
+    year = '1st Year',
+    section = 'A',
+    phone = '',
+    skills = [],
+    interests = [],
+  } = studentData;
+
+  await createUserDocument(uid, {
+    email,
+    role: 'student',
+    displayName: fullName,
+    photoURL: '',
+  });
+
+  const parsedSkills = Array.isArray(skills)
+    ? skills
+    : (skills || '').split(',').map((s) => s.trim()).filter(Boolean);
+  const parsedInterests = Array.isArray(interests)
+    ? interests
+    : (interests || '').split(',').map((i) => i.trim()).filter(Boolean);
+
+  await createStudentProfile(uid, {
+    fullName,
+    registerNo,
+    email,
+    college: 'K.S.R. College of Engineering',
+    department,
+    year,
+    section,
+    phone,
+    skills: parsedSkills,
+    interests: parsedInterests,
+    photoURL: '',
+  });
+
+  return { uid, email };
+};
+
+/**
+ * Admin: Manually add a new Alumni user and profile
+ */
+export const adminAddAlumni = async (alumniData) => {
+  const uid = `alumni_${Date.now()}`;
+  const {
+    email,
+    fullName,
+    department = 'Computer Science and Engineering',
+    graduationYear = '2024',
+    company = '',
+    jobRole = '',
+    location = '',
+    phone = '',
+    skills = [],
+    experience = '',
+    verificationStatus = 'verified',
+  } = alumniData;
+
+  await createUserDocument(uid, {
+    email,
+    role: 'alumni',
+    displayName: fullName,
+    photoURL: '',
+  });
+
+  const parsedSkills = Array.isArray(skills)
+    ? skills
+    : (skills || '').split(',').map((s) => s.trim()).filter(Boolean);
+
+  await createAlumniProfile(uid, {
+    fullName,
+    email,
+    college: 'K.S.R. College of Engineering',
+    department,
+    graduationYear,
+    company,
+    jobRole,
+    location,
+    phone,
+    skills: parsedSkills,
+    experience,
+    photoURL: '',
+    verificationStatus,
+  });
+
+  return { uid, email };
+};
+
 

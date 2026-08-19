@@ -123,294 +123,34 @@ const SignupPage = () => {
     }
   };
 
-  if (step === 'role') {
-    return (
-      <div className="min-h-screen bg-bg flex items-center justify-center p-4">
-        <div className="w-full max-w-lg">
-          <div className="text-center mb-8">
-            <Link to="/" className="inline-flex items-center gap-2 mb-6">
-              <div className="w-9 h-9 bg-primary-600 rounded-xl flex items-center justify-center">
-                <Link2 size={20} className="text-white" />
-              </div>
-              <span className="text-2xl font-heading font-bold text-text-primary">AlumLink</span>
-            </Link>
-            <h1 className="text-2xl font-heading font-bold text-text-primary">Join AlumLink</h1>
-            <p className="text-text-secondary mt-1 text-sm">Select how you'd like to join the network</p>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <button
-              onClick={() => { setRole('student'); setStep('form'); }}
-              className="bg-white border-2 border-border hover:border-primary-400 rounded-2xl p-8 text-center transition-all duration-200 group hover:shadow-card-hover"
-            >
-              <div className="w-16 h-16 bg-primary-50 group-hover:bg-primary-100 rounded-2xl flex items-center justify-center mx-auto mb-4 transition-colors">
-                <GraduationCap size={30} className="text-primary-600" />
-              </div>
-              <h3 className="text-lg font-heading font-semibold text-text-primary mb-2">I'm a Student</h3>
-              <p className="text-sm text-text-secondary">
-                Connect with alumni, find mentors, and discover opportunities.
-              </p>
-            </button>
-
-            <button
-              onClick={() => { setRole('alumni'); setStep('form'); }}
-              className="bg-white border-2 border-border hover:border-primary-400 rounded-2xl p-8 text-center transition-all duration-200 group hover:shadow-card-hover"
-            >
-              <div className="w-16 h-16 bg-green-50 group-hover:bg-green-100 rounded-2xl flex items-center justify-center mx-auto mb-4 transition-colors">
-                <UserCheck size={30} className="text-green-600" />
-              </div>
-              <h3 className="text-lg font-heading font-semibold text-text-primary mb-2">I'm an Alumni</h3>
-              <p className="text-sm text-text-secondary">
-                Give back, mentor students, and share opportunities.
-              </p>
-            </button>
-          </div>
-
-          <p className="text-center text-sm text-text-secondary mt-6">
-            Already have an account?{' '}
-            <Link to="/login" className="text-primary-600 font-medium hover:text-primary-700">Sign in</Link>
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  // Registration form
   return (
-    <div className="min-h-screen bg-bg py-8 px-4">
-      <div className="max-w-2xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <Link to="/" className="inline-flex items-center gap-2 mb-4">
-            <div className="w-8 h-8 bg-primary-600 rounded-xl flex items-center justify-center">
-              <Link2 size={18} className="text-white" />
-            </div>
-            <span className="text-xl font-heading font-bold text-text-primary">AlumLink</span>
-          </Link>
-          <h1 className="text-2xl font-heading font-bold text-text-primary">
-            Create your {role === 'student' ? 'Student' : 'Alumni'} account
+    <div className="min-h-screen bg-bg flex items-center justify-center p-4">
+      <div className="w-full max-w-lg text-center">
+        <div className="bg-white rounded-3xl border border-border p-8 sm:p-10 shadow-card">
+          <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-5 border border-blue-100 shadow-xs">
+            <ShieldCheck size={32} />
+          </div>
+          <h1 className="text-2xl font-heading font-bold text-slate-900 mb-2">
+            Managed Portal Access
           </h1>
-          <p className="text-text-secondary mt-1 text-sm">Fill in your details to get started</p>
-        </div>
-
-        <div className="bg-white rounded-2xl border border-border shadow-card p-8">
-          {error && (
-            <div className="mb-5 p-3.5 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
-              {error}
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="space-y-5">
-            {/* Profile photo */}
-            <div className="flex items-center gap-4">
-              <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden flex-shrink-0 border-2 border-border">
-                {photoPreview ? (
-                  <img src={photoPreview} alt="Profile" className="w-full h-full object-cover" />
-                ) : (
-                  <User size={24} className="text-gray-400" />
-                )}
-              </div>
-              <div>
-                <label className="btn-secondary btn-sm cursor-pointer inline-flex items-center gap-2 rounded-lg">
-                  <Upload size={14} />
-                  Upload Photo
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handlePhotoChange}
-                    className="hidden"
-                  />
-                </label>
-                <p className="text-xs text-text-muted mt-1">JPG, PNG up to 5MB</p>
-              </div>
-            </div>
-
-            {/* Common fields */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <Input
-                label="Full Name"
-                placeholder="Priya Menon"
-                leftIcon={User}
-                value={form.fullName}
-                onChange={handleChange('fullName')}
-                required
-              />
-              <Input
-                label="Email Address"
-                type="email"
-                placeholder="priya@college.edu"
-                leftIcon={Mail}
-                value={form.email}
-                onChange={handleChange('email')}
-                required
-              />
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="relative">
-                <Input
-                  label="Password"
-                  type={showPassword ? 'text' : 'password'}
-                  placeholder="Min. 6 characters"
-                  leftIcon={Lock}
-                  value={form.password}
-                  onChange={handleChange('password')}
-                  required
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword((v) => !v)}
-                  className="absolute right-3 top-9 text-text-muted hover:text-text-secondary"
-                >
-                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                </button>
-              </div>
-              <Input
-                label="Confirm Password"
-                type="password"
-                placeholder="Repeat password"
-                leftIcon={Lock}
-                value={form.confirmPassword}
-                onChange={handleChange('confirmPassword')}
-                required
-              />
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <Input
-                label="College"
-                placeholder="PSG College of Technology"
-                leftIcon={Building2}
-                value={form.college}
-                onChange={handleChange('college')}
-                required
-              />
-              <Select
-                label="Department"
-                options={DEPARTMENTS}
-                value={form.department}
-                onChange={handleChange('department')}
-                required
-              />
-            </div>
-
-            <Input
-              label="Phone Number"
-              type="tel"
-              placeholder="+91 98765 43210"
-              leftIcon={Phone}
-              value={form.phone}
-              onChange={handleChange('phone')}
-            />
-
-            {/* Student-specific fields */}
-            {role === 'student' && (
-              <div className="space-y-4">
-                <Input
-                  label="Register Number"
-                  placeholder="e.g., 217101"
-                  value={form.registerNo}
-                  onChange={handleChange('registerNo')}
-                  required
-                />
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <Select
-                    label="Year of Study"
-                    options={STUDENT_YEARS}
-                    value={form.year}
-                    onChange={handleChange('year')}
-                    required
-                  />
-                  <Input
-                    label="Section"
-                    placeholder="e.g., A, B, C"
-                    value={form.section}
-                    onChange={handleChange('section')}
-                  />
-                </div>
-              </div>
-            )}
-
-            {/* Alumni-specific fields */}
-            {role === 'alumni' && (
-              <>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <Select
-                    label="Graduation Year"
-                    options={GRADUATION_YEARS}
-                    value={form.graduationYear}
-                    onChange={handleChange('graduationYear')}
-                    required
-                  />
-                  <Input
-                    label="Current Company"
-                    placeholder="Google, TCS, Infosys..."
-                    value={form.company}
-                    onChange={handleChange('company')}
-                    required
-                  />
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <Input
-                    label="Job Role / Title"
-                    placeholder="Software Engineer, PM..."
-                    value={form.jobRole}
-                    onChange={handleChange('jobRole')}
-                    required
-                  />
-                  <Input
-                    label="Location"
-                    placeholder="Chennai, Bangalore..."
-                    value={form.location}
-                    onChange={handleChange('location')}
-                  />
-                </div>
-                <Input
-                  label="LinkedIn Profile URL"
-                  placeholder="https://linkedin.com/in/yourname"
-                  value={form.linkedinUrl}
-                  onChange={handleChange('linkedinUrl')}
-                  hint="Optional but recommended"
-                />
-              </>
-            )}
-
-            <Input
-              label={role === 'student' ? 'Skills' : 'Key Skills'}
-              placeholder="e.g., JavaScript, Python, React (comma-separated)"
-              value={form.skills}
-              onChange={handleChange('skills')}
-              hint="Separate multiple skills with commas"
-            />
-
-            {role === 'student' && (
-              <Input
-                label="Interests"
-                placeholder="e.g., Web Development, Machine Learning, Design"
-                value={form.interests}
-                onChange={handleChange('interests')}
-                hint="Comma-separated interests"
-              />
-            )}
-
-            <div className="flex items-center gap-4 pt-2">
-              <Button
-                type="button"
-                variant="ghost"
-                onClick={() => setStep('role')}
-              >
-                ← Back
-              </Button>
-              <Button type="submit" fullWidth size="lg" loading={loading}>
-                Create Account
-              </Button>
-            </div>
-          </form>
-
-          <p className="text-center text-sm text-text-secondary mt-5">
-            Already have an account?{' '}
-            <Link to="/login" className="text-primary-600 font-medium hover:text-primary-700">Sign in</Link>
+          <p className="text-slate-600 text-sm leading-relaxed mb-6">
+            Student and Alumni accounts are manually provisioned and assigned by <strong className="text-slate-900">College Administration</strong>. Self-registration is restricted for institution verification and security.
           </p>
+
+          <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl text-left text-xs space-y-2 mb-6">
+            <p className="font-semibold text-slate-800 uppercase tracking-wider">How to get your credentials:</p>
+            <ul className="list-disc list-inside text-slate-600 space-y-1">
+              <li>Students: Obtain your login email & password from your HOD or Department Admin.</li>
+              <li>Alumni: Contact the Alumni Cell / Administration office for account activation.</li>
+            </ul>
+          </div>
+
+          <Link
+            to="/login"
+            className="btn-primary w-full py-3 text-sm font-bold flex items-center justify-center gap-2 rounded-xl shadow-xs"
+          >
+            ← Back to Sign In
+          </Link>
         </div>
       </div>
     </div>
