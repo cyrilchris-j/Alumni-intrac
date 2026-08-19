@@ -119,7 +119,7 @@ const Notifications = () => {
           description="We'll notify you when someone connects with you or an event is posted."
         />
       ) : (
-        <div className="bg-white rounded-2xl border border-border divide-y divide-border overflow-hidden max-w-4xl shadow-sm">
+        <div className="bg-white rounded-2xl border border-border divide-y divide-border overflow-hidden w-full shadow-sm">
           {notifications.map((notif) => (
             <div
               key={notif.id}

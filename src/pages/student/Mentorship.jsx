@@ -228,7 +228,7 @@ const StudentMentorship = () => {
           actionLabel="Find an Advisory Mentor"
         />
       ) : (
-        <div className="space-y-4 max-w-4xl">
+        <div className="space-y-4 w-full">
           {filtered.map((request) => {
             const alumni = alumniProfiles[request.alumniId];
             const config = statusConfig[request.status] || statusConfig.pending;
@@ -236,70 +236,83 @@ const StudentMentorship = () => {
             return (
               <div
                 key={request.id}
-                className="bg-white rounded-2xl border border-slate-200/90 p-6 shadow-card hover:shadow-card-hover transition-all duration-200"
+                className="bg-white rounded-2xl border border-slate-200/90 p-5 sm:p-6 shadow-card hover:shadow-card-hover transition-all duration-200"
               >
-                <div className="flex items-start gap-4">
-                  <Avatar src={alumni?.photoURL} name={alumni?.fullName} size="lg" />
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between gap-4 flex-wrap">
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <h3 className="font-bold text-text-primary text-base">
-                            {alumni?.fullName || 'Alumni Mentor'}
-                          </h3>
-                          {alumni?.verificationStatus === 'verified' && (
-                            <Badge variant="success" className="text-[10px]">
-                              ✓ Verified
-                            </Badge>
-                          )}
-                        </div>
-                        <p className="text-xs text-text-secondary mt-0.5">
-                          {alumni?.jobRole} {alumni?.company && `at ${alumni.company}`}
-                        </p>
-                      </div>
-                      <Badge variant={config.variant} className="capitalize">
-                        <StatusIcon size={12} />
-                        {config.label}
-                      </Badge>
-                    </div>
-
-                    {/* Topic Box */}
-                    <div className="mt-3.5 p-3.5 bg-gradient-to-r from-gray-50 to-primary-50/30 rounded-xl border border-border/80">
-                      <div className="flex items-center justify-between gap-2 mb-1">
-                        <span className="text-[11px] font-bold text-primary-700 uppercase tracking-wider">
-                          Mentorship Topic
-                        </span>
-                        {request.preferredArea && (
-                          <span className="text-xs bg-white text-text-secondary px-2 py-0.5 rounded-md border border-border font-medium">
-                            {request.preferredArea}
+                {/* Header Row: Avatar, Info & Status */}
+                <div className="flex items-start justify-between gap-4 mb-4">
+                  <div className="flex items-center gap-3.5 min-w-0">
+                    <Avatar
+                      src={alumni?.photoURL}
+                      name={alumni?.fullName}
+                      size="md"
+                      ring
+                      className="w-12 h-12 flex-shrink-0"
+                    />
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <h3 className="font-heading font-bold text-slate-900 text-base sm:text-lg truncate">
+                          {alumni?.fullName || 'Alumni Mentor'}
+                        </h3>
+                        {alumni?.verificationStatus === 'verified' && (
+                          <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                            ✓ Verified
                           </span>
                         )}
                       </div>
-                      <p className="text-sm font-semibold text-text-primary">{request.topic}</p>
-                    </div>
-
-                    {request.message && (
-                      <p className="text-xs text-text-secondary mt-3 leading-relaxed bg-gray-50/50 p-3 rounded-lg border border-dashed border-border">
-                        "{request.message}"
+                      <p className="text-xs sm:text-sm text-slate-500 font-medium truncate mt-0.5">
+                        {alumni?.jobRole} {alumni?.company && `at ${alumni.company}`}
                       </p>
-                    )}
-
-                    <div className="flex items-center justify-between mt-4 pt-3 border-t border-border">
-                      <span className="text-xs text-text-muted">
-                        Requested {timeAgo(request.createdAt)}
-                      </span>
-                      {request.status === MENTORSHIP_STATUS.ACCEPTED && (
-                        <Button
-                          size="sm"
-                          variant="primary"
-                          leftIcon={MessageSquare}
-                          onClick={() => handleSendMessage(request.alumniId, alumni?.fullName)}
-                        >
-                          Send Message
-                        </Button>
-                      )}
                     </div>
                   </div>
+
+                  <Badge variant={config.variant} className="capitalize flex-shrink-0 text-xs px-2.5 py-1 rounded-full font-bold">
+                    <StatusIcon size={13} />
+                    {config.label}
+                  </Badge>
+                </div>
+
+                {/* Mentorship Topic Box */}
+                <div className="p-4 bg-blue-50/40 rounded-xl border border-blue-100/80 mb-3">
+                  <div className="flex items-center justify-between gap-2 mb-1.5 flex-wrap">
+                    <span className="text-[10px] font-mono font-bold text-blue-700 uppercase tracking-widest flex items-center gap-1">
+                      <BookOpen size={12} className="text-blue-600" />
+                      Mentorship Topic
+                    </span>
+                    {request.preferredArea && (
+                      <span className="text-xs bg-white text-slate-700 px-2.5 py-0.5 rounded-lg border border-blue-200/80 font-semibold shadow-2xs">
+                        {request.preferredArea}
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-sm sm:text-base font-bold text-slate-900 leading-snug">
+                    {request.topic}
+                  </p>
+                </div>
+
+                {/* Quote / Message Box */}
+                {request.message && (
+                  <div className="p-3.5 bg-slate-50/80 rounded-r-xl border-l-4 border-l-blue-600 text-xs sm:text-sm text-slate-600 leading-relaxed font-sans mb-1">
+                    "{request.message}"
+                  </div>
+                )}
+
+                {/* Footer Row: Timestamp & Message Action */}
+                <div className="flex items-center justify-between mt-4 pt-3.5 border-t border-slate-100">
+                  <span className="text-xs text-slate-400 font-medium flex items-center gap-1.5 whitespace-nowrap">
+                    <Clock size={13} className="text-slate-400" />
+                    Requested {timeAgo(request.createdAt)}
+                  </span>
+                  {request.status === MENTORSHIP_STATUS.ACCEPTED && (
+                    <Button
+                      size="sm"
+                      variant="primary"
+                      leftIcon={MessageSquare}
+                      onClick={() => handleSendMessage(request.alumniId, alumni?.fullName)}
+                      className="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-4 py-2 rounded-xl shadow-xs"
+                    >
+                      Send Message
+                    </Button>
+                  )}
                 </div>
               </div>
             );

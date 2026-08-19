@@ -48,7 +48,7 @@ const Announcements = () => {
           description="You are all caught up! New updates from administration will be published here."
         />
       ) : (
-        <div className="space-y-4 max-w-4xl">
+        <div className="space-y-4 w-full">
           {announcements.map((ann) => (
             <div key={ann.id} className="bg-white rounded-2xl border border-border p-6 shadow-sm">
               <div className="flex items-center justify-between gap-4 mb-3">

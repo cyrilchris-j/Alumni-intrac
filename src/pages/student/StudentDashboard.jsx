@@ -619,30 +619,7 @@ const StudentDashboard = () => {
             )}
           </div>
 
-          {/* Quick Mentorship & Career Guidance Banner */}
-          <div className="bg-gradient-to-br from-blue-600 via-blue-600 to-cyan-600 rounded-2xl p-6 text-white shadow-md relative overflow-hidden border border-blue-400/30">
-            <div className="absolute -right-8 -bottom-8 w-36 h-36 bg-cyan-400/20 rounded-full blur-2xl pointer-events-none" />
-            <div className="w-11 h-11 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center mb-3.5 shadow-xs">
-              <Award size={24} className="text-white" />
-            </div>
-            <span className="text-[10px] font-mono font-bold text-cyan-200 uppercase tracking-widest block mb-1">
-              Executive Guidance
-            </span>
-            <h3 className="font-heading font-bold text-xl mb-1.5 text-white">
-              1-on-1 Alumni Mentorship
-            </h3>
-            <p className="text-blue-50 text-xs mb-5 leading-relaxed font-sans">
-              Schedule personalized advisory sessions with distinguished alumni leaders at Google, Microsoft, Goldman Sachs, and top institutions.
-            </p>
-            <Button
-              size="sm"
-              variant="secondary"
-              onClick={() => navigate('/student/mentorship')}
-              className="w-full text-xs font-bold bg-white text-blue-700 hover:bg-blue-50 border-0 shadow-sm"
-            >
-              Book Advisory Session
-            </Button>
-          </div>
+
         </div>
       </div>
 

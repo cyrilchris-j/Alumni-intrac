@@ -160,7 +160,7 @@ const AlumniMentorship = () => {
           }
         />
       ) : (
-        <div className="space-y-4 max-w-4xl">
+        <div className="space-y-4 w-full">
           {currentList.map((req) => {
             const student = studentProfiles[req.studentId];
             return (

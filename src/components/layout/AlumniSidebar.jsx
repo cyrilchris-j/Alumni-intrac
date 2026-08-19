@@ -51,45 +51,7 @@ const AlumniSidebar = ({ onClose }) => {
         </div>
       </div>
 
-      {/* User Info Profile Pill */}
-      <div className="p-3.5 flex-shrink-0">
-        <Link
-          to="/alumni/profile"
-          onClick={onClose}
-          className="p-3 rounded-xl bg-slate-50 hover:bg-blue-50/70 border border-slate-200/80 block transition-all duration-200 group shadow-2xs"
-        >
-          <div className="flex items-center gap-3">
-            <Avatar 
-              src={userProfile?.photoURL} 
-              name={userProfile?.fullName || currentUser?.displayName} 
-              size="sm" 
-              ring 
-            />
-            <div className="min-w-0 flex-1">
-              <p className="text-xs font-bold text-slate-900 truncate group-hover:text-blue-600 transition-colors">
-                {userProfile?.fullName || currentUser?.displayName || 'Alumni Member'}
-              </p>
-              <p className="text-[11px] text-slate-500 truncate mt-0.5">
-                {userProfile?.jobRole || userProfile?.company || 'Alumni Member'}
-              </p>
-            </div>
-          </div>
-          {isVerified && (
-            <div className="mt-2.5">
-              <Badge variant="emerald" dot className="text-[10px] py-0.5 bg-emerald-50 text-emerald-700 border-emerald-200">
-                Verified Alumni
-              </Badge>
-            </div>
-          )}
-          {userProfile?.verificationStatus === 'pending' && (
-            <div className="mt-2.5">
-              <Badge variant="warning" dot className="text-[10px] py-0.5 bg-amber-50 text-amber-700 border-amber-200">
-                Verification Pending
-              </Badge>
-            </div>
-          )}
-        </Link>
-      </div>
+
 
       {/* Nav items */}
       <nav className="flex-1 px-3 py-2 overflow-y-auto space-y-1 scrollbar-none">

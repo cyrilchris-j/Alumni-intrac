@@ -13,13 +13,13 @@ const sizeClasses = {
 };
 
 const variantClasses = {
-  primary: 'bg-blue-600 hover:bg-blue-700 text-white focus:ring-blue-500 shadow-sm hover:shadow-md hover:-translate-y-0.5 active:translate-y-0',
-  gold: 'bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white focus:ring-blue-400 shadow-sm hover:-translate-y-0.5 active:translate-y-0',
-  secondary: 'bg-white text-slate-800 border border-slate-200 hover:bg-slate-50 hover:border-slate-300 focus:ring-blue-500 shadow-xs hover:-translate-y-0.5 active:translate-y-0',
-  ghost: 'text-slate-600 hover:bg-blue-50 hover:text-blue-600 focus:ring-blue-300',
-  danger: 'bg-gradient-to-r from-red-600 to-red-700 text-white hover:from-red-700 hover:to-red-800 focus:ring-red-500 shadow-sm',
-  success: 'bg-gradient-to-r from-emerald-600 to-emerald-700 text-white hover:from-emerald-700 hover:to-emerald-800 focus:ring-emerald-500 shadow-sm',
-  outline: 'border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 hover:border-slate-300 focus:ring-slate-300 shadow-xs',
+  primary: 'bg-blue-600 hover:bg-blue-700 text-white focus:ring-blue-500 shadow-sm hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 font-medium',
+  gold: 'bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white focus:ring-blue-400 shadow-sm hover:-translate-y-0.5 active:translate-y-0 font-medium',
+  secondary: 'bg-white text-slate-700 border border-slate-200/90 hover:bg-slate-50 hover:text-slate-900 hover:border-slate-300 focus:ring-blue-500 shadow-xs hover:-translate-y-0.5 active:translate-y-0 font-medium',
+  ghost: 'text-slate-700 hover:bg-slate-100 hover:text-slate-900 focus:ring-slate-300 font-medium',
+  danger: 'bg-gradient-to-r from-red-600 to-red-700 text-white hover:from-red-700 hover:to-red-800 focus:ring-red-500 shadow-sm font-medium',
+  success: 'bg-gradient-to-r from-emerald-600 to-emerald-700 text-white hover:from-emerald-700 hover:to-emerald-800 focus:ring-emerald-500 shadow-sm font-medium',
+  outline: 'border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 hover:border-slate-300 focus:ring-slate-300 shadow-xs font-medium',
 };
 
 const Button = ({

@@ -55,31 +55,7 @@ const StudentSidebar = ({ onClose }) => {
         </div>
       </div>
 
-      {/* User Info Profile Pill */}
-      <div className="p-3.5 flex-shrink-0">
-        <Link
-          to="/student/profile"
-          onClick={onClose}
-          className="p-3 rounded-xl bg-slate-50 hover:bg-blue-50/70 border border-slate-200/80 flex items-center gap-3 transition-all duration-200 group block shadow-2xs"
-        >
-          <Avatar 
-            src={userProfile?.photoURL} 
-            name={userProfile?.fullName || currentUser?.displayName} 
-            size="sm" 
-            ring 
-          />
-          <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-1.5">
-              <p className="text-xs font-bold text-slate-900 truncate group-hover:text-blue-600 transition-colors">
-                {userProfile?.fullName || currentUser?.displayName || 'Student Member'}
-              </p>
-            </div>
-            <p className="text-[11px] text-slate-500 truncate mt-0.5">
-              {userProfile?.department || 'Student Scholar'}
-            </p>
-          </div>
-        </Link>
-      </div>
+
 
       {/* Nav items */}
       <nav className="flex-1 px-3 py-2 overflow-y-auto space-y-1 scrollbar-none">

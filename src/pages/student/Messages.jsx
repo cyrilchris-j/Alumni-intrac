@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import {
   Send, Search, MessageSquare, ArrowLeft, Plus, Check, CheckCheck,
-  Building2, GraduationCap, Sparkles
+  Building2, GraduationCap, Sparkles, Mail, MapPin, ExternalLink, UserCheck
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import DashboardLayout from '../../components/layout/DashboardLayout';
@@ -25,6 +25,7 @@ import { formatTime, timeAgo, getConversationId } from '../../utils/formatters';
 const Messages = () => {
   const { currentUser, userProfile } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
 
   const [conversations, setConversations] = useState([]);
   const [selectedConvId, setSelectedConvId] = useState(null);
@@ -35,7 +36,8 @@ const Messages = () => {
   const [search, setSearch] = useState('');
   const [mobileView, setMobileView] = useState('list'); // 'list' | 'chat'
 
-  // New Chat Modal state
+  // Modal states
+  const [showProfileModal, setShowProfileModal] = useState(false);
   const [showNewChatModal, setShowNewChatModal] = useState(false);
   const [acceptedConnections, setAcceptedConnections] = useState([]);
   const [connectionProfiles, setConnectionProfiles] = useState({});
@@ -382,68 +384,83 @@ const Messages = () => {
               </div>
             ) : (
               <>
-                {/* Classical Chat Header */}
-                <div className="h-16 px-5 border-b border-border bg-white flex items-center justify-between flex-shrink-0 shadow-xs">
-                  <div className="flex items-center gap-3.5 min-w-0">
+                {/* Modern iMessage / Classical Header */}
+                <div className="px-4 py-3 border-b border-slate-200/80 bg-white flex items-center justify-between flex-shrink-0 shadow-2xs">
+                  <div className="flex items-center gap-3 min-w-0 flex-1">
                     <button
                       onClick={() => setMobileView('list')}
-                      className="sm:hidden p-1.5 text-text-secondary hover:text-text-primary rounded-lg hover:bg-slate-100 transition-colors"
+                      className="sm:hidden p-1.5 text-slate-500 hover:text-slate-900 rounded-xl hover:bg-slate-100 transition-colors flex-shrink-0"
+                      aria-label="Back to chat list"
                     >
-                      <ArrowLeft size={18} />
+                      <ArrowLeft size={20} />
                     </button>
 
-                    <div className="relative flex-shrink-0">
-                      <Avatar
-                        src={selectedOther?.profile?.photoURL}
-                        name={selectedOther?.profile?.fullName}
-                        size="md"
-                      />
-                      <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 border-2 border-white rounded-full" />
-                    </div>
-
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-1.5">
-                        <h3 className="font-heading font-bold text-text-primary text-sm truncate">
-                          {selectedOther?.profile?.fullName || 'Contact'}
-                        </h3>
-                        {selectedOther?.profile?.verificationStatus === 'verified' && (
-                          <Badge variant="success" className="text-[9px] px-1 py-0.2">
-                            ✓ Verified
-                          </Badge>
-                        )}
+                    {/* Clickable Profile Header Block */}
+                    <div
+                      onClick={() => setShowProfileModal(true)}
+                      className="flex items-center gap-3 min-w-0 cursor-pointer hover:bg-slate-50 p-1 rounded-xl transition-all group flex-1"
+                      title="Click to view full profile details"
+                    >
+                      <div className="relative flex-shrink-0">
+                        <Avatar
+                          src={selectedOther?.profile?.photoURL}
+                          name={selectedOther?.profile?.fullName}
+                          size="md"
+                          ring
+                        />
+                        <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 border-2 border-white rounded-full" />
                       </div>
-                      <p className="text-xs text-text-secondary truncate flex items-center gap-1.5">
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                        <span className="text-emerald-700 font-medium">Online</span>
-                        <span className="text-text-muted">•</span>
-                        <span>
-                          {selectedOther?.profile?.jobRole ||
-                            selectedOther?.profile?.department ||
-                            'Connected'}
-                        </span>
-                      </p>
+
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-1.5">
+                          <h3 className="font-heading font-bold text-slate-900 text-sm sm:text-base leading-tight truncate group-hover:text-blue-600 transition-colors">
+                            {selectedOther?.profile?.fullName || 'Contact'}
+                          </h3>
+                          {selectedOther?.profile?.verificationStatus === 'verified' && (
+                            <span title="Verified Member" className="text-emerald-600 flex-shrink-0">
+                              <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded-full border border-emerald-200">
+                                ✓ Verified
+                              </span>
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-[11px] sm:text-xs text-slate-500 font-medium truncate mt-0.5 flex items-center gap-1.5">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 flex-shrink-0 animate-pulse" />
+                          <span className="text-emerald-700 font-bold">Online</span>
+                          <span className="text-slate-300">•</span>
+                          <span className="truncate">
+                            {selectedOther?.profile?.jobRole ||
+                              selectedOther?.profile?.department ||
+                              'Connected Network'}
+                          </span>
+                        </p>
+                      </div>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2">
-                    <span className="text-[11px] bg-slate-100 text-slate-700 font-semibold px-2.5 py-1 rounded-lg border border-slate-200">
-                      Direct Chat
-                    </span>
+                  <div className="flex items-center gap-2 flex-shrink-0 ml-2">
+                    <button
+                      onClick={() => setShowProfileModal(true)}
+                      className="text-xs bg-blue-50 hover:bg-blue-100 text-blue-700 font-semibold px-3 py-1.5 rounded-xl border border-blue-200/80 transition-all flex items-center gap-1.5 shadow-2xs"
+                    >
+                      <UserCheck size={14} />
+                      <span className="hidden sm:inline">View</span> Profile
+                    </button>
                   </div>
                 </div>
 
                 {/* Messages Body */}
-                <div className="flex-1 overflow-y-auto p-5 space-y-4 bg-gradient-to-b from-slate-50/50 via-white to-slate-50/30">
+                <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-3.5 bg-slate-50/50">
                   {messages.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center h-full text-center">
-                      <div className="w-12 h-12 bg-primary-50 rounded-2xl flex items-center justify-center text-primary-600 mb-2">
-                        <Sparkles size={20} />
+                    <div className="flex flex-col items-center justify-center h-full text-center py-12">
+                      <div className="w-14 h-14 bg-blue-50 border border-blue-100 rounded-2xl flex items-center justify-center text-blue-600 mb-3 shadow-xs">
+                        <Sparkles size={24} />
                       </div>
-                      <p className="text-sm font-semibold text-text-primary">
+                      <p className="text-base font-bold text-slate-900">
                         Say hello to {selectedOther?.profile?.fullName || 'your connection'}!
                       </p>
-                      <p className="text-xs text-text-muted mt-1">
-                        Send a message to collaborate or seek career guidance.
+                      <p className="text-xs text-slate-500 mt-1 max-w-sm">
+                        Send a direct message to discuss career goals, seek guidance, or collaborate.
                       </p>
                     </div>
                   ) : (
@@ -455,28 +472,28 @@ const Messages = () => {
                           className={`flex ${isOwn ? 'justify-end' : 'justify-start'} animate-in fade-in duration-200`}
                         >
                           <div
-                            className={`max-w-[80%] sm:max-w-[65%] flex flex-col ${
+                            className={`max-w-[85%] sm:max-w-[70%] flex flex-col ${
                               isOwn ? 'items-end' : 'items-start'
                             }`}
                           >
                             <div
-                              className={`px-4 py-2.5 rounded-2xl text-sm leading-relaxed shadow-xs ${
+                              className={`px-4 py-2.5 rounded-2xl text-sm leading-relaxed min-w-[54px] ${
                                 isOwn
-                                  ? 'bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-br-xs font-normal'
-                                  : 'bg-white text-slate-800 border border-slate-200/90 rounded-bl-xs font-normal shadow-sm'
+                                  ? 'bg-blue-600 text-white font-medium rounded-tr-xs shadow-2xs'
+                                  : 'bg-white text-slate-800 border border-slate-200/90 font-medium rounded-tl-xs shadow-2xs'
                               }`}
                             >
                               <p className="whitespace-pre-wrap break-words">{msg.text}</p>
                             </div>
 
                             <div
-                              className={`flex items-center gap-1 mt-1 text-[10px] text-text-muted px-1 ${
+                              className={`flex items-center gap-1 mt-1 text-[10px] text-slate-400 font-medium px-1 ${
                                 isOwn ? 'justify-end' : 'justify-start'
                               }`}
                             >
                               <span>{msg.createdAt ? formatTime(msg.createdAt) : ''}</span>
                               {isOwn && (
-                                <span className="text-primary-600">
+                                <span className="text-blue-600">
                                   {msg.read ? <CheckCheck size={13} /> : <Check size={13} />}
                                 </span>
                               )}
@@ -492,7 +509,7 @@ const Messages = () => {
                 {/* Classical Message Input Bar */}
                 <form
                   onSubmit={handleSendMessage}
-                  className="p-3.5 bg-white border-t border-border flex items-center gap-3 flex-shrink-0 shadow-lg"
+                  className="p-3.5 sm:p-4 bg-white border-t border-slate-200/90 flex items-center gap-2.5 flex-shrink-0 shadow-2xs"
                 >
                   <div className="flex-1 relative">
                     <input
@@ -502,7 +519,7 @@ const Messages = () => {
                       onChange={(e) => setNewMessage(e.target.value)}
                       onKeyDown={handleKeyDown}
                       placeholder={`Message ${selectedOther?.profile?.fullName || '...'}`}
-                      className="w-full pl-4 pr-10 py-3 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all placeholder:text-text-muted"
+                      className="w-full pl-4 pr-4 py-2.5 sm:py-3 text-sm bg-slate-50 border border-slate-200/90 rounded-full focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all font-medium text-slate-900 placeholder:text-slate-400"
                       disabled={sending}
                     />
                   </div>
@@ -510,9 +527,10 @@ const Messages = () => {
                   <button
                     type="submit"
                     disabled={!newMessage.trim() || sending}
-                    className="p-3 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-xl hover:from-primary-700 hover:to-primary-800 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-sm flex items-center justify-center flex-shrink-0"
+                    className="w-10 h-10 sm:w-11 sm:h-11 bg-blue-600 hover:bg-blue-700 active:scale-95 text-white rounded-full flex items-center justify-center flex-shrink-0 shadow-xs transition-all disabled:opacity-40 disabled:bg-slate-300 disabled:cursor-not-allowed"
+                    aria-label="Send message"
                   >
-                    <Send size={17} />
+                    <Send size={17} className="text-white fill-white translate-x-0.5" />
                   </button>
                 </form>
               </>
@@ -600,6 +618,145 @@ const Messages = () => {
             )}
           </div>
         </div>
+      </Modal>
+
+      {/* Contact Profile Detail Modal */}
+      <Modal
+        isOpen={showProfileModal}
+        onClose={() => setShowProfileModal(false)}
+        title="Member Profile Details"
+        size="md"
+        footer={
+          <div className="flex items-center justify-between w-full">
+            {selectedOther?.id ? (
+              <Button
+                variant="outline"
+                leftIcon={ExternalLink}
+                onClick={() => {
+                  setShowProfileModal(false);
+                  navigate(`/student/alumni/${selectedOther?.id}`);
+                }}
+                className="text-xs font-bold"
+              >
+                View Full Page
+              </Button>
+            ) : <div />}
+            <Button variant="primary" onClick={() => setShowProfileModal(false)} className="text-xs font-bold px-5">
+              Close
+            </Button>
+          </div>
+        }
+      >
+        {selectedOther?.profile ? (
+          <div className="space-y-5">
+            {/* Header Card */}
+            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 p-5 text-white shadow-md">
+              <div className="flex items-center gap-4 relative z-10">
+                <Avatar
+                  src={selectedOther.profile.photoURL}
+                  name={selectedOther.profile.fullName}
+                  size="xl"
+                  ring
+                  className="w-18 h-18 border-4 border-white/30 shadow-lg flex-shrink-0"
+                />
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h3 className="text-xl font-heading font-bold tracking-tight text-white truncate">
+                      {selectedOther.profile.fullName}
+                    </h3>
+                    {selectedOther.profile.verificationStatus === 'verified' && (
+                      <span className="bg-emerald-500/90 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full shadow-2xs backdrop-blur-xs">
+                        ✓ Verified Alumni
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-xs sm:text-sm font-medium text-blue-100 mt-1 truncate">
+                    {selectedOther.profile.jobRole || selectedOther.profile.department || 'Alumni Network Member'}
+                    {selectedOther.profile.company && ` at ${selectedOther.profile.company}`}
+                  </p>
+                  <p className="text-xs text-blue-200/90 mt-0.5 truncate">
+                    {selectedOther.profile.graduationYear && `Class of ${selectedOther.profile.graduationYear}`}
+                    {selectedOther.profile.department && ` • ${selectedOther.profile.department}`}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Quick Details Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="p-3 bg-slate-50 rounded-xl border border-slate-200/80 flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center flex-shrink-0">
+                  <Mail size={16} />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Email Address</p>
+                  <p className="text-xs font-bold text-slate-800 truncate">{selectedOther.profile.email || 'Private'}</p>
+                </div>
+              </div>
+
+              <div className="p-3 bg-slate-50 rounded-xl border border-slate-200/80 flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center flex-shrink-0">
+                  <Building2 size={16} />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Organization / Company</p>
+                  <p className="text-xs font-bold text-slate-800 truncate">
+                    {selectedOther.profile.company || selectedOther.profile.collegeName || 'Alumni Network'}
+                  </p>
+                </div>
+              </div>
+
+              <div className="p-3 bg-slate-50 rounded-xl border border-slate-200/80 flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg bg-purple-100 text-purple-700 flex items-center justify-center flex-shrink-0">
+                  <GraduationCap size={16} />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Department / Program</p>
+                  <p className="text-xs font-bold text-slate-800 truncate">{selectedOther.profile.department || 'Computer Science'}</p>
+                </div>
+              </div>
+
+              <div className="p-3 bg-slate-50 rounded-xl border border-slate-200/80 flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center flex-shrink-0">
+                  <MapPin size={16} />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Location</p>
+                  <p className="text-xs font-bold text-slate-800 truncate">{selectedOther.profile.location || 'Tamil Nadu, India'}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Bio Section */}
+            {selectedOther.profile.bio && (
+              <div className="p-3.5 bg-slate-50/80 rounded-xl border border-slate-200/80">
+                <p className="text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">About / Bio</p>
+                <p className="text-xs text-slate-600 leading-relaxed italic">{selectedOther.profile.bio}</p>
+              </div>
+            )}
+
+            {/* Skills & Focus Areas */}
+            {selectedOther.profile.skills?.length > 0 && (
+              <div>
+                <p className="text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-2">Skills & Expertise</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {selectedOther.profile.skills.map((skill) => (
+                    <span
+                      key={skill}
+                      className="text-xs font-medium bg-blue-50 text-blue-800 border border-blue-200/80 px-2.5 py-1 rounded-lg"
+                    >
+                      {skill}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="p-6 text-center text-xs text-slate-500">
+            Profile details for this user are loading or private.
+          </div>
+        )}
       </Modal>
     </DashboardLayout>
   );

@@ -285,61 +285,61 @@ const Opportunities = () => {
                 <div
                   key={opp.id}
                   onClick={() => setSelectedOpp(opp)}
-                  className={`bg-white rounded-2xl border p-4.5 cursor-pointer transition-all duration-200 ${
+                  className={`bg-white rounded-2xl border p-5 cursor-pointer transition-all duration-200 shadow-xs hover:shadow-card-hover ${
                     isSelected
-                      ? 'border-primary-600 ring-2 ring-primary-500/20 shadow-sm bg-primary-50/20'
-                      : 'border-border hover:border-gray-300'
+                      ? 'border-blue-600 ring-2 ring-blue-500/20 bg-blue-50/20'
+                      : 'border-slate-200/90 hover:border-slate-300'
                   }`}
                 >
-                  <div className="flex items-start justify-between gap-2 mb-2">
+                  <div className="flex items-start justify-between gap-3 mb-3">
                     <div className="min-w-0 flex-1">
-                      <h3 className="font-bold text-text-primary text-sm line-clamp-1">
+                      <h3 className="font-heading font-bold text-slate-900 text-sm sm:text-base leading-snug line-clamp-2">
                         {opp.title}
                       </h3>
-                      <p className="text-xs text-text-secondary font-medium mt-0.5">{opp.company}</p>
+                      <p className="text-xs text-slate-500 font-semibold mt-1">{opp.company}</p>
                     </div>
                     <button
                       onClick={(e) => toggleSave(opp.id, e)}
-                      className={`p-1.5 rounded-lg transition-colors flex-shrink-0 ${
+                      className={`p-2 rounded-xl transition-colors flex-shrink-0 ${
                         isSaved
-                          ? 'text-primary-600 bg-primary-50'
-                          : 'text-text-muted hover:text-text-primary'
+                          ? 'text-blue-600 bg-blue-50 border border-blue-200'
+                          : 'text-slate-400 hover:text-slate-700 hover:bg-slate-100'
                       }`}
                       title={isSaved ? 'Remove from Saved' : 'Save Opportunity'}
                     >
-                      {isSaved ? <BookmarkCheck size={17} /> : <Bookmark size={17} />}
+                      {isSaved ? <BookmarkCheck size={18} /> : <Bookmark size={18} />}
                     </button>
                   </div>
 
-                  <div className="flex flex-wrap gap-2 text-xs text-text-muted mb-3">
-                    <span className="flex items-center gap-1">
-                      <MapPin size={11} />
+                  <div className="flex flex-wrap items-center gap-2 text-xs text-slate-400 mb-4 font-medium">
+                    <span className="flex items-center gap-1.5 text-slate-500">
+                      <MapPin size={13} className="text-slate-400" />
                       {opp.location || 'Remote'}
                     </span>
                     <span>•</span>
-                    <span>{opp.workMode || 'Remote'}</span>
+                    <span className="text-slate-500">{opp.workMode || 'Remote'}</span>
                   </div>
 
-                  <div className="flex items-center justify-between pt-2.5 border-t border-border/80 text-xs">
-                    <div className="flex items-center gap-1.5">
+                  <div className="flex items-center justify-between pt-3 border-t border-slate-100 text-xs">
+                    <div className="flex items-center gap-2">
                       <span
-                        className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
+                        className={`text-[11px] font-bold px-2.5 py-1 rounded-full border ${
                           isHackathon
                             ? 'bg-amber-50 text-amber-700 border-amber-200'
                             : isVacancy
                             ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                            : 'bg-primary-50 text-primary-700 border-primary-200'
+                            : 'bg-blue-50 text-blue-700 border-blue-200'
                         }`}
                       >
                         {opp.type}
                       </span>
                       {isApplied && (
-                        <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded-md border border-emerald-200">
+                        <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
                           ✓ Applied
                         </span>
                       )}
                     </div>
-                    <span className="text-text-muted text-[11px]">{timeAgo(opp.createdAt)}</span>
+                    <span className="text-slate-400 text-[11px] font-medium">{timeAgo(opp.createdAt)}</span>
                   </div>
                 </div>
               );

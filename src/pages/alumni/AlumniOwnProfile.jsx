@@ -148,9 +148,9 @@ const AlumniOwnProfile = () => {
         </div>
 
         <Button
-          variant={editing ? 'ghost' : 'primary'}
+          variant={editing ? 'secondary' : 'primary'}
           onClick={() => setEditing((prev) => !prev)}
-          className="rounded-xl px-5 py-2.5 text-sm font-semibold flex-shrink-0 bg-blue-600 hover:bg-blue-700 text-white shadow-xs"
+          className="rounded-xl px-5 py-2.5 text-sm font-semibold flex-shrink-0"
         >
           {editing ? 'Cancel' : 'Edit Profile'}
         </Button>
