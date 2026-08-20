@@ -33,8 +33,8 @@ const AdminSettings = () => {
         </div>
       )}
 
-      <div className="max-w-3xl space-y-6">
-        <form onSubmit={handleSave} className="bg-white rounded-2xl border border-border p-6 shadow-sm space-y-4">
+      <div className="w-full space-y-4">
+        <form onSubmit={handleSave} className="bg-white rounded-xl border border-border p-4 sm:p-5 shadow-sm space-y-4">
           <div className="flex items-center gap-3 mb-2">
             <div className="w-10 h-10 rounded-xl bg-primary-50 flex items-center justify-center text-primary-600">
               <Building2 size={20} />
