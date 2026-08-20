@@ -184,7 +184,7 @@ const Connections = () => {
                 actionLabel="Explore Directory"
               />
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                 {connections.map((conn) => {
                   const otherId = getOtherId(conn);
                   const profile = profiles[otherId];
@@ -192,62 +192,66 @@ const Connections = () => {
                   return (
                     <div
                       key={conn.id}
-                      className="bg-white rounded-2xl border border-slate-200/90 p-5 hover:shadow-card-hover hover:border-gold-300 transition-all duration-200 flex flex-col justify-between shadow-card"
+                      className="bg-white rounded-2xl border border-slate-200/80 p-5 hover:shadow-md hover:border-slate-300 transition-all duration-200 flex flex-col justify-between"
                     >
-                      <div className="flex items-start gap-3.5 mb-3">
-                        <Avatar src={profile?.photoURL} name={profile?.fullName} size="lg" ring />
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-1.5 flex-wrap">
-                            <p className="font-serif font-bold text-slate-900 text-sm truncate">
-                              {profile?.fullName || 'Network Connection'}
+                      <div>
+                        {/* Top Info */}
+                        <div className="flex items-start gap-3.5 mb-3">
+                          <Avatar src={profile?.photoURL} name={profile?.fullName} size="lg" />
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-1.5 flex-wrap">
+                              <h3 className="font-heading font-semibold text-slate-900 text-sm truncate">
+                                {profile?.fullName || 'Network Connection'}
+                              </h3>
+                              {profile?.verificationStatus === 'verified' && (
+                                <span className="text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full text-[10px] font-bold border border-emerald-200/80 flex items-center gap-0.5">
+                                  <CheckCircle size={10} /> Verified
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-xs text-slate-600 font-medium truncate mt-0.5">
+                              {profile?.jobRole || profile?.department}
                             </p>
-                            {profile?.verificationStatus === 'verified' && (
-                              <span className="text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded-full text-[10px] font-bold border border-emerald-200 flex items-center gap-0.5">
-                                ✓ Verified
-                              </span>
+                            {profile?.company ? (
+                              <p className="text-xs text-primary-600 font-medium truncate flex items-center gap-1 mt-1">
+                                <Building2 size={12} className="text-slate-400 flex-shrink-0" />
+                                {profile.company}
+                              </p>
+                            ) : (
+                              <p className="text-xs text-slate-500 font-medium truncate flex items-center gap-1 mt-1">
+                                <GraduationCap size={12} className="text-slate-400 flex-shrink-0" />
+                                {profile?.year || 'Collegiate Scholar'}
+                              </p>
                             )}
                           </div>
-                          <p className="text-xs text-slate-600 truncate mt-0.5 font-medium">
-                            {profile?.jobRole || profile?.department}
-                          </p>
-                          {profile?.company ? (
-                            <p className="text-xs text-primary-900 font-semibold truncate flex items-center gap-1 mt-0.5">
-                              <Building2 size={11} className="text-gold-600" />
-                              {profile.company}
-                            </p>
-                          ) : (
-                            <p className="text-xs text-slate-500 font-medium truncate flex items-center gap-1 mt-0.5">
-                              <GraduationCap size={11} className="text-gold-600" />
-                              {profile?.year || 'Collegiate Scholar'}
-                            </p>
-                          )}
                         </div>
                       </div>
 
-                      <div className="flex gap-2 pt-3 border-t border-slate-100">
+                      {/* Action Buttons */}
+                      <div className="flex items-center gap-2 pt-3.5 border-t border-slate-100 mt-2">
                         <Button
                           size="sm"
                           variant="primary"
                           loading={actioning === `chat_${otherId}`}
                           onClick={() => handleStartChat(otherId, profile?.fullName)}
-                          className="flex-1 text-xs"
+                          className="flex-1 text-xs font-medium"
                           leftIcon={MessageSquare}
                         >
-                          Send Message
+                          Message
                         </Button>
                         {isAlumni ? (
                           <Button
                             size="sm"
                             variant="secondary"
                             onClick={() => navigate(`/student/alumni/${otherId}`)}
-                            className="text-xs px-3"
+                            className="text-xs px-3.5 font-medium"
                           >
                             Profile
                           </Button>
                         ) : (
-                          <Badge variant="gold" className="text-[10px] self-center">
+                          <span className="text-xs font-medium text-slate-500 px-2">
                             Connected
-                          </Badge>
+                          </span>
                         )}
                       </div>
                     </div>
@@ -266,46 +270,51 @@ const Connections = () => {
                 description="When someone sends you a connection request, you'll see it here."
               />
             ) : (
-              <div className="space-y-3 max-w-3xl">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                 {pending.map((conn) => {
                   const profile = profiles[conn.senderId];
                   return (
                     <div
                       key={conn.id}
-                      className="bg-white rounded-2xl border border-border p-4.5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 shadow-sm"
+                      className="bg-white rounded-2xl border border-slate-200/80 p-5 hover:shadow-md hover:border-slate-300 transition-all duration-200 flex flex-col justify-between"
                     >
-                      <div className="flex items-center gap-3 min-w-0">
-                        <Avatar src={profile?.photoURL} name={profile?.fullName} size="md" />
-                        <div className="min-w-0">
-                          <p className="font-bold text-text-primary text-sm">
+                      <div className="flex items-start gap-3.5 mb-4">
+                        <Avatar src={profile?.photoURL} name={profile?.fullName} size="lg" />
+                        <div className="flex-1 min-w-0">
+                          <p className="font-heading font-semibold text-slate-900 text-sm truncate">
                             {profile?.fullName || 'User'}
                           </p>
-                          <p className="text-xs text-text-secondary">
-                            {profile?.jobRole || profile?.department}{' '}
-                            {profile?.company && `• ${profile.company}`}
+                          <p className="text-xs text-slate-600 font-medium truncate mt-0.5">
+                            {profile?.jobRole || profile?.department}
                           </p>
-                          <p className="text-[11px] text-text-muted mt-0.5">
+                          {profile?.company && (
+                            <p className="text-xs text-slate-500 font-medium truncate flex items-center gap-1 mt-1">
+                              <Building2 size={12} className="text-slate-400 flex-shrink-0" />
+                              {profile.company}
+                            </p>
+                          )}
+                          <p className="text-[11px] text-slate-400 mt-1">
                             Received {timeAgo(conn.createdAt)}
                           </p>
                         </div>
                       </div>
 
-                      <div className="flex gap-2 flex-shrink-0">
+                      <div className="flex gap-2 pt-3.5 border-t border-slate-100 mt-2">
                         <Button
                           size="sm"
-                          variant="success"
+                          variant="primary"
                           loading={actioning === conn.id}
                           onClick={() => handleAccept(conn)}
-                          className="text-xs"
+                          className="flex-1 text-xs font-medium"
                         >
                           Accept
                         </Button>
                         <Button
                           size="sm"
-                          variant="ghost"
+                          variant="secondary"
                           loading={actioning === `reject_${conn.id}`}
                           onClick={() => handleReject(conn)}
-                          className="text-xs text-red-600 hover:bg-red-50"
+                          className="flex-1 text-xs font-medium text-slate-700 hover:text-red-600"
                         >
                           Decline
                         </Button>
@@ -317,7 +326,7 @@ const Connections = () => {
             )
           )}
 
-          {/* Sent Requests (Pending approval - NO message button until accepted) */}
+          {/* Sent Requests */}
           {activeTab === 'sent' && (
             sent.length === 0 ? (
               <EmptyState
@@ -328,34 +337,40 @@ const Connections = () => {
                 actionLabel="Find People"
               />
             ) : (
-              <div className="space-y-3 max-w-3xl">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                 {sent.map((conn) => {
                   const profile = profiles[conn.receiverId];
                   return (
                     <div
                       key={conn.id}
-                      className="bg-white rounded-2xl border border-border p-4.5 flex items-center justify-between gap-4 shadow-sm"
+                      className="bg-white rounded-2xl border border-slate-200/80 p-5 hover:shadow-md hover:border-slate-300 transition-all duration-200 flex flex-col justify-between"
                     >
-                      <div className="flex items-center gap-3 min-w-0">
-                        <Avatar src={profile?.photoURL} name={profile?.fullName} size="md" />
-                        <div className="min-w-0">
-                          <p className="font-bold text-text-primary text-sm">
+                      <div className="flex items-start gap-3.5 mb-4">
+                        <Avatar src={profile?.photoURL} name={profile?.fullName} size="lg" />
+                        <div className="flex-1 min-w-0">
+                          <p className="font-heading font-semibold text-slate-900 text-sm truncate">
                             {profile?.fullName || 'User'}
                           </p>
-                          <p className="text-xs text-text-secondary">
-                            {profile?.jobRole || profile?.department}{' '}
-                            {profile?.company && `• ${profile.company}`}
+                          <p className="text-xs text-slate-600 font-medium truncate mt-0.5">
+                            {profile?.jobRole || profile?.department}
                           </p>
-                          <p className="text-[11px] text-text-muted mt-0.5">
+                          {profile?.company && (
+                            <p className="text-xs text-slate-500 font-medium truncate flex items-center gap-1 mt-1">
+                              <Building2 size={12} className="text-slate-400 flex-shrink-0" />
+                              {profile.company}
+                            </p>
+                          )}
+                          <p className="text-[11px] text-slate-400 mt-1">
                             Sent {timeAgo(conn.createdAt)}
                           </p>
                         </div>
                       </div>
 
-                      {/* Explicitly showing Pending Status badge, NO message option */}
-                      <Badge variant="warning" dot className="text-xs font-semibold px-2.5 py-1">
-                        Pending Approval
-                      </Badge>
+                      <div className="pt-3.5 border-t border-slate-100 mt-2 flex justify-end">
+                        <Badge variant="warning" dot className="text-xs font-medium px-2.5 py-1">
+                          Pending Approval
+                        </Badge>
+                      </div>
                     </div>
                   );
                 })}
