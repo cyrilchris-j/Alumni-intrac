@@ -18,29 +18,27 @@ import { getEvents } from '../../services/eventService';
 import { getOpportunities } from '../../services/opportunityService';
 import { timeAgo } from '../../utils/formatters';
 
-const StatCard = ({ icon: Icon, label, value, color = 'primary', onClick }) => (
+const StatCard = ({ icon: Icon, label, value, color = 'primary', onClick, sublabel }) => (
   <div
     onClick={onClick}
-    className={`bg-white rounded-xl border border-border p-5 flex items-center gap-4 ${
-      onClick ? 'cursor-pointer hover:shadow-card-hover transition-shadow' : ''
+    className={`bg-white rounded-2xl border border-slate-200/90 p-4 sm:p-5 flex flex-col justify-between transition-all duration-200 shadow-card hover:shadow-card-hover hover:border-blue-300 hover:-translate-y-0.5 relative overflow-hidden group ${
+      onClick ? 'cursor-pointer' : ''
     }`}
   >
-    <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${
-      color === 'primary' ? 'bg-primary-50' :
-      color === 'green' ? 'bg-green-50' :
-      color === 'purple' ? 'bg-purple-50' :
-      'bg-orange-50'
-    }`}>
-      <Icon size={22} className={`${
-        color === 'primary' ? 'text-primary-600' :
-        color === 'green' ? 'text-green-600' :
-        color === 'purple' ? 'text-purple-600' :
-        'text-orange-600'
-      }`} />
+    <div className="flex items-center justify-between gap-3 mb-3">
+      <div className={`w-10 h-10 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center flex-shrink-0 transition-transform duration-200 group-hover:scale-105 ${
+        color === 'primary' ? 'bg-blue-50 text-blue-700 border border-blue-100' :
+        color === 'green' ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' :
+        color === 'purple' ? 'bg-purple-50 text-purple-700 border border-purple-100' :
+        'bg-amber-50 text-amber-700 border border-amber-200'
+      }`}>
+        <Icon size={20} />
+      </div>
+      <p className="text-2xl sm:text-3xl font-heading font-bold text-slate-900 tracking-tight">{value}</p>
     </div>
     <div>
-      <p className="text-2xl font-heading font-bold text-text-primary">{value}</p>
-      <p className="text-sm text-text-secondary">{label}</p>
+      <p className="text-xs sm:text-sm font-bold text-slate-800 leading-snug">{label}</p>
+      {sublabel && <p className="text-[11px] text-slate-500 font-medium mt-0.5 leading-tight">{sublabel}</p>}
     </div>
   </div>
 );

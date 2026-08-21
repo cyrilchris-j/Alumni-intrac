@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import {
   MapPin, Building2, GraduationCap, Calendar,
   Mail, Phone, Link2, MessageSquare, BookOpen, ArrowLeft,
-  Briefcase, Star, Users
+  Briefcase, Users
 } from 'lucide-react';
 import { LinkedInIcon } from '../../components/ui/Icons';
 import { useAuth } from '../../context/AuthContext';
@@ -325,24 +325,7 @@ const AlumniProfile = () => {
             </div>
           </div>
 
-          {/* Mentorship CTA */}
-          <div className="bg-green-50 rounded-xl border border-green-100 p-5">
-            <div className="flex items-center gap-2 mb-2">
-              <Star size={18} className="text-green-600" />
-              <h3 className="font-semibold text-text-primary text-sm">Open to Mentorship</h3>
-            </div>
-            <p className="text-xs text-text-secondary mb-3 leading-relaxed">
-              {alumni.fullName?.split(' ')[0]} is available to guide students in their career journey.
-            </p>
-            <Button
-              size="sm"
-              variant="success"
-              fullWidth
-              onClick={() => setShowMentorshipModal(true)}
-            >
-              Request Mentorship
-            </Button>
-          </div>
+
         </div>
       </div>
 

@@ -38,27 +38,29 @@ import { formatDate, formatFirebaseError } from '../../utils/formatters';
 const StatCard = ({ icon: Icon, label, value, color = 'primary', onClick, sublabel }) => (
   <div
     onClick={onClick}
-    className={`bg-white rounded-2xl border border-slate-200/90 p-5 flex items-center gap-4 transition-all duration-200 shadow-card hover:shadow-card-hover hover:-translate-y-0.5 relative overflow-hidden group ${
+    className={`bg-white rounded-2xl border border-slate-200/90 p-4 sm:p-5 flex flex-col justify-between transition-all duration-200 shadow-card hover:shadow-card-hover hover:border-blue-300 hover:-translate-y-0.5 relative overflow-hidden group ${
       onClick ? 'cursor-pointer' : ''
     }`}
   >
-    <div
-      className={`w-13 h-13 rounded-2xl flex items-center justify-center flex-shrink-0 transition-transform duration-200 group-hover:scale-105 ${
-        color === 'primary'
-          ? 'bg-primary-50 text-primary-800 border border-primary-100'
-          : color === 'green'
-          ? 'bg-emerald-50 text-emerald-800 border border-emerald-100'
-          : color === 'purple'
-          ? 'bg-purple-50 text-purple-800 border border-purple-100'
-          : 'bg-gold-50 text-gold-800 border border-gold-200'
-      }`}
-    >
-      <Icon size={24} />
+    <div className="flex items-center justify-between gap-3 mb-3">
+      <div
+        className={`w-10 h-10 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center flex-shrink-0 transition-transform duration-200 group-hover:scale-105 ${
+          color === 'primary'
+            ? 'bg-blue-50 text-blue-700 border border-blue-100'
+            : color === 'green'
+            ? 'bg-emerald-50 text-emerald-700 border border-emerald-100'
+            : color === 'purple'
+            ? 'bg-purple-50 text-purple-700 border border-purple-100'
+            : 'bg-amber-50 text-amber-700 border border-amber-200'
+        }`}
+      >
+        <Icon size={20} />
+      </div>
+      <p className="text-2xl sm:text-3xl font-heading font-bold text-slate-900 tracking-tight">{value}</p>
     </div>
-    <div className="min-w-0 flex-1">
-      <p className="text-3xl font-serif font-bold text-slate-900 tracking-tight">{value}</p>
-      <p className="text-xs font-semibold text-slate-700 truncate mt-0.5 uppercase tracking-wider">{label}</p>
-      {sublabel && <p className="text-[11px] text-slate-400 truncate font-medium">{sublabel}</p>}
+    <div>
+      <p className="text-xs sm:text-sm font-bold text-slate-800 leading-snug">{label}</p>
+      {sublabel && <p className="text-[11px] text-slate-500 font-medium mt-0.5 leading-tight">{sublabel}</p>}
     </div>
   </div>
 );
