@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import {
-  Bell, Check, CheckCheck, Link2, BookOpen,
+  Bell, Check, Link2, BookOpen,
   MessageSquare, Briefcase, Calendar, Megaphone, Trash2
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
@@ -99,7 +99,7 @@ const Notifications = () => {
           <Button
             variant="outline"
             size="sm"
-            leftIcon={CheckCheck}
+            leftIcon={Check}
             loading={markingAll}
             onClick={handleMarkAllRead}
           >

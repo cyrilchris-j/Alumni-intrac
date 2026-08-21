@@ -247,11 +247,6 @@ const StudentDashboard = () => {
       {/* Light Blue Welcome Header */}
       <div className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-xs font-mono font-bold text-blue-700 uppercase tracking-widest bg-blue-50 px-2.5 py-0.5 rounded-full border border-blue-200">
-              Collegiate Portal
-            </span>
-          </div>
           <h1 className="text-3xl sm:text-4xl font-heading font-bold text-slate-900 tracking-tight">
             Welcome back, {userProfile?.fullName?.split(' ')[0] || 'Scholar'}
           </h1>

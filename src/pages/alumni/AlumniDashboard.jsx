@@ -152,10 +152,7 @@ const AlumniDashboard = () => {
       {/* Header */}
       <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <span className="text-xs font-crest font-bold text-gold-600 uppercase tracking-widest bg-gold-100/60 px-2.5 py-0.5 rounded-full border border-gold-200/80">
-            Distinguished Alumni Portal
-          </span>
-          <h1 className="text-3xl font-serif font-bold text-slate-900 tracking-tight mt-1.5">
+          <h1 className="text-3xl font-serif font-bold text-slate-900 tracking-tight">
             Welcome back, {userProfile?.fullName?.split(' ')[0] || 'Alumni'}
           </h1>
           <p className="text-slate-500 text-sm mt-1">

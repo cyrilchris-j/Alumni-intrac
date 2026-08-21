@@ -124,10 +124,7 @@ const Connections = () => {
     <DashboardLayout>
       <div className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <span className="text-xs font-mono font-bold text-blue-700 uppercase tracking-widest bg-blue-50 px-2.5 py-0.5 rounded-full border border-blue-200">
-            Professional Network
-          </span>
-          <h1 className="text-3xl font-heading font-bold text-slate-900 tracking-tight mt-1.5">
+          <h1 className="text-3xl font-heading font-bold text-slate-900 tracking-tight">
             Connections & Requests
           </h1>
           <p className="text-slate-500 text-sm mt-1">
