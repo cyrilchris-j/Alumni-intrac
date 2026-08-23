@@ -17,7 +17,7 @@ import { SkeletonCard } from '../../components/ui/Skeleton';
 import { getStudentMentorshipRequests, sendMentorshipRequest } from '../../services/mentorshipService';
 import { getAlumniProfile, searchAlumni } from '../../services/userService';
 import { getOrCreateConversation } from '../../services/messageService';
-import { formatDate, timeAgo, formatFirebaseError } from '../../utils/formatters';
+import { formatDate, timeAgo, formatAuthError } from '../../utils/formatters';
 import { MENTORSHIP_STATUS, MENTORSHIP_AREAS } from '../../utils/constants';
 
 const statusConfig = {
@@ -112,7 +112,7 @@ const StudentMentorship = () => {
       await loadData();
       alert(`Mentorship request sent to ${selectedAlumni.fullName}!`);
     } catch (err) {
-      alert(formatFirebaseError(err));
+      alert(formatAuthError(err));
     } finally {
       setSendingRequest(false);
     }

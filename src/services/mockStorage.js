@@ -8,7 +8,7 @@ import {
 
 import { isSupabaseConfigured } from '../supabase/client';
 
-export const isFirebaseConfigured = isSupabaseConfigured;
+export { isSupabaseConfigured };
 
 // Storage keys
 const STORAGE_KEYS = {

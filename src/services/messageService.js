@@ -1,6 +1,6 @@
 import { supabase, isSupabaseConfigured } from '../supabase/client';
 import { getConversationId } from '../utils/formatters';
-import { isFirebaseConfigured, mockStore } from './mockStorage';
+import { mockStore } from './mockStorage';
 
 /**
  * Get or create a conversation between two users

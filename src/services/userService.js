@@ -1,6 +1,6 @@
 import { supabase, isSupabaseConfigured } from '../supabase/client';
 import { uploadProfilePhoto } from '../supabase/storage';
-import { isFirebaseConfigured, mockStore } from './mockStorage';
+import { mockStore } from './mockStorage';
 
 /**
  * Create a new user document in public.users after signup

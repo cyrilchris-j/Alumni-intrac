@@ -7,7 +7,7 @@ import {
 import { signUpWithEmail } from '../../supabase/auth';
 import { createUserDocument, createStudentProfile, createAlumniProfile } from '../../services/userService';
 import { uploadProfilePhoto } from '../../supabase/storage';
-import { formatFirebaseError } from '../../utils/formatters';
+import { formatAuthError } from '../../utils/formatters';
 import { DEPARTMENTS, STUDENT_YEARS, GRADUATION_YEARS, POPULAR_SKILLS } from '../../utils/constants';
 import Input from '../../components/ui/Input';
 import Select from '../../components/ui/Select';
@@ -61,7 +61,7 @@ const SignupPage = () => {
 
     setLoading(true);
     try {
-      // Create Firebase Auth user
+      // Create Supabase Auth user
       const user = await signUpWithEmail(form.email, form.password, form.fullName);
 
       // Upload profile photo if provided
@@ -117,7 +117,7 @@ const SignupPage = () => {
         navigate('/alumni/dashboard', { replace: true });
       }
     } catch (err) {
-      setError(formatFirebaseError(err));
+      setError(formatAuthError(err));
     } finally {
       setLoading(false);
     }

@@ -33,7 +33,7 @@ import {
   getRecommendedAlumni,
   getRecommendedStudents,
 } from '../../services/userService';
-import { formatDate, formatFirebaseError } from '../../utils/formatters';
+import { formatDate, formatAuthError } from '../../utils/formatters';
 
 const StatCard = ({ icon: Icon, label, value, color = 'primary', onClick, sublabel }) => (
   <div
@@ -160,7 +160,7 @@ const StudentDashboard = () => {
       }));
       setSentRequests((prev) => [...prev, { id: `req_${Date.now()}`, receiverId: targetId }]);
     } catch (e) {
-      alert(formatFirebaseError(e));
+      alert(formatAuthError(e));
     } finally {
       setConnectingId(null);
     }

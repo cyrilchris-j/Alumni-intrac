@@ -1,7 +1,7 @@
 import { supabase, isSupabaseConfigured } from '../supabase/client';
 import { MENTORSHIP_STATUS, NOTIFICATION_TYPES } from '../utils/constants';
 import { createNotification } from './notificationService';
-import { isFirebaseConfigured, mockStore } from './mockStorage';
+import { mockStore } from './mockStorage';
 
 /**
  * Send a mentorship request

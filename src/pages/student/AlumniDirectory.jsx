@@ -15,7 +15,7 @@ import Select from '../../components/ui/Select';
 import { searchAlumni, searchStudents } from '../../services/userService';
 import { sendConnectionRequest, getConnectionStatus } from '../../services/connectionService';
 import { getOrCreateConversation } from '../../services/messageService';
-import { formatFirebaseError, debounce } from '../../utils/formatters';
+import { formatAuthError, debounce } from '../../utils/formatters';
 import { DEPARTMENTS, GRADUATION_YEARS, STUDENT_YEARS } from '../../utils/constants';
 
 const AlumniDirectory = () => {
@@ -105,7 +105,7 @@ const AlumniDirectory = () => {
         [targetId]: { status: 'pending', senderId: currentUser.uid },
       }));
     } catch (e) {
-      alert(formatFirebaseError(e));
+      alert(formatAuthError(e));
     } finally {
       setActioning(null);
     }
@@ -120,7 +120,7 @@ const AlumniDirectory = () => {
       });
       navigate('/student/messages', { state: { conversationWith: personId } });
     } catch (e) {
-      alert(formatFirebaseError(e));
+      alert(formatAuthError(e));
     } finally {
       setActioning(null);
     }

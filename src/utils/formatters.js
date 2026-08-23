@@ -1,9 +1,10 @@
 /**
- * Format a Firebase Timestamp or Date to a readable string
+ * Format an ISO timestamp or Date to a readable string
  */
 export const formatDate = (timestamp, options = {}) => {
   if (!timestamp) return '';
-  const date = timestamp?.toDate ? timestamp.toDate() : new Date(timestamp);
+  const date = timestamp instanceof Date ? timestamp : new Date(timestamp);
+  if (isNaN(date.getTime())) return '';
   return date.toLocaleDateString('en-IN', {
     year: 'numeric',
     month: 'short',
@@ -17,7 +18,8 @@ export const formatDate = (timestamp, options = {}) => {
  */
 export const formatTime = (timestamp) => {
   if (!timestamp) return '';
-  const date = timestamp?.toDate ? timestamp.toDate() : new Date(timestamp);
+  const date = timestamp instanceof Date ? timestamp : new Date(timestamp);
+  if (isNaN(date.getTime())) return '';
   return date.toLocaleTimeString('en-IN', {
     hour: '2-digit',
     minute: '2-digit',
@@ -29,7 +31,8 @@ export const formatTime = (timestamp) => {
  */
 export const timeAgo = (timestamp) => {
   if (!timestamp) return '';
-  const date = timestamp?.toDate ? timestamp.toDate() : new Date(timestamp);
+  const date = timestamp instanceof Date ? timestamp : new Date(timestamp);
+  if (isNaN(date.getTime())) return '';
   const now = new Date();
   const diff = now - date;
 
@@ -72,26 +75,43 @@ export const truncate = (text, maxLength = 100) => {
 };
 
 /**
- * Format Firebase error codes to user-friendly messages
+ * Format Supabase & Auth error codes and messages to user-friendly messages
  */
-export const formatFirebaseError = (error) => {
-  const errorMap = {
-    'auth/user-not-found': 'No account found with this email address.',
-    'auth/wrong-password': 'Incorrect password. Please try again.',
-    'auth/email-already-in-use': 'An account with this email already exists.',
-    'auth/weak-password': 'Password must be at least 6 characters.',
-    'auth/invalid-email': 'Please enter a valid email address.',
-    'auth/too-many-requests': 'Too many attempts. Please try again later.',
-    'auth/network-request-failed': 'Network error. Please check your connection.',
-    'auth/popup-closed-by-user': 'Sign-in popup was closed. Please try again.',
-    'auth/cancelled-popup-request': 'Another sign-in is in progress.',
-    'auth/invalid-credential': 'Invalid email or password.',
-    'permission-denied': 'You do not have permission to perform this action.',
-    'unavailable': 'Service is temporarily unavailable. Please try again.',
-  };
+export const formatAuthError = (error) => {
+  if (!error) return 'Something went wrong. Please try again.';
+  const msg = error.message || error.error_description || (typeof error === 'string' ? error : '');
+  const code = error.code || error.status;
 
-  return errorMap[error?.code] || error?.message || 'Something went wrong. Please try again.';
+  if (msg.includes('Invalid login credentials') || msg.includes('invalid_credentials')) {
+    return 'Invalid email or password. Please try again.';
+  }
+  if (msg.includes('User already registered') || msg.includes('email_exists') || code === '23505') {
+    return 'An account with this email already exists.';
+  }
+  if (msg.includes('Password should be at least') || msg.includes('weak-password')) {
+    return 'Password must be at least 6 characters.';
+  }
+  if (msg.includes('Email not confirmed')) {
+    return 'Please confirm your email address before signing in.';
+  }
+  if (msg.includes('rate limit') || msg.includes('too many requests') || code === 429) {
+    return 'Too many attempts. Please try again later.';
+  }
+  if (msg.includes('invalid email') || msg.includes('unable to validate email address')) {
+    return 'Please enter a valid email address.';
+  }
+  if (msg.includes('network') || msg.includes('Failed to fetch')) {
+    return 'Network error. Please check your connection.';
+  }
+  if (code === '42501' || msg.includes('row-level security') || msg.includes('permission denied')) {
+    return 'You do not have permission to perform this action.';
+  }
+
+  return msg || 'Something went wrong. Please try again.';
 };
+
+// Backward compatibility alias
+export const formatFirebaseError = formatAuthError;
 
 /**
  * Debounce function

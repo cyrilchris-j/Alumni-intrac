@@ -17,7 +17,7 @@ import {
 } from '../../services/connectionService';
 import { getAlumniProfile, getStudentProfile } from '../../services/userService';
 import { getOrCreateConversation } from '../../services/messageService';
-import { timeAgo, formatFirebaseError } from '../../utils/formatters';
+import { timeAgo, formatAuthError } from '../../utils/formatters';
 
 const Connections = () => {
   const { currentUser, userProfile } = useAuth();
@@ -78,7 +78,7 @@ const Connections = () => {
       await acceptConnection(conn.id, userProfile?.fullName || 'User', conn.senderId);
       await loadData();
     } catch (err) {
-      alert(formatFirebaseError(err));
+      alert(formatAuthError(err));
     } finally {
       setActioning(null);
     }
@@ -90,7 +90,7 @@ const Connections = () => {
       await rejectConnection(conn.id);
       await loadData();
     } catch (err) {
-      alert(formatFirebaseError(err));
+      alert(formatAuthError(err));
     } finally {
       setActioning(null);
     }

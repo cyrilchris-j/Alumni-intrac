@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Mail, Link2, ArrowLeft, CheckCircle } from 'lucide-react';
 import { resetPassword } from '../../supabase/auth';
-import { formatFirebaseError } from '../../utils/formatters';
+import { formatAuthError } from '../../utils/formatters';
 import Input from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
 
@@ -20,7 +20,7 @@ const ForgotPasswordPage = () => {
       await resetPassword(email);
       setSent(true);
     } catch (err) {
-      setError(formatFirebaseError(err));
+      setError(formatAuthError(err));
     } finally {
       setLoading(false);
     }

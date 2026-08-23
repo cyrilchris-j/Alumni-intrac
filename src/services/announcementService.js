@@ -1,6 +1,6 @@
 import { supabase, isSupabaseConfigured } from '../supabase/client';
 import { broadcastAnnouncement } from './notificationService';
-import { isFirebaseConfigured, mockStore } from './mockStorage';
+import { mockStore } from './mockStorage';
 
 /**
  * Create an announcement (admin)

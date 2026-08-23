@@ -1,7 +1,7 @@
 import { supabase, isSupabaseConfigured } from './client';
 
 /**
- * Helper to split Firebase path style 'bucketName/rest/of/path.jpg' into Supabase parts
+ * Helper to split path style 'bucketName/rest/of/path.jpg' into Supabase bucket and key
  */
 const parsePath = (path) => {
   const cleanPath = path.startsWith('/') ? path.slice(1) : path;

@@ -1,5 +1,5 @@
 import { supabase, isSupabaseConfigured } from '../supabase/client';
-import { isFirebaseConfigured, mockStore } from './mockStorage';
+import { mockStore } from './mockStorage';
 
 /**
  * Create an event (admin)

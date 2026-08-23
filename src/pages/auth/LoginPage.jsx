@@ -12,7 +12,7 @@ import {
   createStudentProfile,
   createAlumniProfile
 } from '../../services/userService';
-import { formatFirebaseError } from '../../utils/formatters';
+import { formatAuthError } from '../../utils/formatters';
 import Input from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
 
@@ -80,7 +80,7 @@ const LoginPage = () => {
       if (!userDoc) throw new Error('Account not found. Please sign up.');
       redirectByRole(userDoc.role);
     } catch (err) {
-      setError(formatFirebaseError(err));
+      setError(formatAuthError(err));
     } finally {
       setLoading(false);
     }
@@ -98,7 +98,7 @@ const LoginPage = () => {
       }
       redirectByRole(userDoc.role);
     } catch (err) {
-      setError(formatFirebaseError(err));
+      setError(formatAuthError(err));
     } finally {
       setGoogleLoading(false);
     }
@@ -118,11 +118,16 @@ const LoginPage = () => {
         // Attempt sign in
         user = await signInWithEmail(demo.email, demo.password);
       } catch (signInErr) {
-        // If user not found in Firebase Auth, auto-create demo user for testing
-        if (signInErr.code === 'auth/user-not-found' || signInErr.code === 'auth/invalid-credential') {
+        // If user not found in Auth, auto-create demo user for testing
+        const errMsg = signInErr?.message || '';
+        if (
+          signInErr.code === 'auth/user-not-found' ||
+          signInErr.code === 'auth/invalid-credential' ||
+          errMsg.includes('Invalid login credentials')
+        ) {
           user = await signUpWithEmail(demo.email, demo.password, demo.name);
 
-          // Create Firestore documents for demo user
+          // Create database documents for demo user
           await createUserDocument(user.uid, {
             email: demo.email,
             role: demo.role,
@@ -165,7 +170,7 @@ const LoginPage = () => {
       const userDoc = await getUserDocument(user.uid);
       redirectByRole(userDoc?.role || demo.role);
     } catch (err) {
-      setError(formatFirebaseError(err));
+      setError(formatAuthError(err));
     } finally {
       setDemoLoading('');
     }

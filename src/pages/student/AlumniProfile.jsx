@@ -17,7 +17,7 @@ import { getAlumniProfile } from '../../services/userService';
 import { sendConnectionRequest, getConnectionStatus } from '../../services/connectionService';
 import { sendMentorshipRequest } from '../../services/mentorshipService';
 import { getOrCreateConversation } from '../../services/messageService';
-import { formatFirebaseError } from '../../utils/formatters';
+import { formatAuthError } from '../../utils/formatters';
 import { MENTORSHIP_AREAS } from '../../utils/constants';
 import Select from '../../components/ui/Select';
 
@@ -67,7 +67,7 @@ const AlumniProfile = () => {
       );
       setConnectionStatus({ status: 'pending', senderId: currentUser.uid });
     } catch (e) {
-      alert(formatFirebaseError(e));
+      alert(formatAuthError(e));
     } finally {
       setConnecting(false);
     }
@@ -86,7 +86,7 @@ const AlumniProfile = () => {
       });
       navigate('/student/messages', { state: { conversationWith: alumniId } });
     } catch (e) {
-      alert(formatFirebaseError(e));
+      alert(formatAuthError(e));
     } finally {
       setMessaging(false);
     }
@@ -108,7 +108,7 @@ const AlumniProfile = () => {
       setShowMentorshipModal(false);
       alert(`Mentorship request sent to ${alumni.fullName}!`);
     } catch (e) {
-      alert(formatFirebaseError(e));
+      alert(formatAuthError(e));
     } finally {
       setMentorshipLoading(false);
     }
