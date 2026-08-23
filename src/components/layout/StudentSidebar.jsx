@@ -4,7 +4,7 @@ import {
   Briefcase, Calendar, Settings, LogOut,
   Megaphone
 } from 'lucide-react';
-import { signOutUser } from '../../firebase/auth';
+import { signOutUser } from '../../supabase/auth';
 import { useAuth } from '../../context/AuthContext';
 import Avatar from '../ui/Avatar';
 

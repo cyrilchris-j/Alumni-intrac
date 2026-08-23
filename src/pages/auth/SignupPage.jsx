@@ -4,9 +4,9 @@ import {
   Link2, GraduationCap, UserCheck, Eye, EyeOff,
   Mail, Lock, User, Building2, Phone, Upload
 } from 'lucide-react';
-import { signUpWithEmail } from '../../firebase/auth';
+import { signUpWithEmail } from '../../supabase/auth';
 import { createUserDocument, createStudentProfile, createAlumniProfile } from '../../services/userService';
-import { uploadProfilePhoto } from '../../firebase/storage';
+import { uploadProfilePhoto } from '../../supabase/storage';
 import { formatFirebaseError } from '../../utils/formatters';
 import { DEPARTMENTS, STUDENT_YEARS, GRADUATION_YEARS, POPULAR_SKILLS } from '../../utils/constants';
 import Input from '../../components/ui/Input';

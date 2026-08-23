@@ -1,36 +1,27 @@
-import {
-  db,
-  collection,
-  doc,
-  addDoc,
-  getDoc,
-  getDocs,
-  updateDoc,
-  deleteDoc,
-  setDoc,
-  query,
-  where,
-  orderBy,
-  serverTimestamp,
-} from '../firebase/firestore';
+import { supabase, isSupabaseConfigured } from '../supabase/client';
 import { isFirebaseConfigured, mockStore } from './mockStorage';
 
 /**
  * Create an event (admin)
  */
 export const createEvent = async (data, createdBy) => {
-  if (isFirebaseConfigured) {
+  if (isSupabaseConfigured) {
     try {
-      const docRef = await addDoc(collection(db, 'events'), {
-        ...data,
-        createdBy,
-        registrationCount: 0,
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
-      });
-      return docRef.id;
+      const { data: insertedData, error } = await supabase
+        .from('events')
+        .insert({
+          ...data,
+          createdBy,
+          registrationCount: 0,
+          updatedAt: new Date().toISOString(),
+        })
+        .select('id')
+        .single();
+
+      if (error) throw error;
+      return insertedData.id;
     } catch (e) {
-      console.warn('Firebase createEvent fallback:', e);
+      console.warn('Supabase createEvent fallback:', e);
     }
   }
 
@@ -53,15 +44,19 @@ export const createEvent = async (data, createdBy) => {
  * Update an event
  */
 export const updateEvent = async (eventId, data) => {
-  if (isFirebaseConfigured) {
+  if (isSupabaseConfigured) {
     try {
-      await updateDoc(doc(db, 'events', eventId), {
-        ...data,
-        updatedAt: serverTimestamp(),
-      });
+      const { error } = await supabase
+        .from('events')
+        .update({
+          ...data,
+          updatedAt: new Date().toISOString(),
+        })
+        .eq('id', eventId);
+      if (error) throw error;
       return;
     } catch (e) {
-      console.warn('Firebase updateEvent fallback:', e);
+      console.warn('Supabase updateEvent fallback:', e);
     }
   }
 
@@ -75,12 +70,16 @@ export const updateEvent = async (eventId, data) => {
  * Delete an event
  */
 export const deleteEvent = async (eventId) => {
-  if (isFirebaseConfigured) {
+  if (isSupabaseConfigured) {
     try {
-      await deleteDoc(doc(db, 'events', eventId));
+      const { error } = await supabase
+        .from('events')
+        .delete()
+        .eq('id', eventId);
+      if (error) throw error;
       return;
     } catch (e) {
-      console.warn('Firebase deleteEvent fallback:', e);
+      console.warn('Supabase deleteEvent fallback:', e);
     }
   }
 
@@ -92,12 +91,16 @@ export const deleteEvent = async (eventId) => {
  * Get all events
  */
 export const getEvents = async () => {
-  if (isFirebaseConfigured) {
+  if (isSupabaseConfigured) {
     try {
-      const snap = await getDocs(query(collection(db, 'events'), orderBy('date', 'asc')));
-      return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      const { data, error } = await supabase
+        .from('events')
+        .select('*')
+        .order('date', { ascending: true });
+      if (error) throw error;
+      return data || [];
     } catch (e) {
-      // Fallback
+      console.warn('Supabase getEvents fallback:', e);
     }
   }
 
@@ -116,17 +119,27 @@ export const getUpcomingEvents = async (lim = 5) => {
  * Register for an event
  */
 export const registerForEvent = async (eventId, userId, userName) => {
-  if (isFirebaseConfigured) {
+  if (isSupabaseConfigured) {
     try {
-      await setDoc(doc(db, 'eventRegistrations', `${eventId}_${userId}`), {
-        eventId,
-        userId,
-        userName,
-        registeredAt: serverTimestamp(),
-      });
+      const { error } = await supabase
+        .from('eventRegistrations')
+        .upsert({
+          eventId,
+          userId,
+          userName,
+        });
+      if (error) throw error;
+
+      // Increment registration count
+      const { data: ev } = await supabase.from('events').select('registrationCount').eq('id', eventId).maybeSingle();
+      await supabase
+        .from('events')
+        .update({ registrationCount: (ev?.registrationCount || 0) + 1 })
+        .eq('id', eventId);
+
       return;
     } catch (e) {
-      console.warn('Firebase registerForEvent fallback:', e);
+      console.warn('Supabase registerForEvent fallback:', e);
     }
   }
 
@@ -148,12 +161,25 @@ export const registerForEvent = async (eventId, userId, userName) => {
  * Cancel event registration
  */
 export const cancelEventRegistration = async (eventId, userId) => {
-  if (isFirebaseConfigured) {
+  if (isSupabaseConfigured) {
     try {
-      await deleteDoc(doc(db, 'eventRegistrations', `${eventId}_${userId}`));
+      const { error } = await supabase
+        .from('eventRegistrations')
+        .delete()
+        .eq('eventId', eventId)
+        .eq('userId', userId);
+      if (error) throw error;
+
+      // Decrement registration count
+      const { data: ev } = await supabase.from('events').select('registrationCount').eq('id', eventId).maybeSingle();
+      await supabase
+        .from('events')
+        .update({ registrationCount: Math.max(0, (ev?.registrationCount || 1) - 1) })
+        .eq('id', eventId);
+
       return;
     } catch (e) {
-      // Fallback
+      console.warn('Supabase cancelEventRegistration fallback:', e);
     }
   }
 
@@ -176,14 +202,16 @@ export const cancelEventRegistration = async (eventId, userId) => {
  * Get events a user is registered for
  */
 export const getUserEventRegistrations = async (userId) => {
-  if (isFirebaseConfigured) {
+  if (isSupabaseConfigured) {
     try {
-      const snap = await getDocs(
-        query(collection(db, 'eventRegistrations'), where('userId', '==', userId))
-      );
-      return snap.docs.map((d) => d.data().eventId);
+      const { data, error } = await supabase
+        .from('eventRegistrations')
+        .select('eventId')
+        .eq('userId', userId);
+      if (error) throw error;
+      return data.map((d) => d.eventId);
     } catch (e) {
-      // Fallback
+      console.warn('Supabase getUserEventRegistrations error:', e);
     }
   }
 
@@ -195,14 +223,16 @@ export const getUserEventRegistrations = async (userId) => {
  * Get registrations for an event (admin)
  */
 export const getEventRegistrations = async (eventId) => {
-  if (isFirebaseConfigured) {
+  if (isSupabaseConfigured) {
     try {
-      const snap = await getDocs(
-        query(collection(db, 'eventRegistrations'), where('eventId', '==', eventId))
-      );
-      return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      const { data, error } = await supabase
+        .from('eventRegistrations')
+        .select('*')
+        .eq('eventId', eventId);
+      if (error) throw error;
+      return data || [];
     } catch (e) {
-      // Fallback
+      console.warn('Supabase getEventRegistrations error:', e);
     }
   }
 

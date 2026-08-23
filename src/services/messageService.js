@@ -1,18 +1,4 @@
-import {
-  db,
-  collection,
-  doc,
-  addDoc,
-  getDoc,
-  getDocs,
-  updateDoc,
-  setDoc,
-  query,
-  where,
-  orderBy,
-  onSnapshot,
-  serverTimestamp,
-} from '../firebase/firestore';
+import { supabase, isSupabaseConfigured } from '../supabase/client';
 import { getConversationId } from '../utils/formatters';
 import { isFirebaseConfigured, mockStore } from './mockStorage';
 
@@ -22,24 +8,31 @@ import { isFirebaseConfigured, mockStore } from './mockStorage';
 export const getOrCreateConversation = async (uid1, uid2, names) => {
   const conversationId = getConversationId(uid1, uid2);
 
-  if (isFirebaseConfigured) {
+  if (isSupabaseConfigured) {
     try {
-      const convRef = doc(db, 'conversations', conversationId);
-      const convDoc = await getDoc(convRef);
+      const { data: conv, error } = await supabase
+        .from('conversations')
+        .select('*')
+        .eq('id', conversationId)
+        .maybeSingle();
 
-      if (!convDoc.exists()) {
-        await setDoc(convRef, {
-          id: conversationId,
-          participants: [uid1, uid2],
-          participantNames: names || {},
-          lastMessage: '',
-          lastMessageAt: serverTimestamp(),
-          createdAt: serverTimestamp(),
-        });
+      if (error) throw error;
+
+      if (!conv) {
+        const { error: insertError } = await supabase
+          .from('conversations')
+          .insert({
+            id: conversationId,
+            participants: [uid1, uid2],
+            participantNames: names || {},
+            lastMessage: '',
+            lastMessageAt: new Date().toISOString(),
+          });
+        if (insertError) throw insertError;
       }
       return conversationId;
     } catch (e) {
-      console.warn('Firebase getOrCreateConversation fallback:', e);
+      console.warn('Supabase getOrCreateConversation fallback:', e);
     }
   }
 
@@ -66,25 +59,44 @@ export const getOrCreateConversation = async (uid1, uid2, names) => {
  * Send a message
  */
 export const sendMessage = async (conversationId, senderId, receiverId, text) => {
-  if (isFirebaseConfigured) {
+  if (isSupabaseConfigured) {
     try {
-      await addDoc(collection(db, 'messages'), {
-        conversationId,
-        senderId,
-        receiverId,
-        text,
-        read: false,
-        createdAt: serverTimestamp(),
-      });
+      // Insert message
+      const { error: msgError } = await supabase
+        .from('messages')
+        .insert({
+          conversationId,
+          senderId,
+          receiverId,
+          text,
+          read: false,
+        });
 
-      await updateDoc(doc(db, 'conversations', conversationId), {
-        lastMessage: text,
-        lastMessageAt: serverTimestamp(),
-        [`unreadCount.${receiverId}`]: true,
-      });
+      if (msgError) throw msgError;
+
+      // Fetch existing unread map to toggle receiver's status
+      const { data: conv } = await supabase
+        .from('conversations')
+        .select('unreadCount')
+        .eq('id', conversationId)
+        .maybeSingle();
+
+      const nextUnread = { ...(conv?.unreadCount || {}), [receiverId]: true };
+
+      // Update conversation
+      const { error: convError } = await supabase
+        .from('conversations')
+        .update({
+          lastMessage: text,
+          lastMessageAt: new Date().toISOString(),
+          unreadCount: nextUnread,
+        })
+        .eq('id', conversationId);
+
+      if (convError) throw convError;
       return;
     } catch (e) {
-      console.warn('Firebase sendMessage fallback:', e);
+      console.warn('Supabase sendMessage fallback:', e);
     }
   }
 
@@ -121,20 +133,42 @@ export const sendMessage = async (conversationId, senderId, receiverId, text) =>
  * Real-time listener for messages in a conversation
  */
 export const listenToMessages = (conversationId, callback) => {
-  if (isFirebaseConfigured) {
-    try {
-      const q = query(
-        collection(db, 'messages'),
-        where('conversationId', '==', conversationId),
-        orderBy('createdAt', 'asc')
-      );
-      return onSnapshot(q, (snap) => {
-        const messages = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-        callback(messages);
+  if (isSupabaseConfigured) {
+    // Initial load
+    supabase
+      .from('messages')
+      .select('*')
+      .eq('conversationId', conversationId)
+      .order('createdAt', { ascending: true })
+      .then(({ data }) => {
+        callback(data || []);
       });
-    } catch (e) {
-      console.warn('Firebase listenToMessages fallback:', e);
-    }
+
+    // Realtime channel
+    const channel = supabase
+      .channel(`public:messages:conversationId=eq.${conversationId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'messages',
+          filter: `conversationId=eq.${conversationId}`,
+        },
+        async () => {
+          const { data } = await supabase
+            .from('messages')
+            .select('*')
+            .eq('conversationId', conversationId)
+            .order('createdAt', { ascending: true });
+          callback(data || []);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }
 
   const emitMessages = () => {
@@ -158,20 +192,36 @@ export const listenToMessages = (conversationId, callback) => {
  * Real-time listener for user conversations
  */
 export const listenToConversations = (uid, callback) => {
-  if (isFirebaseConfigured) {
-    try {
-      const q = query(
-        collection(db, 'conversations'),
-        where('participants', 'array-contains', uid),
-        orderBy('lastMessageAt', 'desc')
-      );
-      return onSnapshot(q, (snap) => {
-        const conversations = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-        callback(conversations);
-      });
-    } catch (e) {
-      console.warn('Firebase listenToConversations fallback:', e);
-    }
+  if (isSupabaseConfigured) {
+    const fetchConvs = async () => {
+      const { data } = await supabase
+        .from('conversations')
+        .select('*')
+        .contains('participants', [uid])
+        .order('lastMessageAt', { ascending: false });
+      callback(data || []);
+    };
+
+    fetchConvs();
+
+    const channel = supabase
+      .channel(`public:conversations:participant=eq.${uid}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'conversations',
+        },
+        async () => {
+          await fetchConvs();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }
 
   const emitConvs = () => {
@@ -195,11 +245,20 @@ export const listenToConversations = (uid, callback) => {
  * Mark messages in a conversation as read
  */
 export const markConversationAsRead = async (conversationId, uid) => {
-  if (isFirebaseConfigured) {
+  if (isSupabaseConfigured) {
     try {
-      await updateDoc(doc(db, 'conversations', conversationId), {
-        [`unreadCount.${uid}`]: false,
-      });
+      const { data: conv } = await supabase
+        .from('conversations')
+        .select('unreadCount')
+        .eq('id', conversationId)
+        .maybeSingle();
+
+      const nextUnread = { ...(conv?.unreadCount || {}), [uid]: false };
+
+      await supabase
+        .from('conversations')
+        .update({ unreadCount: nextUnread })
+        .eq('id', conversationId);
     } catch (e) {
       // Ignored
     }

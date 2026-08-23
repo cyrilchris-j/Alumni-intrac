@@ -1,40 +1,26 @@
-import {
-  db,
-  doc,
-  getDoc,
-  getDocs,
-  setDoc,
-  updateDoc,
-  deleteDoc,
-  collection,
-  query,
-  where,
-  orderBy,
-  limit,
-  serverTimestamp,
-} from '../firebase/firestore';
-import { uploadProfilePhoto } from '../firebase/storage';
+import { supabase, isSupabaseConfigured } from '../supabase/client';
+import { uploadProfilePhoto } from '../supabase/storage';
 import { isFirebaseConfigured, mockStore } from './mockStorage';
 
 /**
- * Create a new user document in Firestore after signup
+ * Create a new user document in public.users after signup
  */
 export const createUserDocument = async (uid, { email, role, displayName, photoURL = '' }) => {
-  if (isFirebaseConfigured) {
+  if (isSupabaseConfigured) {
     try {
-      await setDoc(doc(db, 'users', uid), {
+      const { error } = await supabase.from('users').upsert({
         uid,
         email,
         role,
         displayName,
         photoURL,
         accountStatus: 'active',
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
+        updatedAt: new Date().toISOString(),
       });
+      if (error) throw error;
       return;
     } catch (e) {
-      console.warn('Firebase createUserDocument fallback:', e);
+      console.warn('Supabase createUserDocument fallback:', e);
     }
   }
 
@@ -58,17 +44,17 @@ export const createUserDocument = async (uid, { email, role, displayName, photoU
  * Create student profile
  */
 export const createStudentProfile = async (uid, profileData) => {
-  if (isFirebaseConfigured) {
+  if (isSupabaseConfigured) {
     try {
-      await setDoc(doc(db, 'studentProfiles', uid), {
+      const { error } = await supabase.from('studentProfiles').upsert({
         uid,
         ...profileData,
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
+        updatedAt: new Date().toISOString(),
       });
+      if (error) throw error;
       return;
     } catch (e) {
-      console.warn('Firebase createStudentProfile fallback:', e);
+      console.warn('Supabase createStudentProfile fallback:', e);
     }
   }
 
@@ -83,18 +69,18 @@ export const createStudentProfile = async (uid, profileData) => {
  * Create alumni profile
  */
 export const createAlumniProfile = async (uid, profileData) => {
-  if (isFirebaseConfigured) {
+  if (isSupabaseConfigured) {
     try {
-      await setDoc(doc(db, 'alumniProfiles', uid), {
+      const { error } = await supabase.from('alumniProfiles').upsert({
         uid,
         ...profileData,
         verificationStatus: 'pending',
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
+        updatedAt: new Date().toISOString(),
       });
+      if (error) throw error;
       return;
     } catch (e) {
-      console.warn('Firebase createAlumniProfile fallback:', e);
+      console.warn('Supabase createAlumniProfile fallback:', e);
     }
   }
 
@@ -109,12 +95,17 @@ export const createAlumniProfile = async (uid, profileData) => {
  * Get a user document
  */
 export const getUserDocument = async (uid) => {
-  if (isFirebaseConfigured) {
+  if (isSupabaseConfigured) {
     try {
-      const docSnap = await getDoc(doc(db, 'users', uid));
-      if (docSnap.exists()) return { id: docSnap.id, ...docSnap.data() };
+      const { data, error } = await supabase
+        .from('users')
+        .select('*')
+        .eq('uid', uid)
+        .maybeSingle();
+      if (error) throw error;
+      if (data) return { id: data.uid, ...data };
     } catch (e) {
-      console.warn('Firebase getUserDocument fallback:', e);
+      console.warn('Supabase getUserDocument fallback:', e);
     }
   }
 
@@ -126,12 +117,17 @@ export const getUserDocument = async (uid) => {
  * Get student profile
  */
 export const getStudentProfile = async (uid) => {
-  if (isFirebaseConfigured) {
+  if (isSupabaseConfigured) {
     try {
-      const docSnap = await getDoc(doc(db, 'studentProfiles', uid));
-      if (docSnap.exists()) return { id: docSnap.id, ...docSnap.data() };
+      const { data, error } = await supabase
+        .from('studentProfiles')
+        .select('*')
+        .eq('uid', uid)
+        .maybeSingle();
+      if (error) throw error;
+      if (data) return { id: data.uid, ...data };
     } catch (e) {
-      console.warn('Firebase getStudentProfile fallback:', e);
+      console.warn('Supabase getStudentProfile fallback:', e);
     }
   }
 
@@ -143,12 +139,17 @@ export const getStudentProfile = async (uid) => {
  * Get alumni profile
  */
 export const getAlumniProfile = async (uid) => {
-  if (isFirebaseConfigured) {
+  if (isSupabaseConfigured) {
     try {
-      const docSnap = await getDoc(doc(db, 'alumniProfiles', uid));
-      if (docSnap.exists()) return { id: docSnap.id, ...docSnap.data() };
+      const { data, error } = await supabase
+        .from('alumniProfiles')
+        .select('*')
+        .eq('uid', uid)
+        .maybeSingle();
+      if (error) throw error;
+      if (data) return { id: data.uid, ...data };
     } catch (e) {
-      console.warn('Firebase getAlumniProfile fallback:', e);
+      console.warn('Supabase getAlumniProfile fallback:', e);
     }
   }
 
@@ -160,15 +161,19 @@ export const getAlumniProfile = async (uid) => {
  * Update student profile
  */
 export const updateStudentProfile = async (uid, data) => {
-  if (isFirebaseConfigured) {
+  if (isSupabaseConfigured) {
     try {
-      await updateDoc(doc(db, 'studentProfiles', uid), {
-        ...data,
-        updatedAt: serverTimestamp(),
-      });
+      const { error } = await supabase
+        .from('studentProfiles')
+        .update({
+          ...data,
+          updatedAt: new Date().toISOString(),
+        })
+        .eq('uid', uid);
+      if (error) throw error;
       return;
     } catch (e) {
-      console.warn('Firebase updateStudentProfile fallback:', e);
+      console.warn('Supabase updateStudentProfile fallback:', e);
     }
   }
 
@@ -182,15 +187,19 @@ export const updateStudentProfile = async (uid, data) => {
  * Update alumni profile
  */
 export const updateAlumniProfile = async (uid, data) => {
-  if (isFirebaseConfigured) {
+  if (isSupabaseConfigured) {
     try {
-      await updateDoc(doc(db, 'alumniProfiles', uid), {
-        ...data,
-        updatedAt: serverTimestamp(),
-      });
+      const { error } = await supabase
+        .from('alumniProfiles')
+        .update({
+          ...data,
+          updatedAt: new Date().toISOString(),
+        })
+        .eq('uid', uid);
+      if (error) throw error;
       return;
     } catch (e) {
-      console.warn('Firebase updateAlumniProfile fallback:', e);
+      console.warn('Supabase updateAlumniProfile fallback:', e);
     }
   }
 
@@ -205,7 +214,7 @@ export const updateAlumniProfile = async (uid, data) => {
  */
 export const updateProfilePhoto = async (file, uid, role) => {
   let photoURL = '';
-  if (isFirebaseConfigured) {
+  if (isSupabaseConfigured) {
     try {
       photoURL = await uploadProfilePhoto(file, uid);
     } catch (e) {
@@ -227,18 +236,18 @@ export const updateProfilePhoto = async (file, uid, role) => {
  * Get all alumni with optional filters
  */
 export const getAlumni = async ({ company, department, graduationYear, location, limit: lim = 20 } = {}) => {
-  if (isFirebaseConfigured) {
+  if (isSupabaseConfigured) {
     try {
-      let q = query(
-        collection(db, 'alumniProfiles'),
-        where('verificationStatus', '==', 'verified'),
-        orderBy('createdAt', 'desc'),
-        limit(lim)
-      );
-      const snap = await getDocs(q);
-      return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      const { data, error } = await supabase
+        .from('alumniProfiles')
+        .select('*')
+        .eq('verificationStatus', 'verified')
+        .order('createdAt', { ascending: false })
+        .limit(lim);
+      if (error) throw error;
+      return data || [];
     } catch (e) {
-      console.warn('Firebase getAlumni fallback:', e);
+      console.warn('Supabase getAlumni fallback:', e);
     }
   }
 
@@ -251,11 +260,15 @@ export const getAlumni = async ({ company, department, graduationYear, location,
  */
 export const searchAlumni = async (searchQuery = '', filters = {}) => {
   let results = [];
-  if (isFirebaseConfigured) {
+  if (isSupabaseConfigured) {
     try {
-      const q = query(collection(db, 'alumniProfiles'), orderBy('createdAt', 'desc'), limit(100));
-      const snap = await getDocs(q);
-      results = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      const { data, error } = await supabase
+        .from('alumniProfiles')
+        .select('*')
+        .order('createdAt', { ascending: false })
+        .limit(100);
+      if (error) throw error;
+      results = data || [];
     } catch (e) {
       results = mockStore.getAlumni();
     }
@@ -299,11 +312,15 @@ export const searchAlumni = async (searchQuery = '', filters = {}) => {
  */
 export const searchStudents = async (searchQuery = '', filters = {}) => {
   let results = [];
-  if (isFirebaseConfigured) {
+  if (isSupabaseConfigured) {
     try {
-      const q = query(collection(db, 'studentProfiles'), orderBy('createdAt', 'desc'), limit(100));
-      const snap = await getDocs(q);
-      results = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      const { data, error } = await supabase
+        .from('studentProfiles')
+        .select('*')
+        .order('createdAt', { ascending: false })
+        .limit(100);
+      if (error) throw error;
+      results = data || [];
     } catch (e) {
       results = mockStore.getStudents();
     }
@@ -416,12 +433,16 @@ export const getRecommendedStudents = async (currentUid, userSkills = [], userIn
  * Get all students (admin)
  */
 export const getAllStudents = async () => {
-  if (isFirebaseConfigured) {
+  if (isSupabaseConfigured) {
     try {
-      const snap = await getDocs(query(collection(db, 'studentProfiles'), orderBy('createdAt', 'desc')));
-      return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      const { data, error } = await supabase
+        .from('studentProfiles')
+        .select('*')
+        .order('createdAt', { ascending: false });
+      if (error) throw error;
+      return data || [];
     } catch (e) {
-      console.warn('Firebase getAllStudents fallback:', e);
+      console.warn('Supabase getAllStudents fallback:', e);
     }
   }
 
@@ -432,12 +453,16 @@ export const getAllStudents = async () => {
  * Get all alumni (admin)
  */
 export const getAllAlumni = async () => {
-  if (isFirebaseConfigured) {
+  if (isSupabaseConfigured) {
     try {
-      const snap = await getDocs(query(collection(db, 'alumniProfiles'), orderBy('createdAt', 'desc')));
-      return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      const { data, error } = await supabase
+        .from('alumniProfiles')
+        .select('*')
+        .order('createdAt', { ascending: false });
+      if (error) throw error;
+      return data || [];
     } catch (e) {
-      console.warn('Firebase getAllAlumni fallback:', e);
+      console.warn('Supabase getAllAlumni fallback:', e);
     }
   }
 
@@ -448,15 +473,19 @@ export const getAllAlumni = async () => {
  * Verify/reject alumni (admin)
  */
 export const updateAlumniVerification = async (uid, status) => {
-  if (isFirebaseConfigured) {
+  if (isSupabaseConfigured) {
     try {
-      await updateDoc(doc(db, 'alumniProfiles', uid), {
-        verificationStatus: status,
-        updatedAt: serverTimestamp(),
-      });
+      const { error } = await supabase
+        .from('alumniProfiles')
+        .update({
+          verificationStatus: status,
+          updatedAt: new Date().toISOString(),
+        })
+        .eq('uid', uid);
+      if (error) throw error;
       return;
     } catch (e) {
-      console.warn('Firebase updateAlumniVerification fallback:', e);
+      console.warn('Supabase updateAlumniVerification fallback:', e);
     }
   }
 
@@ -470,15 +499,19 @@ export const updateAlumniVerification = async (uid, status) => {
  * Suspend/activate user (admin)
  */
 export const updateUserAccountStatus = async (uid, status) => {
-  if (isFirebaseConfigured) {
+  if (isSupabaseConfigured) {
     try {
-      await updateDoc(doc(db, 'users', uid), {
-        accountStatus: status,
-        updatedAt: serverTimestamp(),
-      });
+      const { error } = await supabase
+        .from('users')
+        .update({
+          accountStatus: status,
+          updatedAt: new Date().toISOString(),
+        })
+        .eq('uid', uid);
+      if (error) throw error;
       return;
     } catch (e) {
-      console.warn('Firebase updateUserAccountStatus fallback:', e);
+      console.warn('Supabase updateUserAccountStatus fallback:', e);
     }
   }
 
@@ -492,12 +525,16 @@ export const updateUserAccountStatus = async (uid, status) => {
  * Get all users (admin)
  */
 export const getAllUsers = async () => {
-  if (isFirebaseConfigured) {
+  if (isSupabaseConfigured) {
     try {
-      const snap = await getDocs(query(collection(db, 'users'), orderBy('createdAt', 'desc')));
-      return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      const { data, error } = await supabase
+        .from('users')
+        .select('*')
+        .order('createdAt', { ascending: false });
+      if (error) throw error;
+      return data || [];
     } catch (e) {
-      console.warn('Firebase getAllUsers fallback:', e);
+      console.warn('Supabase getAllUsers fallback:', e);
     }
   }
 
@@ -509,14 +546,13 @@ export const getAllUsers = async () => {
  */
 export const deleteUserAccount = async (uid) => {
   if (!uid) return;
-  if (isFirebaseConfigured) {
+  if (isSupabaseConfigured) {
     try {
-      await deleteDoc(doc(db, 'users', uid));
-      try { await deleteDoc(doc(db, 'studentProfiles', uid)); } catch (e) {}
-      try { await deleteDoc(doc(db, 'alumniProfiles', uid)); } catch (e) {}
+      const { error } = await supabase.from('users').delete().eq('uid', uid);
+      if (error) throw error;
       return;
     } catch (e) {
-      console.warn('Firebase deleteUserAccount fallback:', e);
+      console.warn('Supabase deleteUserAccount fallback:', e);
     }
   }
 
@@ -563,7 +599,7 @@ export const adminAddStudent = async (studentData) => {
     fullName,
     registerNo,
     email,
-    college: 'K.S.R. College of Engineering',
+    college: 'PSG College of Technology',
     department,
     year,
     section,
@@ -609,7 +645,7 @@ export const adminAddAlumni = async (alumniData) => {
   await createAlumniProfile(uid, {
     fullName,
     email,
-    college: 'K.S.R. College of Engineering',
+    college: 'PSG College of Technology',
     department,
     graduationYear,
     company,
@@ -624,5 +660,3 @@ export const adminAddAlumni = async (alumniData) => {
 
   return { uid, email };
 };
-
-

@@ -4,7 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import DashboardLayout from '../../components/layout/DashboardLayout';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
-import { resetPassword } from '../../firebase/auth';
+import { resetPassword } from '../../supabase/auth';
 
 const StudentSettings = () => {
   const { currentUser } = useAuth();

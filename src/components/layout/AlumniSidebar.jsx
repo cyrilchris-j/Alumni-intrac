@@ -3,7 +3,7 @@ import {
   LayoutDashboard, Link2, BookOpen, MessageSquare,
   Briefcase, Calendar, FileText, Settings, LogOut
 } from 'lucide-react';
-import { signOutUser } from '../../firebase/auth';
+import { signOutUser } from '../../supabase/auth';
 import { useAuth } from '../../context/AuthContext';
 import Avatar from '../ui/Avatar';
 import Badge from '../ui/Badge';

@@ -5,7 +5,7 @@ import {
   UserCheck, ShieldCheck, Sparkles, QrCode, MessageCircle
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import { signInWithEmail, signInWithGoogle, signUpWithEmail } from '../../firebase/auth';
+import { signInWithEmail, signInWithGoogle, signUpWithEmail } from '../../supabase/auth';
 import {
   getUserDocument,
   createUserDocument,

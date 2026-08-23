@@ -1,8 +1,7 @@
 import { createContext, useContext, useEffect, useState } from 'react';
-import { onAuthStateChange } from '../firebase/auth';
-import { db } from '../firebase/config';
-import { doc, getDoc } from 'firebase/firestore';
-import { isFirebaseConfigured, mockStore } from '../services/mockStorage';
+import { onAuthStateChange } from '../supabase/auth';
+import { supabase, isSupabaseConfigured } from '../supabase/client';
+import { mockStore } from '../services/mockStorage';
 
 const AuthContext = createContext(null);
 
@@ -18,29 +17,40 @@ export const AuthProvider = ({ children }) => {
 
       if (user) {
         try {
-          if (isFirebaseConfigured) {
-            // Fetch user document from Firestore
-            const userDoc = await getDoc(doc(db, 'users', user.uid));
-            if (userDoc.exists()) {
-              const data = userDoc.data();
-              setUserRole(data.role);
+          if (isSupabaseConfigured) {
+            // Fetch user document from Supabase
+            const { data: userData, error: userError } = await supabase
+              .from('users')
+              .select('*')
+              .eq('uid', user.uid)
+              .maybeSingle();
 
-              let profileRef;
-              if (data.role === 'student') {
-                profileRef = doc(db, 'studentProfiles', user.uid);
-              } else if (data.role === 'alumni') {
-                profileRef = doc(db, 'alumniProfiles', user.uid);
-              } else if (data.role === 'admin') {
-                profileRef = doc(db, 'users', user.uid);
+            if (userData) {
+              setUserRole(userData.role);
+
+              let profileData = null;
+              if (userData.role === 'student') {
+                const { data } = await supabase
+                  .from('studentProfiles')
+                  .select('*')
+                  .eq('uid', user.uid)
+                  .maybeSingle();
+                profileData = data;
+              } else if (userData.role === 'alumni') {
+                const { data } = await supabase
+                  .from('alumniProfiles')
+                  .select('*')
+                  .eq('uid', user.uid)
+                  .maybeSingle();
+                profileData = data;
+              } else if (userData.role === 'admin') {
+                profileData = userData;
               }
 
-              if (profileRef) {
-                const profileDoc = await getDoc(profileRef);
-                if (profileDoc.exists()) {
-                  setUserProfile({ id: profileDoc.id, ...profileDoc.data() });
-                  setLoading(false);
-                  return;
-                }
+              if (profileData) {
+                setUserProfile({ id: user.uid, ...profileData });
+                setLoading(false);
+                return;
               }
             }
           }
@@ -106,18 +116,32 @@ export const AuthProvider = ({ children }) => {
   const refreshProfile = async () => {
     if (!currentUser || !userRole) return;
     try {
-      if (isFirebaseConfigured) {
-        let profileRef;
+      if (isSupabaseConfigured) {
+        let profileData = null;
         if (userRole === 'student') {
-          profileRef = doc(db, 'studentProfiles', currentUser.uid);
+          const { data } = await supabase
+            .from('studentProfiles')
+            .select('*')
+            .eq('uid', currentUser.uid)
+            .maybeSingle();
+          profileData = data;
         } else if (userRole === 'alumni') {
-          profileRef = doc(db, 'alumniProfiles', currentUser.uid);
+          const { data } = await supabase
+            .from('alumniProfiles')
+            .select('*')
+            .eq('uid', currentUser.uid)
+            .maybeSingle();
+          profileData = data;
         } else {
-          profileRef = doc(db, 'users', currentUser.uid);
+          const { data } = await supabase
+            .from('users')
+            .select('*')
+            .eq('uid', currentUser.uid)
+            .maybeSingle();
+          profileData = data;
         }
-        const profileDoc = await getDoc(profileRef);
-        if (profileDoc.exists()) {
-          setUserProfile({ id: profileDoc.id, ...profileDoc.data() });
+        if (profileData) {
+          setUserProfile({ id: currentUser.uid, ...profileData });
           return;
         }
       }

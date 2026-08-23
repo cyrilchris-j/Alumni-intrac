@@ -1,15 +1,4 @@
-import {
-  db,
-  collection,
-  doc,
-  addDoc,
-  getDocs,
-  updateDoc,
-  query,
-  where,
-  orderBy,
-  serverTimestamp,
-} from '../firebase/firestore';
+import { supabase, isSupabaseConfigured } from '../supabase/client';
 import { MENTORSHIP_STATUS, NOTIFICATION_TYPES } from '../utils/constants';
 import { createNotification } from './notificationService';
 import { isFirebaseConfigured, mockStore } from './mockStorage';
@@ -18,44 +7,49 @@ import { isFirebaseConfigured, mockStore } from './mockStorage';
  * Send a mentorship request
  */
 export const sendMentorshipRequest = async (studentId, alumniId, { topic, message, preferredArea, availability }, studentName) => {
-  if (isFirebaseConfigured) {
+  if (isSupabaseConfigured) {
     try {
-      const existing = await getDocs(
-        query(
-          collection(db, 'mentorshipRequests'),
-          where('studentId', '==', studentId),
-          where('alumniId', '==', alumniId),
-          where('status', '==', MENTORSHIP_STATUS.PENDING)
-        )
-      );
+      const { data: existing, error: existingError } = await supabase
+        .from('mentorshipRequests')
+        .select('id')
+        .eq('studentId', studentId)
+        .eq('alumniId', alumniId)
+        .eq('status', MENTORSHIP_STATUS.PENDING);
 
-      if (!existing.empty) {
+      if (existingError) throw existingError;
+
+      if (existing && existing.length > 0) {
         throw new Error('You already have a pending mentorship request with this alumni.');
       }
 
-      const docRef = await addDoc(collection(db, 'mentorshipRequests'), {
-        studentId,
-        alumniId,
-        topic,
-        message,
-        preferredArea,
-        availability: availability || '',
-        status: MENTORSHIP_STATUS.PENDING,
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
-      });
+      const { data: insertedData, error } = await supabase
+        .from('mentorshipRequests')
+        .insert({
+          studentId,
+          alumniId,
+          topic,
+          message,
+          preferredArea,
+          availability: availability || '',
+          status: MENTORSHIP_STATUS.PENDING,
+          updatedAt: new Date().toISOString(),
+        })
+        .select('id')
+        .single();
+
+      if (error) throw error;
 
       await createNotification(alumniId, {
         type: NOTIFICATION_TYPES.MENTORSHIP_REQUEST,
         title: 'New Mentorship Request',
         message: `${studentName} has requested you as a mentor. Topic: ${topic}`,
-        relatedId: docRef.id,
+        relatedId: insertedData.id,
       });
 
-      return docRef.id;
+      return insertedData.id;
     } catch (e) {
       if (e.message?.includes('already have')) throw e;
-      console.warn('Firebase sendMentorshipRequest fallback:', e);
+      console.warn('Supabase sendMentorshipRequest fallback:', e);
     }
   }
 
@@ -97,12 +91,18 @@ export const sendMentorshipRequest = async (studentId, alumniId, { topic, messag
  * Accept a mentorship request
  */
 export const acceptMentorshipRequest = async (requestId, alumniName, studentId) => {
-  if (isFirebaseConfigured) {
+  if (isSupabaseConfigured) {
     try {
-      await updateDoc(doc(db, 'mentorshipRequests', requestId), {
-        status: MENTORSHIP_STATUS.ACCEPTED,
-        updatedAt: serverTimestamp(),
-      });
+      const { error } = await supabase
+        .from('mentorshipRequests')
+        .update({
+          status: MENTORSHIP_STATUS.ACCEPTED,
+          updatedAt: new Date().toISOString(),
+        })
+        .eq('id', requestId);
+
+      if (error) throw error;
+
       await createNotification(studentId, {
         type: NOTIFICATION_TYPES.MENTORSHIP_ACCEPTED,
         title: 'Mentorship Request Accepted!',
@@ -111,7 +111,7 @@ export const acceptMentorshipRequest = async (requestId, alumniName, studentId) 
       });
       return;
     } catch (e) {
-      console.warn('Firebase acceptMentorshipRequest fallback:', e);
+      console.warn('Supabase acceptMentorshipRequest fallback:', e);
     }
   }
 
@@ -132,12 +132,18 @@ export const acceptMentorshipRequest = async (requestId, alumniName, studentId) 
  * Reject a mentorship request
  */
 export const rejectMentorshipRequest = async (requestId, alumniName, studentId) => {
-  if (isFirebaseConfigured) {
+  if (isSupabaseConfigured) {
     try {
-      await updateDoc(doc(db, 'mentorshipRequests', requestId), {
-        status: MENTORSHIP_STATUS.REJECTED,
-        updatedAt: serverTimestamp(),
-      });
+      const { error } = await supabase
+        .from('mentorshipRequests')
+        .update({
+          status: MENTORSHIP_STATUS.REJECTED,
+          updatedAt: new Date().toISOString(),
+        })
+        .eq('id', requestId);
+
+      if (error) throw error;
+
       await createNotification(studentId, {
         type: NOTIFICATION_TYPES.MENTORSHIP_REJECTED,
         title: 'Mentorship Request Update',
@@ -146,7 +152,7 @@ export const rejectMentorshipRequest = async (requestId, alumniName, studentId) 
       });
       return;
     } catch (e) {
-      console.warn('Firebase rejectMentorshipRequest fallback:', e);
+      console.warn('Supabase rejectMentorshipRequest fallback:', e);
     }
   }
 
@@ -167,15 +173,19 @@ export const rejectMentorshipRequest = async (requestId, alumniName, studentId) 
  * Complete a mentorship
  */
 export const completeMentorship = async (requestId) => {
-  if (isFirebaseConfigured) {
+  if (isSupabaseConfigured) {
     try {
-      await updateDoc(doc(db, 'mentorshipRequests', requestId), {
-        status: MENTORSHIP_STATUS.COMPLETED,
-        updatedAt: serverTimestamp(),
-      });
+      const { error } = await supabase
+        .from('mentorshipRequests')
+        .update({
+          status: MENTORSHIP_STATUS.COMPLETED,
+          updatedAt: new Date().toISOString(),
+        })
+        .eq('id', requestId);
+      if (error) throw error;
       return;
     } catch (e) {
-      console.warn('Firebase completeMentorship fallback:', e);
+      console.warn('Supabase completeMentorship fallback:', e);
     }
   }
 
@@ -189,14 +199,17 @@ export const completeMentorship = async (requestId) => {
  * Get mentorship requests for a student
  */
 export const getStudentMentorshipRequests = async (studentId) => {
-  if (isFirebaseConfigured) {
+  if (isSupabaseConfigured) {
     try {
-      const snap = await getDocs(
-        query(collection(db, 'mentorshipRequests'), where('studentId', '==', studentId), orderBy('createdAt', 'desc'))
-      );
-      return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      const { data, error } = await supabase
+        .from('mentorshipRequests')
+        .select('*')
+        .eq('studentId', studentId)
+        .order('createdAt', { ascending: false });
+      if (error) throw error;
+      return data || [];
     } catch (e) {
-      // Fallback
+      console.warn('Supabase getStudentMentorshipRequests error:', e);
     }
   }
 
@@ -208,14 +221,17 @@ export const getStudentMentorshipRequests = async (studentId) => {
  * Get mentorship requests for an alumni
  */
 export const getAlumniMentorshipRequests = async (alumniId) => {
-  if (isFirebaseConfigured) {
+  if (isSupabaseConfigured) {
     try {
-      const snap = await getDocs(
-        query(collection(db, 'mentorshipRequests'), where('alumniId', '==', alumniId), orderBy('createdAt', 'desc'))
-      );
-      return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      const { data, error } = await supabase
+        .from('mentorshipRequests')
+        .select('*')
+        .eq('alumniId', alumniId)
+        .order('createdAt', { ascending: false });
+      if (error) throw error;
+      return data || [];
     } catch (e) {
-      // Fallback
+      console.warn('Supabase getAlumniMentorshipRequests error:', e);
     }
   }
 

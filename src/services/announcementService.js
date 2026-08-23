@@ -1,15 +1,4 @@
-import {
-  db,
-  collection,
-  addDoc,
-  getDocs,
-  updateDoc,
-  deleteDoc,
-  doc,
-  query,
-  orderBy,
-  serverTimestamp,
-} from '../firebase/firestore';
+import { supabase, isSupabaseConfigured } from '../supabase/client';
 import { broadcastAnnouncement } from './notificationService';
 import { isFirebaseConfigured, mockStore } from './mockStorage';
 
@@ -17,18 +6,24 @@ import { isFirebaseConfigured, mockStore } from './mockStorage';
  * Create an announcement (admin)
  */
 export const createAnnouncement = async (data, createdBy) => {
-  if (isFirebaseConfigured) {
+  if (isSupabaseConfigured) {
     try {
-      const docRef = await addDoc(collection(db, 'announcements'), {
-        ...data,
-        createdBy,
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
-      });
+      const { data: insertedData, error } = await supabase
+        .from('announcements')
+        .insert({
+          ...data,
+          createdBy,
+          updatedAt: new Date().toISOString(),
+        })
+        .select('id')
+        .single();
+
+      if (error) throw error;
+
       await broadcastAnnouncement(data.title, data.content, data.targetAudience || 'all');
-      return docRef.id;
+      return insertedData.id;
     } catch (e) {
-      console.warn('Firebase createAnnouncement fallback:', e);
+      console.warn('Supabase createAnnouncement fallback:', e);
     }
   }
 
@@ -52,12 +47,16 @@ export const createAnnouncement = async (data, createdBy) => {
  * Get all announcements
  */
 export const getAnnouncements = async () => {
-  if (isFirebaseConfigured) {
+  if (isSupabaseConfigured) {
     try {
-      const snap = await getDocs(query(collection(db, 'announcements'), orderBy('createdAt', 'desc')));
-      return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      const { data, error } = await supabase
+        .from('announcements')
+        .select('*')
+        .order('createdAt', { ascending: false });
+      if (error) throw error;
+      return data || [];
     } catch (e) {
-      // Fallback
+      console.warn('Supabase getAnnouncements fallback:', e);
     }
   }
 
@@ -76,15 +75,19 @@ export const getAnnouncementsForRole = async (role) => {
  * Update an announcement
  */
 export const updateAnnouncement = async (id, data) => {
-  if (isFirebaseConfigured) {
+  if (isSupabaseConfigured) {
     try {
-      await updateDoc(doc(db, 'announcements', id), {
-        ...data,
-        updatedAt: serverTimestamp(),
-      });
+      const { error } = await supabase
+        .from('announcements')
+        .update({
+          ...data,
+          updatedAt: new Date().toISOString(),
+        })
+        .eq('id', id);
+      if (error) throw error;
       return;
     } catch (e) {
-      // Fallback
+      console.warn('Supabase updateAnnouncement fallback:', e);
     }
   }
 
@@ -98,12 +101,16 @@ export const updateAnnouncement = async (id, data) => {
  * Delete an announcement
  */
 export const deleteAnnouncement = async (id) => {
-  if (isFirebaseConfigured) {
+  if (isSupabaseConfigured) {
     try {
-      await deleteDoc(doc(db, 'announcements', id));
+      const { error } = await supabase
+        .from('announcements')
+        .delete()
+        .eq('id', id);
+      if (error) throw error;
       return;
     } catch (e) {
-      // Fallback
+      console.warn('Supabase deleteAnnouncement fallback:', e);
     }
   }
 

@@ -1,36 +1,26 @@
-import {
-  db,
-  collection,
-  doc,
-  addDoc,
-  getDocs,
-  updateDoc,
-  query,
-  where,
-  orderBy,
-  onSnapshot,
-  serverTimestamp,
-} from '../firebase/firestore';
+import { supabase, isSupabaseConfigured } from '../supabase/client';
 import { isFirebaseConfigured, mockStore } from './mockStorage';
 
 /**
  * Create a notification for a user
  */
 export const createNotification = async (userId, { type, title, message, relatedId = null }) => {
-  if (isFirebaseConfigured) {
+  if (isSupabaseConfigured) {
     try {
-      await addDoc(collection(db, 'notifications'), {
-        userId,
-        type,
-        title,
-        message,
-        relatedId,
-        read: false,
-        createdAt: serverTimestamp(),
-      });
+      const { error } = await supabase
+        .from('notifications')
+        .insert({
+          userId,
+          type,
+          title,
+          message,
+          relatedId: relatedId ? String(relatedId) : null,
+          read: false,
+        });
+      if (error) throw error;
       return;
     } catch (e) {
-      console.warn('Firebase createNotification fallback:', e);
+      console.warn('Supabase createNotification fallback:', e);
     }
   }
 
@@ -54,14 +44,17 @@ export const createNotification = async (userId, { type, title, message, related
  * Get notifications for a user
  */
 export const getUserNotifications = async (userId) => {
-  if (isFirebaseConfigured) {
+  if (isSupabaseConfigured) {
     try {
-      const snap = await getDocs(
-        query(collection(db, 'notifications'), where('userId', '==', userId), orderBy('createdAt', 'desc'))
-      );
-      return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      const { data, error } = await supabase
+        .from('notifications')
+        .select('*')
+        .eq('userId', userId)
+        .order('createdAt', { ascending: false });
+      if (error) throw error;
+      return data || [];
     } catch (e) {
-      // Fallback
+      console.warn('Supabase getUserNotifications error:', e);
     }
   }
 
@@ -73,20 +66,32 @@ export const getUserNotifications = async (userId) => {
  * Real-time listener for user notifications
  */
 export const listenToNotifications = (userId, callback) => {
-  if (isFirebaseConfigured) {
-    try {
-      const q = query(
-        collection(db, 'notifications'),
-        where('userId', '==', userId),
-        orderBy('createdAt', 'desc')
-      );
-      return onSnapshot(q, (snap) => {
-        const notifications = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-        callback(notifications);
-      });
-    } catch (e) {
-      // Fallback
-    }
+  if (isSupabaseConfigured) {
+    // Initial fetch
+    getUserNotifications(userId).then((notifs) => {
+      callback(notifs);
+    });
+
+    const channel = supabase
+      .channel(`public:notifications:userId=eq.${userId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'notifications',
+          filter: `userId=eq.${userId}`,
+        },
+        async (payload) => {
+          const fresh = await getUserNotifications(userId);
+          callback(fresh);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }
 
   const emit = () => {
@@ -108,12 +113,16 @@ export const listenToNotifications = (userId, callback) => {
  * Mark a notification as read
  */
 export const markNotificationRead = async (notificationId) => {
-  if (isFirebaseConfigured) {
+  if (isSupabaseConfigured) {
     try {
-      await updateDoc(doc(db, 'notifications', notificationId), { read: true });
+      const { error } = await supabase
+        .from('notifications')
+        .update({ read: true })
+        .eq('id', notificationId);
+      if (error) throw error;
       return;
     } catch (e) {
-      // Fallback
+      console.warn('Supabase markNotificationRead error:', e);
     }
   }
 
@@ -127,15 +136,17 @@ export const markNotificationRead = async (notificationId) => {
  * Mark all notifications as read
  */
 export const markAllNotificationsRead = async (userId) => {
-  if (isFirebaseConfigured) {
+  if (isSupabaseConfigured) {
     try {
-      const snap = await getDocs(
-        query(collection(db, 'notifications'), where('userId', '==', userId), where('read', '==', false))
-      );
-      await Promise.all(snap.docs.map((d) => updateDoc(doc(db, 'notifications', d.id), { read: true })));
+      const { error } = await supabase
+        .from('notifications')
+        .update({ read: true })
+        .eq('userId', userId)
+        .eq('read', false);
+      if (error) throw error;
       return;
     } catch (e) {
-      // Fallback
+      console.warn('Supabase markAllNotificationsRead error:', e);
     }
   }
 
@@ -149,7 +160,13 @@ export const markAllNotificationsRead = async (userId) => {
  * Broadcast announcement
  */
 export const broadcastAnnouncement = async (title, message, targetRole) => {
-  const users = isFirebaseConfigured ? await (await getDocs(collection(db, 'users'))).docs.map(d=>({id: d.id, ...d.data()})) : mockStore.getUsers();
+  const users = isSupabaseConfigured
+    ? await (async () => {
+        const { data } = await supabase.from('users').select('*');
+        return data || [];
+      })()
+    : mockStore.getUsers();
+
   const targets = users.filter((u) => targetRole === 'all' || u.role === targetRole);
   for (const t of targets) {
     await createNotification(t.uid || t.id, {

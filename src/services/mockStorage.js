@@ -6,11 +6,9 @@ import {
   SAMPLE_ANNOUNCEMENTS
 } from '../utils/seedData';
 
-export const isFirebaseConfigured = Boolean(
-  import.meta.env.VITE_FIREBASE_API_KEY &&
-  import.meta.env.VITE_FIREBASE_API_KEY !== 'your-api-key-here' &&
-  !import.meta.env.VITE_FIREBASE_API_KEY.includes('your-')
-);
+import { isSupabaseConfigured } from '../supabase/client';
+
+export const isFirebaseConfigured = isSupabaseConfigured;
 
 // Storage keys
 const STORAGE_KEYS = {

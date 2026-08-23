@@ -3,7 +3,7 @@ import {
   LayoutDashboard, Users, GraduationCap, UserCheck, Calendar,
   Briefcase, Megaphone, BarChart2, Settings, LogOut, Link2
 } from 'lucide-react';
-import { signOutUser } from '../../firebase/auth';
+import { signOutUser } from '../../supabase/auth';
 import Avatar from '../ui/Avatar';
 
 const navItems = [

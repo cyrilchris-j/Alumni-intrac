@@ -1,36 +1,29 @@
-import {
-  db,
-  collection,
-  doc,
-  addDoc,
-  getDocs,
-  updateDoc,
-  deleteDoc,
-  query,
-  where,
-  orderBy,
-  serverTimestamp,
-  setDoc,
-} from '../firebase/firestore';
+import { supabase, isSupabaseConfigured } from '../supabase/client';
 import { isFirebaseConfigured, mockStore } from './mockStorage';
 
 /**
  * Create an opportunity
  */
 export const createOpportunity = async (postedBy, postedByName, data) => {
-  if (isFirebaseConfigured) {
+  if (isSupabaseConfigured) {
     try {
-      const docRef = await addDoc(collection(db, 'opportunities'), {
-        ...data,
-        postedBy,
-        postedByName,
-        skills: Array.isArray(data.skills) ? data.skills : data.skills?.split(',').map((s) => s.trim()).filter(Boolean) || [],
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
-      });
-      return docRef.id;
+      const skills = Array.isArray(data.skills) ? data.skills : data.skills?.split(',').map((s) => s.trim()).filter(Boolean) || [];
+      const { data: insertedData, error } = await supabase
+        .from('opportunities')
+        .insert({
+          ...data,
+          postedBy,
+          postedByName,
+          skills,
+          updatedAt: new Date().toISOString(),
+        })
+        .select('id')
+        .single();
+
+      if (error) throw error;
+      return insertedData.id;
     } catch (e) {
-      console.warn('Firebase createOpportunity fallback:', e);
+      console.warn('Supabase createOpportunity fallback:', e);
     }
   }
 
@@ -54,15 +47,19 @@ export const createOpportunity = async (postedBy, postedByName, data) => {
  * Update an opportunity
  */
 export const updateOpportunity = async (opportunityId, data) => {
-  if (isFirebaseConfigured) {
+  if (isSupabaseConfigured) {
     try {
-      await updateDoc(doc(db, 'opportunities', opportunityId), {
-        ...data,
-        updatedAt: serverTimestamp(),
-      });
+      const { error } = await supabase
+        .from('opportunities')
+        .update({
+          ...data,
+          updatedAt: new Date().toISOString(),
+        })
+        .eq('id', opportunityId);
+      if (error) throw error;
       return;
     } catch (e) {
-      console.warn('Firebase updateOpportunity fallback:', e);
+      console.warn('Supabase updateOpportunity fallback:', e);
     }
   }
 
@@ -76,12 +73,16 @@ export const updateOpportunity = async (opportunityId, data) => {
  * Delete an opportunity
  */
 export const deleteOpportunity = async (opportunityId) => {
-  if (isFirebaseConfigured) {
+  if (isSupabaseConfigured) {
     try {
-      await deleteDoc(doc(db, 'opportunities', opportunityId));
+      const { error } = await supabase
+        .from('opportunities')
+        .delete()
+        .eq('id', opportunityId);
+      if (error) throw error;
       return;
     } catch (e) {
-      console.warn('Firebase deleteOpportunity fallback:', e);
+      console.warn('Supabase deleteOpportunity fallback:', e);
     }
   }
 
@@ -94,10 +95,14 @@ export const deleteOpportunity = async (opportunityId) => {
  */
 export const getOpportunities = async (filters = {}) => {
   let results = [];
-  if (isFirebaseConfigured) {
+  if (isSupabaseConfigured) {
     try {
-      const snap = await getDocs(query(collection(db, 'opportunities'), orderBy('createdAt', 'desc')));
-      results = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      const { data, error } = await supabase
+        .from('opportunities')
+        .select('*')
+        .order('createdAt', { ascending: false });
+      if (error) throw error;
+      results = data || [];
     } catch (e) {
       results = mockStore.getOpportunities();
     }
@@ -128,14 +133,17 @@ export const getOpportunities = async (filters = {}) => {
  * Get opportunities posted by a specific alumni
  */
 export const getAlumniOpportunities = async (alumniId) => {
-  if (isFirebaseConfigured) {
+  if (isSupabaseConfigured) {
     try {
-      const snap = await getDocs(
-        query(collection(db, 'opportunities'), where('postedBy', '==', alumniId), orderBy('createdAt', 'desc'))
-      );
-      return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      const { data, error } = await supabase
+        .from('opportunities')
+        .select('*')
+        .eq('postedBy', alumniId)
+        .order('createdAt', { ascending: false });
+      if (error) throw error;
+      return data || [];
     } catch (e) {
-      // Fallback
+      console.warn('Supabase getAlumniOpportunities error:', e);
     }
   }
 
@@ -147,16 +155,18 @@ export const getAlumniOpportunities = async (alumniId) => {
  * Save an opportunity for a student
  */
 export const saveOpportunity = async (studentId, opportunityId) => {
-  if (isFirebaseConfigured) {
+  if (isSupabaseConfigured) {
     try {
-      await setDoc(doc(db, 'savedOpportunities', `${studentId}_${opportunityId}`), {
-        studentId,
-        opportunityId,
-        createdAt: serverTimestamp(),
-      });
+      const { error } = await supabase
+        .from('savedOpportunities')
+        .upsert({
+          studentId,
+          opportunityId,
+        });
+      if (error) throw error;
       return;
     } catch (e) {
-      // Fallback
+      console.warn('Supabase saveOpportunity error:', e);
     }
   }
 
@@ -170,12 +180,17 @@ export const saveOpportunity = async (studentId, opportunityId) => {
  * Unsave an opportunity
  */
 export const unsaveOpportunity = async (studentId, opportunityId) => {
-  if (isFirebaseConfigured) {
+  if (isSupabaseConfigured) {
     try {
-      await deleteDoc(doc(db, 'savedOpportunities', `${studentId}_${opportunityId}`));
+      const { error } = await supabase
+        .from('savedOpportunities')
+        .delete()
+        .eq('studentId', studentId)
+        .eq('opportunityId', opportunityId);
+      if (error) throw error;
       return;
     } catch (e) {
-      // Fallback
+      console.warn('Supabase unsaveOpportunity error:', e);
     }
   }
 
@@ -189,14 +204,16 @@ export const unsaveOpportunity = async (studentId, opportunityId) => {
  * Get saved opportunities for a student
  */
 export const getSavedOpportunities = async (studentId) => {
-  if (isFirebaseConfigured) {
+  if (isSupabaseConfigured) {
     try {
-      const snap = await getDocs(
-        query(collection(db, 'savedOpportunities'), where('studentId', '==', studentId))
-      );
-      return snap.docs.map((d) => d.data().opportunityId);
+      const { data, error } = await supabase
+        .from('savedOpportunities')
+        .select('opportunityId')
+        .eq('studentId', studentId);
+      if (error) throw error;
+      return data.map((d) => d.opportunityId);
     } catch (e) {
-      // Fallback
+      console.warn('Supabase getSavedOpportunities error:', e);
     }
   }
 
@@ -208,17 +225,19 @@ export const getSavedOpportunities = async (studentId) => {
  * Apply to an opportunity
  */
 export const applyOpportunity = async (studentId, opportunityId, applicationData = {}) => {
-  if (isFirebaseConfigured) {
+  if (isSupabaseConfigured) {
     try {
-      await setDoc(doc(db, 'appliedOpportunities', `${studentId}_${opportunityId}`), {
-        studentId,
-        opportunityId,
-        ...applicationData,
-        appliedAt: serverTimestamp(),
-      });
+      const { error } = await supabase
+        .from('appliedOpportunities')
+        .upsert({
+          studentId,
+          opportunityId,
+          data: applicationData,
+        });
+      if (error) throw error;
       return;
     } catch (e) {
-      console.warn('Firebase applyOpportunity fallback:', e);
+      console.warn('Supabase applyOpportunity fallback:', e);
     }
   }
 
@@ -241,14 +260,16 @@ export const applyOpportunity = async (studentId, opportunityId, applicationData
  * Get all opportunities applied to by a student
  */
 export const getAppliedOpportunities = async (studentId) => {
-  if (isFirebaseConfigured) {
+  if (isSupabaseConfigured) {
     try {
-      const snap = await getDocs(
-        query(collection(db, 'appliedOpportunities'), where('studentId', '==', studentId))
-      );
-      return snap.docs.map((d) => d.data().opportunityId);
+      const { data, error } = await supabase
+        .from('appliedOpportunities')
+        .select('opportunityId')
+        .eq('studentId', studentId);
+      if (error) throw error;
+      return data.map((d) => d.opportunityId);
     } catch (e) {
-      // Fallback
+      console.warn('Supabase getAppliedOpportunities error:', e);
     }
   }
 
@@ -263,4 +284,3 @@ export const hasAppliedOpportunity = async (studentId, opportunityId) => {
   const list = await getAppliedOpportunities(studentId);
   return list.includes(opportunityId);
 };
-
