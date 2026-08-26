@@ -167,39 +167,22 @@ const AlumniProfile = () => {
         </div>
 
         <div className="px-6 sm:px-8 pb-7">
-          <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 -mt-16 sm:-mt-20 mb-6">
-            <div className="flex flex-col sm:flex-row items-start sm:items-end gap-5">
-              {/* Premium Avatar Ring Container */}
-              <div className="relative p-1.5 bg-white rounded-full shadow-xl ring-4 ring-white/90 shadow-blue-900/10 flex-shrink-0">
-                <Avatar src={alumni.photoURL} name={alumni.fullName} size="2xl" className="w-24 h-24 sm:w-28 sm:h-28" />
-              </div>
-              <div className="mb-1">
-                <div className="flex items-center gap-2.5 flex-wrap">
-                  <h1 className="text-2xl sm:text-3xl font-heading font-extrabold text-slate-900 tracking-tight">
-                    {alumni.fullName}
-                  </h1>
-                  {alumni.verificationStatus === 'verified' && (
-                    <Badge variant="success" className="shadow-xs backdrop-blur-xs">
-                      ✓ Verified Alumni
-                    </Badge>
-                  )}
-                </div>
-                <p className="text-slate-600 font-medium text-base sm:text-lg mt-1 flex items-center gap-2">
-                  <Briefcase size={18} className="text-blue-600 flex-shrink-0" />
-                  <span>{alumni.jobRole} {alumni.company && <span className="font-semibold text-slate-800">at {alumni.company}</span>}</span>
-                </p>
-              </div>
+          {/* Avatar & Action Buttons Row */}
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 -mt-14 sm:-mt-16 mb-5">
+            {/* Premium Avatar Ring Container */}
+            <div className="relative p-1.5 bg-white rounded-full shadow-xl ring-4 ring-white shadow-blue-900/10 flex-shrink-0 self-start sm:self-auto">
+              <Avatar src={alumni.photoURL} name={alumni.fullName} size="2xl" className="w-24 h-24 sm:w-28 sm:h-28" />
             </div>
 
             {/* Action buttons */}
-            <div className="flex items-center gap-3 flex-wrap sm:flex-nowrap">
+            <div className="flex items-center gap-2.5 flex-wrap sm:flex-nowrap pt-2 sm:pt-0">
               <Button
                 leftIcon={Link2}
                 disabled={connectBtn.disabled}
                 loading={connecting}
                 onClick={handleConnect}
                 variant={connectBtn.disabled ? 'outline' : 'primary'}
-                className="rounded-xl px-5 py-2.5 shadow-sm transition-transform active:scale-95"
+                className="rounded-xl px-5 py-2.5 shadow-sm transition-transform active:scale-95 text-sm"
               >
                 {connectBtn.label}
               </Button>
@@ -214,7 +197,7 @@ const AlumniProfile = () => {
                 }
                 loading={messaging}
                 onClick={handleMessage}
-                className="rounded-xl px-5 py-2.5 shadow-xs transition-transform active:scale-95"
+                className="rounded-xl px-5 py-2.5 shadow-xs transition-transform active:scale-95 text-sm"
               >
                 Message
               </Button>
@@ -222,11 +205,37 @@ const AlumniProfile = () => {
                 leftIcon={BookOpen}
                 variant="gold"
                 onClick={() => setShowMentorshipModal(true)}
-                className="rounded-xl px-5 py-2.5 shadow-md shadow-cyan-500/15 transition-transform active:scale-95"
+                className="rounded-xl px-5 py-2.5 shadow-md shadow-cyan-500/15 transition-transform active:scale-95 text-sm"
               >
                 Request Mentorship
               </Button>
             </div>
+          </div>
+
+          {/* User Details (Name, Badge, Role) - Cleanly below banner */}
+          <div className="mb-5">
+            <div className="flex items-center gap-3 flex-wrap">
+              <h1 className="text-2xl sm:text-3xl font-heading font-extrabold text-slate-900 tracking-tight">
+                {alumni.fullName}
+              </h1>
+              {alumni.verificationStatus === 'verified' && (
+                <Badge variant="success" className="shadow-xs backdrop-blur-xs">
+                  ✓ Verified Alumni
+                </Badge>
+              )}
+            </div>
+            <p className="text-slate-600 font-medium text-base sm:text-lg mt-1.5 flex items-center gap-2 flex-wrap">
+              <span>{alumni.jobRole}</span>
+              {alumni.company && (
+                <>
+                  <span className="text-slate-400">•</span>
+                  <span className="font-semibold text-slate-800 flex items-center gap-1.5">
+                    <Briefcase size={16} className="text-blue-600 inline" />
+                    {alumni.company}
+                  </span>
+                </>
+              )}
+            </p>
           </div>
 
           {/* Quick info Micro-Cards */}
