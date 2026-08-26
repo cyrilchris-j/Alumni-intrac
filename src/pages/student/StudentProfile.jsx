@@ -101,48 +101,58 @@ const StudentProfile = () => {
 
   return (
     <DashboardLayout>
-      {/* Horizontal Profile Header Card */}
-      <div className="bg-white rounded-2xl border border-slate-200/90 p-5 sm:p-6 mb-6 flex items-center justify-between gap-4 shadow-card">
-        <div className="flex items-center gap-4 min-w-0">
-          <div className="relative flex-shrink-0">
-            <Avatar
-              src={photoPreview || userProfile.photoURL}
-              name={userProfile.fullName}
-              size="lg"
-              ring
-              className="w-14 h-14 sm:w-16 sm:h-16 flex-shrink-0"
-            />
-            {editing && (
-              <label className="absolute -bottom-1 -right-1 p-1.5 bg-blue-600 text-white rounded-full cursor-pointer hover:bg-blue-700 shadow-md">
-                <Upload size={12} />
-                <input type="file" accept="image/*" onChange={handlePhotoChange} className="hidden" />
-              </label>
-            )}
-          </div>
-          <div className="min-w-0">
-            <div className="flex items-center gap-2 flex-wrap">
-              <h1 className="text-xl sm:text-2xl font-heading font-bold text-slate-900 truncate">
-                {userProfile.fullName || 'Student Profile'}
-              </h1>
-              {userProfile.registerNo && (
-                <span className="inline-block px-2.5 py-0.5 bg-blue-50 text-blue-700 text-xs font-mono font-bold rounded-full border border-blue-200">
-                  Reg No: {userProfile.registerNo}
-                </span>
-              )}
-            </div>
-            <p className="text-sm text-slate-500 font-medium truncate mt-0.5">
-              {userProfile.year || '3 Year'} {userProfile.department || 'CSE'} Student
-            </p>
-          </div>
+      {/* Profile Header Card */}
+      <div className="bg-white rounded-3xl border border-slate-200/80 shadow-[0_12px_36px_-6px_rgba(37,99,235,0.08),0_4px_16px_-2px_rgba(0,0,0,0.02)] overflow-hidden mb-6 transition-all duration-300">
+        {/* Banner Cover with Premium Gradient & Ambient Lighting */}
+        <div className="relative h-36 sm:h-44 bg-gradient-to-r from-blue-700 via-blue-600 to-cyan-600 overflow-hidden">
+          <div className="absolute -top-20 -right-20 w-72 h-72 bg-cyan-400/25 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute top-0 left-1/3 w-80 h-36 bg-white/10 rounded-full blur-2xl pointer-events-none" />
+          <div className="absolute inset-0 opacity-15 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:20px_20px] pointer-events-none" />
         </div>
 
-        <Button
-          variant={editing ? 'secondary' : 'primary'}
-          onClick={() => setEditing((prev) => !prev)}
-          className="rounded-xl px-5 py-2.5 text-sm font-semibold flex-shrink-0"
-        >
-          {editing ? 'Cancel' : 'Edit Profile'}
-        </Button>
+        <div className="px-6 sm:px-8 pb-6">
+          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-5 -mt-12 sm:-mt-14 mb-4">
+            <div className="flex items-end gap-4 min-w-0">
+              <div className="relative p-1 bg-white rounded-full shadow-xl ring-4 ring-white/90 shadow-blue-900/10 flex-shrink-0">
+                <Avatar
+                  src={photoPreview || userProfile.photoURL}
+                  name={userProfile.fullName}
+                  size="xl"
+                  className="w-20 h-20 sm:w-24 sm:h-24 flex-shrink-0"
+                />
+                {editing && (
+                  <label className="absolute -bottom-1 -right-1 p-1.5 bg-blue-600 text-white rounded-full cursor-pointer hover:bg-blue-700 shadow-md">
+                    <Upload size={14} />
+                    <input type="file" accept="image/*" onChange={handlePhotoChange} className="hidden" />
+                  </label>
+                )}
+              </div>
+              <div className="min-w-0 mb-1">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h1 className="text-xl sm:text-2xl font-heading font-extrabold text-slate-900 truncate">
+                    {userProfile.fullName || 'Student Profile'}
+                  </h1>
+                  {userProfile.registerNo && (
+                    <span className="inline-block px-3 py-0.5 bg-blue-50 text-blue-700 text-xs font-mono font-bold rounded-full border border-blue-200 shadow-2xs">
+                      Reg No: {userProfile.registerNo}
+                    </span>
+                  )}
+                </div>
+                <p className="text-sm sm:text-base text-slate-600 font-medium truncate mt-0.5">
+                  {userProfile.year || '3 Year'} {userProfile.department || 'CSE'} Student
+                </p>
+              </div>
+            </div>
+
+            <Button
+              variant={editing ? 'secondary' : 'primary'}
+              onClick={() => setEditing((prev) => !prev)}
+              className="rounded-xl px-5 py-2.5 text-sm font-semibold flex-shrink-0 shadow-sm transition-transform active:scale-95"
+            >
+              {editing ? 'Cancel' : 'Edit Profile'}
+            </Button>
+          </div>
+        </div>
       </div>
 
       {successMsg && (
