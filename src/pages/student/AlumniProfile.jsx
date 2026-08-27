@@ -262,11 +262,10 @@ const AlumniProfile = () => {
         </div>
       </div>
 
-      {/* ── Body grid: 2 cols on lg ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-
+      {/* ── Unified Symmetrical Single-Column Stack ── */}
+      <div className="space-y-5">
         {/* Main content */}
-        <div className="lg:col-span-2 space-y-5">
+        <div className="space-y-5">
 
           {/* About */}
           {alumni.bio && (
@@ -322,12 +321,10 @@ const AlumniProfile = () => {
               </div>
             </SectionCard>
           )}
-        </div>
 
-        {/* Sidebar */}
-        <div className="space-y-5">
-          <SectionCard title="Contact">
-            <div className="space-y-1.5">
+          {/* Contact Details (Clean responsive grid) */}
+          <SectionCard title="Contact Details">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
               <ContactRow
                 icon={<Mail size={15} />}
                 href={`mailto:${alumni.email}`}
