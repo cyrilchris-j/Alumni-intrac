@@ -122,8 +122,8 @@ const AlumniOwnProfile = () => {
 
         <div className="px-4 sm:px-6 lg:px-8 pb-6">
           {/* Avatar row */}
-          <div className="flex items-start justify-between gap-3 -mt-10 sm:-mt-14 mb-4">
-            <div className="relative shrink-0 p-1.5 bg-white rounded-full shadow-xl ring-4 ring-white shadow-blue-900/10">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 -mt-10 sm:-mt-14 mb-4">
+            <div className="relative shrink-0 p-1.5 bg-white rounded-full shadow-xl ring-4 ring-white shadow-blue-900/10 self-start sm:self-auto">
               <Avatar
                 src={photoPreview || userProfile.photoURL}
                 name={userProfile.fullName}
@@ -141,7 +141,7 @@ const AlumniOwnProfile = () => {
             <Button
               variant={editing ? 'secondary' : 'primary'}
               onClick={() => setEditing((prev) => !prev)}
-              className="rounded-xl px-4 sm:px-5 py-2.5 text-sm font-semibold shrink-0 shadow-sm active:scale-95 transition-transform mt-12 sm:mt-auto sm:mb-1"
+              className="rounded-xl px-4 sm:px-5 py-2.5 text-sm font-semibold shrink-0 shadow-sm active:scale-95 transition-transform w-full sm:w-auto justify-center sm:mb-1"
             >
               {editing ? 'Cancel' : 'Edit Profile'}
             </Button>

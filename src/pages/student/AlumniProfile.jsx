@@ -167,11 +167,11 @@ const AlumniProfile = () => {
         </div>
 
         <div className="px-4 sm:px-6 lg:px-8 pb-6">
-          {/* Avatar row — avatar overlaps banner, buttons sit right */}
-          <div className="flex items-start justify-between gap-3 -mt-10 sm:-mt-14 mb-4">
+          {/* Avatar and Actions Container */}
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 -mt-10 sm:-mt-14 mb-4">
 
             {/* Avatar ring */}
-            <div className="relative shrink-0 p-1.5 bg-white rounded-full shadow-xl ring-4 ring-white shadow-blue-900/10">
+            <div className="relative shrink-0 p-1.5 bg-white rounded-full shadow-xl ring-4 ring-white shadow-blue-900/10 self-start sm:self-auto">
               <Avatar
                 src={alumni.photoURL}
                 name={alumni.fullName}
@@ -180,17 +180,17 @@ const AlumniProfile = () => {
               />
             </div>
 
-            {/* Action buttons — stacked on mobile, row on sm+ */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 mt-12 sm:mt-auto sm:mb-1 w-full sm:w-auto">
+            {/* Action buttons — 3-column grid on mobile to look neat, normal row on sm+ */}
+            <div className="grid grid-cols-3 gap-2 w-full sm:flex sm:items-center sm:gap-2 sm:w-auto sm:mb-1">
               <Button
                 leftIcon={Link2}
                 disabled={connectBtn.disabled}
                 loading={connecting}
                 onClick={handleConnect}
                 variant={connectBtn.disabled ? 'outline' : 'primary'}
-                className="rounded-xl px-4 py-2.5 text-sm shadow-sm active:scale-95 transition-transform w-full sm:w-auto justify-center"
+                className="rounded-xl px-1.5 py-2 sm:px-4 sm:py-2.5 text-xs sm:text-sm shadow-sm active:scale-95 transition-transform w-full justify-center"
               >
-                {connectBtn.label}
+                <span className="truncate">{connectBtn.label}</span>
               </Button>
               <Button
                 leftIcon={MessageSquare}
@@ -203,17 +203,17 @@ const AlumniProfile = () => {
                 }
                 loading={messaging}
                 onClick={handleMessage}
-                className="rounded-xl px-4 py-2.5 text-sm active:scale-95 transition-transform w-full sm:w-auto justify-center"
+                className="rounded-xl px-1.5 py-2 sm:px-4 sm:py-2.5 text-xs sm:text-sm active:scale-95 transition-transform w-full justify-center"
               >
-                Message
+                <span className="truncate">Message</span>
               </Button>
               <Button
                 leftIcon={BookOpen}
                 variant="gold"
                 onClick={() => setShowMentorshipModal(true)}
-                className="rounded-xl px-4 py-2.5 text-sm shadow-md shadow-cyan-500/15 active:scale-95 transition-transform w-full sm:w-auto justify-center"
+                className="rounded-xl px-1.5 py-2 sm:px-4 sm:py-2.5 text-xs sm:text-sm shadow-md shadow-cyan-500/15 active:scale-95 transition-transform w-full justify-center"
               >
-                Mentorship
+                <span className="truncate">Mentorship</span>
               </Button>
             </div>
           </div>

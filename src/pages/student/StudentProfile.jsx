@@ -112,12 +112,12 @@ const StudentProfile = () => {
 
         <div className="px-6 sm:px-8 pb-6">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 -mt-12 sm:-mt-14 mb-4">
-            <div className="relative p-1 bg-white rounded-full shadow-xl ring-4 ring-white shadow-blue-900/10 flex-shrink-0 self-start sm:self-auto">
+            <div className="relative p-1 bg-white rounded-full shadow-xl ring-4 ring-white shadow-blue-900/10 shrink-0 self-start sm:self-auto">
               <Avatar
                 src={photoPreview || userProfile.photoURL}
                 name={userProfile.fullName}
                 size="xl"
-                className="w-20 h-20 sm:w-24 sm:h-24 flex-shrink-0"
+                className="w-20 h-20 sm:w-24 sm:h-24"
               />
               {editing && (
                 <label className="absolute -bottom-1 -right-1 p-1.5 bg-blue-600 text-white rounded-full cursor-pointer hover:bg-blue-700 shadow-md">
@@ -130,7 +130,7 @@ const StudentProfile = () => {
             <Button
               variant={editing ? 'secondary' : 'primary'}
               onClick={() => setEditing((prev) => !prev)}
-              className="rounded-xl px-5 py-2.5 text-sm font-semibold flex-shrink-0 shadow-sm transition-transform active:scale-95"
+              className="rounded-xl px-5 py-2.5 text-sm font-semibold shrink-0 shadow-sm transition-transform active:scale-95 w-full sm:w-auto justify-center"
             >
               {editing ? 'Cancel' : 'Edit Profile'}
             </Button>
