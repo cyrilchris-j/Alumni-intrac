@@ -149,40 +149,46 @@ const AlumniProfile = () => {
       {/* Back */}
       <button
         onClick={() => navigate(-1)}
-        className="flex items-center gap-2 text-sm text-text-secondary hover:text-text-primary mb-4 transition-colors"
+        className="inline-flex items-center gap-2 text-sm text-text-secondary hover:text-text-primary mb-4 transition-colors group"
       >
-        <ArrowLeft size={16} /> Back to Directory
+        <ArrowLeft size={16} className="group-hover:-translate-x-0.5 transition-transform" />
+        Back to Directory
       </button>
 
-      {/* Profile Header Card */}
-      <div className="bg-white rounded-3xl border border-slate-200/80 shadow-[0_12px_36px_-6px_rgba(37,99,235,0.08),0_4px_16px_-2px_rgba(0,0,0,0.02)] overflow-hidden mb-6 transition-all duration-300">
-        {/* Banner Cover with Premium Gradient & Ambient Lighting */}
-        <div className="relative h-44 sm:h-52 bg-gradient-to-r from-blue-700 via-blue-600 to-cyan-600 overflow-hidden">
-          {/* Ambient Lighting & Abstract Glass Orbs */}
-          <div className="absolute -top-20 -right-20 w-80 h-80 bg-cyan-400/25 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute top-0 left-1/3 w-96 h-40 bg-white/10 rounded-full blur-2xl pointer-events-none" />
-          <div className="absolute -bottom-10 -left-10 w-60 h-60 bg-blue-900/30 rounded-full blur-2xl pointer-events-none" />
-          {/* Subtle grid pattern overlay */}
-          <div className="absolute inset-0 opacity-15 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:20px_20px] pointer-events-none" />
+      {/* ── Profile Header Card ── */}
+      <div className="bg-white rounded-3xl border border-slate-200/80 shadow-[0_12px_36px_-6px_rgba(37,99,235,0.08),0_4px_16px_-2px_rgba(0,0,0,0.02)] overflow-hidden mb-5">
+
+        {/* Banner */}
+        <div className="relative h-36 sm:h-44 bg-gradient-to-br from-blue-800 via-blue-600 to-cyan-500 overflow-hidden">
+          <div className="absolute -top-16 -right-16 w-72 h-72 bg-cyan-400/20 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute top-0 left-1/4 w-96 h-40 bg-white/10 rounded-full blur-2xl pointer-events-none" />
+          <div className="absolute -bottom-10 -left-10 w-56 h-56 bg-blue-900/30 rounded-full blur-2xl pointer-events-none" />
+          <div className="absolute inset-0 opacity-[0.12] bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:20px_20px] pointer-events-none" />
         </div>
 
-        <div className="px-6 sm:px-8 pb-7">
-          {/* Avatar & Action Buttons Row */}
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 -mt-14 sm:-mt-16 mb-5">
-            {/* Premium Avatar Ring Container */}
-            <div className="relative p-1.5 bg-white rounded-full shadow-xl ring-4 ring-white shadow-blue-900/10 flex-shrink-0 self-start sm:self-auto">
-              <Avatar src={alumni.photoURL} name={alumni.fullName} size="2xl" className="w-24 h-24 sm:w-28 sm:h-28" />
+        <div className="px-4 sm:px-6 lg:px-8 pb-6">
+          {/* Avatar row — avatar overlaps banner, buttons sit right */}
+          <div className="flex items-start justify-between gap-3 -mt-10 sm:-mt-14 mb-4">
+
+            {/* Avatar ring */}
+            <div className="relative shrink-0 p-1.5 bg-white rounded-full shadow-xl ring-4 ring-white shadow-blue-900/10">
+              <Avatar
+                src={alumni.photoURL}
+                name={alumni.fullName}
+                size="2xl"
+                className="w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28"
+              />
             </div>
 
-            {/* Action buttons */}
-            <div className="flex items-center gap-2.5 flex-wrap sm:flex-nowrap pt-2 sm:pt-0">
+            {/* Action buttons — stacked on mobile, row on sm+ */}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 mt-12 sm:mt-auto sm:mb-1 w-full sm:w-auto">
               <Button
                 leftIcon={Link2}
                 disabled={connectBtn.disabled}
                 loading={connecting}
                 onClick={handleConnect}
                 variant={connectBtn.disabled ? 'outline' : 'primary'}
-                className="rounded-xl px-5 py-2.5 shadow-sm transition-transform active:scale-95 text-sm"
+                className="rounded-xl px-4 py-2.5 text-sm shadow-sm active:scale-95 transition-transform w-full sm:w-auto justify-center"
               >
                 {connectBtn.label}
               </Button>
@@ -197,7 +203,7 @@ const AlumniProfile = () => {
                 }
                 loading={messaging}
                 onClick={handleMessage}
-                className="rounded-xl px-5 py-2.5 shadow-xs transition-transform active:scale-95 text-sm"
+                className="rounded-xl px-4 py-2.5 text-sm active:scale-95 transition-transform w-full sm:w-auto justify-center"
               >
                 Message
               </Button>
@@ -205,32 +211,32 @@ const AlumniProfile = () => {
                 leftIcon={BookOpen}
                 variant="gold"
                 onClick={() => setShowMentorshipModal(true)}
-                className="rounded-xl px-5 py-2.5 shadow-md shadow-cyan-500/15 transition-transform active:scale-95 text-sm"
+                className="rounded-xl px-4 py-2.5 text-sm shadow-md shadow-cyan-500/15 active:scale-95 transition-transform w-full sm:w-auto justify-center"
               >
-                Request Mentorship
+                Mentorship
               </Button>
             </div>
           </div>
 
-          {/* User Details (Name, Badge, Role) - Cleanly below banner */}
-          <div className="mb-5">
-            <div className="flex items-center gap-3 flex-wrap">
-              <h1 className="text-2xl sm:text-3xl font-heading font-extrabold text-slate-900 tracking-tight">
+          {/* Name + badge + title */}
+          <div className="mb-4">
+            <div className="flex flex-wrap items-center gap-2 mb-1">
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-heading font-extrabold text-slate-900 tracking-tight">
                 {alumni.fullName}
               </h1>
               {alumni.verificationStatus === 'verified' && (
-                <Badge variant="success" className="shadow-xs backdrop-blur-xs">
+                <Badge variant="success" className="shadow-xs backdrop-blur-xs shrink-0">
                   ✓ Verified Alumni
                 </Badge>
               )}
             </div>
-            <p className="text-slate-600 font-medium text-base sm:text-lg mt-1.5 flex items-center gap-2 flex-wrap">
-              <span>{alumni.jobRole}</span>
+            <p className="text-slate-600 font-medium text-sm sm:text-base flex flex-wrap items-center gap-x-2 gap-y-0.5">
+              {alumni.jobRole && <span>{alumni.jobRole}</span>}
               {alumni.company && (
                 <>
-                  <span className="text-slate-400">•</span>
+                  <span className="text-slate-300">•</span>
                   <span className="font-semibold text-slate-800 flex items-center gap-1.5">
-                    <Briefcase size={16} className="text-blue-600 inline" />
+                    <Briefcase size={14} className="text-blue-600 shrink-0" />
                     {alumni.company}
                   </span>
                 </>
@@ -238,160 +244,116 @@ const AlumniProfile = () => {
             </p>
           </div>
 
-          {/* Quick info Micro-Cards */}
-          <div className="flex flex-wrap gap-2.5 pt-4 border-t border-slate-100">
+          {/* Micro-cards — wrappable grid so nothing clips */}
+          <div className="flex flex-wrap gap-2 pt-4 border-t border-slate-100">
             {alumni.location && (
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-slate-50/80 border border-slate-200/60 text-xs font-medium text-slate-700 shadow-2xs hover:bg-blue-50/50 transition-colors">
-                <div className="w-5 h-5 rounded-md bg-blue-100/70 text-blue-600 flex items-center justify-center flex-shrink-0">
-                  <MapPin size={12} />
-                </div>
-                {alumni.location}
-              </div>
+              <MicroCard icon={<MapPin size={11} />}>{alumni.location}</MicroCard>
             )}
             {alumni.graduationYear && (
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-slate-50/80 border border-slate-200/60 text-xs font-medium text-slate-700 shadow-2xs hover:bg-blue-50/50 transition-colors">
-                <div className="w-5 h-5 rounded-md bg-blue-100/70 text-blue-600 flex items-center justify-center flex-shrink-0">
-                  <GraduationCap size={12} />
-                </div>
-                Class of {alumni.graduationYear}
-              </div>
+              <MicroCard icon={<GraduationCap size={11} />}>Class of {alumni.graduationYear}</MicroCard>
             )}
             {alumni.department && (
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-slate-50/80 border border-slate-200/60 text-xs font-medium text-slate-700 shadow-2xs hover:bg-blue-50/50 transition-colors">
-                <div className="w-5 h-5 rounded-md bg-blue-100/70 text-blue-600 flex items-center justify-center flex-shrink-0">
-                  <Briefcase size={12} />
-                </div>
-                {alumni.department}
-              </div>
+              <MicroCard icon={<Briefcase size={11} />}>{alumni.department}</MicroCard>
             )}
             {alumni.college && (
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-slate-50/80 border border-slate-200/60 text-xs font-medium text-slate-700 shadow-2xs hover:bg-blue-50/50 transition-colors">
-                <div className="w-5 h-5 rounded-md bg-blue-100/70 text-blue-600 flex items-center justify-center flex-shrink-0">
-                  <Building2 size={12} />
-                </div>
-                {alumni.college}
-              </div>
+              <MicroCard icon={<Building2 size={11} />}>{alumni.college}</MicroCard>
             )}
           </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {/* ── Body grid: 2 cols on lg ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+
         {/* Main content */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="lg:col-span-2 space-y-5">
+
           {/* About */}
           {alumni.bio && (
-            <div className="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-sm hover:shadow-md transition-all">
-              <div className="flex items-center gap-2.5 mb-3">
-                <div className="w-1.5 h-5 bg-blue-600 rounded-full" />
-                <h2 className="text-lg font-heading font-bold text-slate-900">About</h2>
-              </div>
+            <SectionCard title="About">
               <p className="text-slate-600 leading-relaxed text-sm sm:text-base">{alumni.bio}</p>
-            </div>
+            </SectionCard>
           )}
 
           {/* Experience */}
           {alumni.experience && (
-            <div className="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-sm hover:shadow-md transition-all">
-              <div className="flex items-center gap-2.5 mb-4">
-                <div className="w-1.5 h-5 bg-blue-600 rounded-full" />
-                <h2 className="text-lg font-heading font-bold text-slate-900">Experience</h2>
-              </div>
-              <div className="flex items-start gap-4 p-4 rounded-xl bg-slate-50/60 border border-slate-100">
-                <div className="w-11 h-11 bg-blue-50 rounded-xl flex items-center justify-center flex-shrink-0 border border-blue-100 text-blue-600 shadow-2xs">
-                  <Building2 size={20} />
+            <SectionCard title="Experience">
+              <div className="flex items-start gap-3 sm:gap-4 p-3.5 sm:p-4 rounded-xl bg-slate-50/70 border border-slate-100">
+                <div className="w-10 h-10 sm:w-11 sm:h-11 bg-blue-50 rounded-xl flex items-center justify-center shrink-0 border border-blue-100 text-blue-600 shadow-2xs">
+                  <Building2 size={18} />
                 </div>
-                <div>
-                  <p className="font-semibold text-slate-900 text-base">{alumni.jobRole}</p>
-                  <p className="text-blue-600 text-sm font-medium">{alumni.company}</p>
-                  <p className="text-slate-500 text-sm mt-1">{alumni.experience}</p>
+                <div className="min-w-0">
+                  <p className="font-semibold text-slate-900 text-sm sm:text-base truncate">{alumni.jobRole}</p>
+                  <p className="text-blue-600 text-xs sm:text-sm font-medium truncate">{alumni.company}</p>
+                  <p className="text-slate-500 text-xs sm:text-sm mt-0.5 leading-relaxed">{alumni.experience}</p>
                 </div>
               </div>
-            </div>
+            </SectionCard>
           )}
 
           {/* Education */}
-          <div className="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-sm hover:shadow-md transition-all">
-            <div className="flex items-center gap-2.5 mb-4">
-              <div className="w-1.5 h-5 bg-blue-600 rounded-full" />
-              <h2 className="text-lg font-heading font-bold text-slate-900">Education</h2>
-            </div>
-            <div className="flex items-start gap-4 p-4 rounded-xl bg-slate-50/60 border border-slate-100">
-              <div className="w-11 h-11 bg-blue-50 rounded-xl flex items-center justify-center flex-shrink-0 border border-blue-100 text-blue-600 shadow-2xs">
-                <GraduationCap size={20} />
+          <SectionCard title="Education">
+            <div className="flex items-start gap-3 sm:gap-4 p-3.5 sm:p-4 rounded-xl bg-slate-50/70 border border-slate-100">
+              <div className="w-10 h-10 sm:w-11 sm:h-11 bg-blue-50 rounded-xl flex items-center justify-center shrink-0 border border-blue-100 text-blue-600 shadow-2xs">
+                <GraduationCap size={18} />
               </div>
-              <div>
-                <p className="font-semibold text-slate-900 text-base">{alumni.college}</p>
-                <p className="text-slate-600 text-sm font-medium">{alumni.department}</p>
+              <div className="min-w-0">
+                <p className="font-semibold text-slate-900 text-sm sm:text-base">{alumni.college}</p>
+                <p className="text-slate-600 text-xs sm:text-sm font-medium mt-0.5">{alumni.department}</p>
                 {alumni.graduationYear && (
-                  <p className="text-slate-500 text-sm mt-0.5">Graduated {alumni.graduationYear}</p>
+                  <p className="text-slate-400 text-xs sm:text-sm mt-0.5">Graduated {alumni.graduationYear}</p>
                 )}
               </div>
             </div>
-          </div>
+          </SectionCard>
 
           {/* Skills */}
           {alumni.skills?.length > 0 && (
-            <div className="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-sm hover:shadow-md transition-all">
-              <div className="flex items-center gap-2.5 mb-4">
-                <div className="w-1.5 h-5 bg-blue-600 rounded-full" />
-                <h2 className="text-lg font-heading font-bold text-slate-900">Skills</h2>
-              </div>
+            <SectionCard title="Skills">
               <div className="flex flex-wrap gap-2">
                 {alumni.skills.map((skill) => (
-                  <span key={skill} className="px-3.5 py-1.5 bg-blue-50/80 text-blue-700 text-sm font-semibold rounded-xl border border-blue-100 shadow-2xs hover:bg-blue-100/60 transition-colors">
+                  <span
+                    key={skill}
+                    className="px-3 py-1.5 bg-blue-50/80 text-blue-700 text-xs sm:text-sm font-semibold rounded-xl border border-blue-100 shadow-2xs hover:bg-blue-100/60 transition-colors cursor-default"
+                  >
                     {skill}
                   </span>
                 ))}
               </div>
-            </div>
+            </SectionCard>
           )}
         </div>
 
         {/* Sidebar */}
         <div className="space-y-5">
-          {/* Contact */}
-          <div className="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-sm hover:shadow-md transition-all">
-            <div className="flex items-center gap-2.5 mb-4">
-              <div className="w-1.5 h-5 bg-blue-600 rounded-full" />
-              <h2 className="text-base font-heading font-bold text-slate-900">Contact</h2>
-            </div>
-            <div className="space-y-3.5">
-              <a
+          <SectionCard title="Contact">
+            <div className="space-y-1.5">
+              <ContactRow
+                icon={<Mail size={15} />}
                 href={`mailto:${alumni.email}`}
-                className="flex items-center gap-3.5 p-2.5 rounded-xl hover:bg-slate-50 text-sm text-slate-600 hover:text-blue-600 transition-colors border border-transparent hover:border-slate-100"
               >
-                <div className="w-8 h-8 rounded-lg bg-slate-100 text-slate-600 flex items-center justify-center flex-shrink-0">
-                  <Mail size={16} />
-                </div>
-                <span className="truncate font-medium">{alumni.email}</span>
-              </a>
+                <span className="truncate min-w-0 block">{alumni.email}</span>
+              </ContactRow>
               {alumni.phone && (
-                <a
+                <ContactRow
+                  icon={<Phone size={15} />}
                   href={`tel:${alumni.phone}`}
-                  className="flex items-center gap-3.5 p-2.5 rounded-xl hover:bg-slate-50 text-sm text-slate-600 hover:text-blue-600 transition-colors border border-transparent hover:border-slate-100"
                 >
-                  <div className="w-8 h-8 rounded-lg bg-slate-100 text-slate-600 flex items-center justify-center flex-shrink-0">
-                    <Phone size={16} />
-                  </div>
-                  <span className="font-medium">{alumni.phone}</span>
-                </a>
+                  {alumni.phone}
+                </ContactRow>
               )}
               {alumni.linkedinUrl && (
-                <a
+                <ContactRow
+                  icon={<LinkedInIcon size={15} />}
                   href={alumni.linkedinUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-3.5 p-2.5 rounded-xl bg-blue-50/50 hover:bg-blue-50 text-sm text-blue-600 hover:text-blue-700 transition-colors border border-blue-100/60 font-semibold"
+                  external
+                  accent
                 >
-                  <div className="w-8 h-8 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center flex-shrink-0">
-                    <LinkedInIcon size={16} />
-                  </div>
-                  <span>LinkedIn Profile</span>
-                </a>
+                  LinkedIn Profile
+                </ContactRow>
               )}
             </div>
-          </div>
+          </SectionCard>
         </div>
       </div>
 
@@ -460,5 +422,50 @@ const AlumniProfile = () => {
     </DashboardLayout>
   );
 };
+
+/* ── Reusable sub-components ─────────────────────────────────────── */
+
+/** Section card with blue left-bar heading */
+const SectionCard = ({ title, children }) => (
+  <div className="bg-white rounded-2xl border border-slate-200/80 p-4 sm:p-6 shadow-sm hover:shadow-md transition-shadow duration-200">
+    <div className="flex items-center gap-2.5 mb-4">
+      <div className="w-1 h-5 bg-blue-600 rounded-full shrink-0" />
+      <h2 className="text-base sm:text-lg font-heading font-bold text-slate-900">{title}</h2>
+    </div>
+    {children}
+  </div>
+);
+
+/** Micro info pill that wraps cleanly and clips long text */
+const MicroCard = ({ icon, children }) => (
+  <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-50/90 border border-slate-200/70 text-xs font-medium text-slate-700 shadow-2xs hover:bg-blue-50/50 transition-colors max-w-[calc(50%-0.5rem)] sm:max-w-xs">
+    <div className="w-4.5 h-4.5 rounded-md bg-blue-100/80 text-blue-600 flex items-center justify-center shrink-0">
+      {icon}
+    </div>
+    <span className="truncate">{children}</span>
+  </div>
+);
+
+/** Contact link row with min touch target */
+const ContactRow = ({ icon, href, children, external = false, accent = false }) => (
+  <a
+    href={href}
+    {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+    className={[
+      'flex items-center gap-3 px-2.5 py-2 rounded-xl min-h-[44px] text-sm font-medium transition-colors border',
+      accent
+        ? 'bg-blue-50/60 hover:bg-blue-50 text-blue-600 hover:text-blue-700 border-blue-100/70'
+        : 'text-slate-600 hover:text-blue-600 hover:bg-slate-50 border-transparent hover:border-slate-100',
+    ].join(' ')}
+  >
+    <div className={[
+      'w-8 h-8 rounded-lg flex items-center justify-center shrink-0',
+      accent ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-600',
+    ].join(' ')}>
+      {icon}
+    </div>
+    <span className="truncate min-w-0">{children}</span>
+  </a>
+);
 
 export default AlumniProfile;

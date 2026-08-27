@@ -112,22 +112,23 @@ const AlumniOwnProfile = () => {
   return (
     <DashboardLayout>
       {/* Profile Header Card */}
-      <div className="bg-white rounded-3xl border border-slate-200/80 shadow-[0_12px_36px_-6px_rgba(37,99,235,0.08),0_4px_16px_-2px_rgba(0,0,0,0.02)] overflow-hidden mb-6 transition-all duration-300">
-        {/* Banner Cover with Premium Gradient & Ambient Lighting */}
-        <div className="relative h-36 sm:h-44 bg-gradient-to-r from-blue-700 via-blue-600 to-cyan-600 overflow-hidden">
-          <div className="absolute -top-20 -right-20 w-72 h-72 bg-cyan-400/25 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute top-0 left-1/3 w-80 h-36 bg-white/10 rounded-full blur-2xl pointer-events-none" />
-          <div className="absolute inset-0 opacity-15 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:20px_20px] pointer-events-none" />
+      <div className="bg-white rounded-3xl border border-slate-200/80 shadow-[0_12px_36px_-6px_rgba(37,99,235,0.08),0_4px_16px_-2px_rgba(0,0,0,0.02)] overflow-hidden mb-6">
+        {/* Banner */}
+        <div className="relative h-36 sm:h-44 bg-gradient-to-br from-blue-800 via-blue-600 to-cyan-500 overflow-hidden">
+          <div className="absolute -top-16 -right-16 w-72 h-72 bg-cyan-400/20 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute top-0 left-1/4 w-80 h-36 bg-white/10 rounded-full blur-2xl pointer-events-none" />
+          <div className="absolute inset-0 opacity-[0.12] bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:20px_20px] pointer-events-none" />
         </div>
 
-        <div className="px-6 sm:px-8 pb-6">
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 -mt-12 sm:-mt-14 mb-4">
-            <div className="relative p-1 bg-white rounded-full shadow-xl ring-4 ring-white shadow-blue-900/10 flex-shrink-0 self-start sm:self-auto">
+        <div className="px-4 sm:px-6 lg:px-8 pb-6">
+          {/* Avatar row */}
+          <div className="flex items-start justify-between gap-3 -mt-10 sm:-mt-14 mb-4">
+            <div className="relative shrink-0 p-1.5 bg-white rounded-full shadow-xl ring-4 ring-white shadow-blue-900/10">
               <Avatar
                 src={photoPreview || userProfile.photoURL}
                 name={userProfile.fullName}
                 size="xl"
-                className="w-20 h-20 sm:w-24 sm:h-24 flex-shrink-0"
+                className="w-20 h-20 sm:w-24 sm:h-24"
               />
               {editing && (
                 <label className="absolute -bottom-1 -right-1 p-1.5 bg-blue-600 text-white rounded-full cursor-pointer hover:bg-blue-700 shadow-md">
@@ -140,24 +141,24 @@ const AlumniOwnProfile = () => {
             <Button
               variant={editing ? 'secondary' : 'primary'}
               onClick={() => setEditing((prev) => !prev)}
-              className="rounded-xl px-5 py-2.5 text-sm font-semibold flex-shrink-0 shadow-sm transition-transform active:scale-95"
+              className="rounded-xl px-4 sm:px-5 py-2.5 text-sm font-semibold shrink-0 shadow-sm active:scale-95 transition-transform mt-12 sm:mt-auto sm:mb-1"
             >
               {editing ? 'Cancel' : 'Edit Profile'}
             </Button>
           </div>
 
           <div className="mb-2">
-            <div className="flex items-center gap-2 flex-wrap">
-              <h1 className="text-xl sm:text-2xl font-heading font-extrabold text-slate-900 truncate">
+            <div className="flex flex-wrap items-center gap-2">
+              <h1 className="text-xl sm:text-2xl font-heading font-extrabold text-slate-900">
                 {userProfile.fullName || 'Alumni Profile'}
               </h1>
               {isVerified ? (
-                <Badge variant="success" dot className="shadow-2xs">Verified Alumni</Badge>
+                <Badge variant="success" dot className="shadow-2xs shrink-0">Verified Alumni</Badge>
               ) : (
-                <Badge variant="warning" dot className="shadow-2xs">Verification Pending</Badge>
+                <Badge variant="warning" dot className="shadow-2xs shrink-0">Verification Pending</Badge>
               )}
             </div>
-            <p className="text-sm sm:text-base text-slate-600 font-medium truncate mt-1">
+            <p className="text-sm sm:text-base text-slate-600 font-medium mt-1">
               {userProfile.jobRole || 'Alumni'} {userProfile.company ? `at ${userProfile.company}` : ''}
               {userProfile.graduationYear ? ` • Class of ${userProfile.graduationYear}` : ''}
             </p>
@@ -172,7 +173,7 @@ const AlumniOwnProfile = () => {
       )}
 
       {/* Details / Edit Form (Full Width) */}
-      <div className="bg-white rounded-2xl border border-border p-6 shadow-sm">
+      <div className="bg-white rounded-2xl border border-border p-4 sm:p-6 shadow-sm">
         {editing ? (
           <form onSubmit={handleSave} className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -274,7 +275,7 @@ const AlumniOwnProfile = () => {
         ) : (
           <div className="space-y-6">
             {/* Quick Credentials Summary Bar */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 p-4 bg-slate-50/80 rounded-xl border border-slate-200/80 text-xs text-slate-600">
+            <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 p-3.5 sm:p-4 bg-slate-50/80 rounded-xl border border-slate-200/80 text-xs text-slate-600">
               <div className="flex items-center gap-2.5">
                 <GraduationCap size={16} className="text-blue-600 flex-shrink-0" />
                 <div>
