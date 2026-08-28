@@ -35,6 +35,7 @@ const Opportunities = () => {
   const [workModeFilter, setWorkModeFilter] = useState('');
   const [onlySaved, setOnlySaved] = useState(false);
   const [selectedOpp, setSelectedOpp] = useState(null);
+  const [isDetailOpenMobile, setIsDetailOpenMobile] = useState(false);
 
   const [confirmModalOpp, setConfirmModalOpp] = useState(null);
   const [confirmInput, setConfirmInput] = useState('');
@@ -172,6 +173,135 @@ const Opportunities = () => {
     }
   };
 
+  const renderDetails = (opp) => {
+    if (!opp) return null;
+    const isSaved = savedIds.has(opp.id);
+    const isApplied = appliedIds.has(opp.id);
+
+    return (
+      <div className="space-y-6">
+        <div className="flex items-start justify-between gap-4 flex-wrap">
+          <div>
+            <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+              <h2 className="text-xl font-heading font-bold text-text-primary">
+                {opp.title}
+              </h2>
+              <Badge variant="primary">{opp.type}</Badge>
+              {isApplied && (
+                <Badge variant="success" className="text-xs">
+                  ✓ Applied
+                </Badge>
+              )}
+            </div>
+            <p className="text-sm font-semibold text-text-secondary flex items-center gap-2">
+              <Building2 size={16} className="text-primary-600" />
+              {opp.company}
+            </p>
+          </div>
+
+          <div className="flex gap-2">
+            <Button
+              variant={isSaved ? 'secondary' : 'outline'}
+              size="sm"
+              onClick={(e) => toggleSave(opp.id, e)}
+            >
+              {isSaved ? (
+                <>
+                  <BookmarkCheck size={16} className="text-primary-600" /> Saved
+                </>
+              ) : (
+                <>
+                  <Bookmark size={16} /> Save
+                </>
+              )}
+            </Button>
+
+            {isApplied ? (
+              <Badge variant="emerald" className="px-3.5 py-2 text-xs font-bold flex items-center gap-1.5 rounded-xl border border-emerald-300 bg-emerald-50 text-emerald-700">
+                <CheckCircle size={15} /> Applied
+              </Badge>
+            ) : (
+              <Button
+                size="sm"
+                variant="primary"
+                onClick={() => handleOpenConfirmModal(opp)}
+                leftIcon={Sparkles}
+              >
+                Applied
+              </Button>
+            )}
+
+            {(opp.externalLink || opp.registrationLink) && (
+              <a
+                href={opp.externalLink || opp.registrationLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-secondary btn-sm rounded-xl flex items-center gap-1.5"
+                title="External Application / Website Link"
+              >
+                Website / Form Link
+                <ExternalLink size={13} />
+              </a>
+            )}
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 p-4 bg-slate-50 rounded-xl text-xs border border-slate-100">
+          <div>
+            <span className="text-text-muted block mb-0.5">Location</span>
+            <span className="font-semibold text-text-primary">
+              {opp.location || 'Remote'}
+            </span>
+          </div>
+          <div>
+            <span className="text-text-muted block mb-0.5">Work Mode</span>
+            <span className="font-semibold text-text-primary">
+              {opp.workMode || 'Full-time'}
+            </span>
+          </div>
+          <div>
+            <span className="text-text-muted block mb-0.5">Application Deadline</span>
+            <span className="font-semibold text-text-primary">
+              {opp.deadline ? formatDate(opp.deadline) : 'Rolling Basis'}
+            </span>
+          </div>
+          {opp.postedByName && (
+            <div className="col-span-full">
+              <span className="text-text-muted block mb-0.5">Posted by</span>
+              <span className="font-semibold text-primary-700">
+                {opp.postedByName}
+              </span>
+            </div>
+          )}
+        </div>
+
+        <div>
+          <h4 className="font-bold text-text-primary text-sm mb-2">
+            About the Opportunity
+          </h4>
+          <p className="text-sm text-text-secondary whitespace-pre-line leading-relaxed">
+            {opp.description}
+          </p>
+        </div>
+
+        {opp.skills && opp.skills.length > 0 && (
+          <div>
+            <h4 className="font-bold text-text-primary text-sm mb-2">
+              Required Skills & Technologies
+            </h4>
+            <div className="flex flex-wrap gap-1.5">
+              {opp.skills.map((skill) => (
+                <span key={skill} className="tag bg-slate-100 text-slate-700 font-medium">
+                  {skill}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
   const filteredOpportunities = opportunities.filter((opp) => {
     if (onlySaved && !savedIds.has(opp.id)) return false;
     return true;
@@ -270,7 +400,7 @@ const Opportunities = () => {
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
           {/* Opportunity List (Left) */}
-          <div className="lg:col-span-5 space-y-3 max-h-[calc(100vh-16rem)] overflow-y-auto pr-1">
+          <div className="lg:col-span-5 space-y-3 lg:max-h-[calc(100vh-16rem)] lg:overflow-y-auto pr-1">
             {filteredOpportunities.map((opp) => {
               const isSelected = selectedOpp?.id === opp.id;
               const isSaved = savedIds.has(opp.id);
@@ -281,7 +411,10 @@ const Opportunities = () => {
               return (
                 <div
                   key={opp.id}
-                  onClick={() => setSelectedOpp(opp)}
+                  onClick={() => {
+                    setSelectedOpp(opp);
+                    setIsDetailOpenMobile(true);
+                  }}
                   className={`bg-white rounded-2xl border p-5 cursor-pointer transition-all duration-200 shadow-xs hover:shadow-card-hover ${
                     isSelected
                       ? 'border-blue-600 ring-2 ring-blue-500/20 bg-blue-50/20'
@@ -343,129 +476,10 @@ const Opportunities = () => {
             })}
           </div>
 
-          {/* Details View (Right) */}
-          <div className="lg:col-span-7 bg-white rounded-2xl border border-border p-6 sticky top-4 shadow-sm">
+          {/* Details View (Right) - Hidden on Mobile */}
+          <div className="hidden lg:block lg:col-span-7 bg-white rounded-2xl border border-border p-6 sticky top-4 shadow-sm">
             {selectedOpp ? (
-              <div className="space-y-6">
-                <div className="flex items-start justify-between gap-4 flex-wrap">
-                  <div>
-                    <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-                      <h2 className="text-xl font-heading font-bold text-text-primary">
-                        {selectedOpp.title}
-                      </h2>
-                      <Badge variant="primary">{selectedOpp.type}</Badge>
-                      {appliedIds.has(selectedOpp.id) && (
-                        <Badge variant="success" className="text-xs">
-                          ✓ Applied
-                        </Badge>
-                      )}
-                    </div>
-                    <p className="text-sm font-semibold text-text-secondary flex items-center gap-2">
-                      <Building2 size={16} className="text-primary-600" />
-                      {selectedOpp.company}
-                    </p>
-                  </div>
-
-                  <div className="flex gap-2">
-                    <Button
-                      variant={savedIds.has(selectedOpp.id) ? 'secondary' : 'outline'}
-                      size="sm"
-                      onClick={(e) => toggleSave(selectedOpp.id, e)}
-                    >
-                      {savedIds.has(selectedOpp.id) ? (
-                        <>
-                          <BookmarkCheck size={16} className="text-primary-600" /> Saved
-                        </>
-                      ) : (
-                        <>
-                          <Bookmark size={16} /> Save
-                        </>
-                      )}
-                    </Button>
-
-                    {appliedIds.has(selectedOpp.id) ? (
-                      <Badge variant="emerald" className="px-3.5 py-2 text-xs font-bold flex items-center gap-1.5 rounded-xl border border-emerald-300 bg-emerald-50 text-emerald-700">
-                        <CheckCircle size={15} /> Applied
-                      </Badge>
-                    ) : (
-                      <Button
-                        size="sm"
-                        variant="primary"
-                        onClick={() => handleOpenConfirmModal(selectedOpp)}
-                        leftIcon={Sparkles}
-                      >
-                        Applied
-                      </Button>
-                    )}
-
-                    {(selectedOpp.externalLink || selectedOpp.registrationLink) && (
-                      <a
-                        href={selectedOpp.externalLink || selectedOpp.registrationLink}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="btn-secondary btn-sm rounded-xl flex items-center gap-1.5"
-                        title="External Application / Website Link"
-                      >
-                        Website / Form Link
-                        <ExternalLink size={13} />
-                      </a>
-                    )}
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 p-4 bg-slate-50 rounded-xl text-xs border border-slate-100">
-                  <div>
-                    <span className="text-text-muted block mb-0.5">Location</span>
-                    <span className="font-semibold text-text-primary">
-                      {selectedOpp.location || 'Remote'}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="text-text-muted block mb-0.5">Work Mode</span>
-                    <span className="font-semibold text-text-primary">
-                      {selectedOpp.workMode || 'Full-time'}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="text-text-muted block mb-0.5">Application Deadline</span>
-                    <span className="font-semibold text-text-primary">
-                      {selectedOpp.deadline ? formatDate(selectedOpp.deadline) : 'Rolling Basis'}
-                    </span>
-                  </div>
-                  {selectedOpp.postedByName && (
-                    <div className="col-span-full">
-                      <span className="text-text-muted block mb-0.5">Posted by</span>
-                      <span className="font-semibold text-primary-700">
-                        {selectedOpp.postedByName}
-                      </span>
-                    </div>
-                  )}
-                </div>
-
-                <div>
-                  <h4 className="font-bold text-text-primary text-sm mb-2">
-                    About the Opportunity
-                  </h4>
-                  <p className="text-sm text-text-secondary whitespace-pre-line leading-relaxed">
-                    {selectedOpp.description}
-                  </p>
-                </div>
-
-                {selectedOpp.skills && selectedOpp.skills.length > 0 && (
-                  <div>
-                    <h4 className="font-bold text-text-primary text-sm mb-2">
-                      Required Skills & Technologies
-                    </h4>
-                    <div className="flex flex-wrap gap-1.5">
-                      {selectedOpp.skills.map((skill) => (
-                        <span key={skill} className="tag bg-slate-100 text-slate-700 font-medium">
-                          {skill}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
+              renderDetails(selectedOpp)
             ) : (
               <p className="text-center text-text-secondary py-12">
                 Select an opportunity from the list to view full specifications.
@@ -627,11 +641,21 @@ const Opportunities = () => {
               className="w-full px-3.5 py-2.5 text-sm border border-border rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-primary-500 font-medium"
               autoFocus
             />
-            {confirmError && (
+             {confirmError && (
               <p className="text-xs text-red-600 font-medium mt-1">{confirmError}</p>
             )}
           </div>
         </form>
+      </Modal>
+
+      {/* Mobile Details Drawer/Modal */}
+      <Modal
+        isOpen={isDetailOpenMobile}
+        onClose={() => setIsDetailOpenMobile(false)}
+        title="Opportunity Details"
+        size="lg"
+      >
+        {selectedOpp && renderDetails(selectedOpp)}
       </Modal>
     </DashboardLayout>
   );
