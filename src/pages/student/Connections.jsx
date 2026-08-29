@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Link2, Clock, Users, MessageSquare, Building2, GraduationCap, CheckCircle } from 'lucide-react';
+import { Link2, Clock, Users, MessageSquare, Building2, GraduationCap, CheckCircle, Sparkles } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import DashboardLayout from '../../components/layout/DashboardLayout';
 import Avatar from '../../components/ui/Avatar';
@@ -169,212 +169,273 @@ const Connections = () => {
           {Array.from({ length: 4 }).map((_, i) => <SkeletonCard key={i} />)}
         </div>
       ) : (
-        <>
-          {/* Active Connections (Accepted Only) */}
-          {activeTab === 'connections' && (
-            connections.length === 0 ? (
-              <EmptyState
-                icon={Users}
-                title="No active connections"
-                description="Start building your network by connecting with alumni leaders and fellow scholars."
-                action={() => navigate('/student/alumni')}
-                actionLabel="Explore Directory"
-              />
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                {connections.map((conn) => {
-                  const otherId = getOtherId(conn);
-                  const profile = profiles[otherId];
-                  const isAlumni = Boolean(profile?.graduationYear || profile?.company);
-                  return (
-                    <div
-                      key={conn.id}
-                      className="bg-white rounded-2xl border border-slate-200/80 p-5 hover:shadow-md hover:border-slate-300 transition-all duration-200 flex flex-col justify-between"
-                    >
-                      <div>
-                        {/* Top Info */}
-                        <div className="flex items-start gap-3.5 mb-3">
-                          <Avatar src={profile?.photoURL} name={profile?.fullName} size="lg" />
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-1.5 flex-wrap">
-                              <h3 className="font-heading font-semibold text-slate-900 text-sm truncate">
-                                {profile?.fullName || 'Network Connection'}
-                              </h3>
-                              {profile?.verificationStatus === 'verified' && (
-                                <span className="text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full text-[10px] font-bold border border-emerald-200/80 flex items-center gap-0.5">
-                                  <CheckCircle size={10} /> Verified
-                                </span>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          {/* Left Column: Connection Cards List */}
+          <div className="lg:col-span-8">
+            {/* Active Connections (Accepted Only) */}
+            {activeTab === 'connections' && (
+              connections.length === 0 ? (
+                <EmptyState
+                  icon={Users}
+                  title="No active connections"
+                  description="Start building your network by connecting with alumni leaders and fellow scholars."
+                  action={() => navigate('/student/alumni')}
+                  actionLabel="Explore Directory"
+                />
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {connections.map((conn) => {
+                    const otherId = getOtherId(conn);
+                    const profile = profiles[otherId];
+                    const isAlumni = Boolean(profile?.graduationYear || profile?.company);
+                    return (
+                      <div
+                        key={conn.id}
+                        className="bg-white rounded-2xl border border-slate-200/85 p-5 hover:shadow-card-hover hover:border-blue-300 transition-all duration-200 flex flex-col justify-between"
+                      >
+                        <div>
+                          {/* Top Info */}
+                          <div className="flex items-start gap-3.5 mb-3">
+                            <Avatar src={profile?.photoURL} name={profile?.fullName} size="lg" />
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-1.5 flex-wrap">
+                                <h3 className="font-heading font-semibold text-slate-900 text-sm truncate">
+                                  {profile?.fullName || 'Network Connection'}
+                                </h3>
+                                {profile?.verificationStatus === 'verified' && (
+                                  <span className="text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full text-[10px] font-bold border border-emerald-200/80 flex items-center gap-0.5">
+                                    <CheckCircle size={10} /> Verified
+                                  </span>
+                                )}
+                              </div>
+                              <p className="text-xs text-slate-600 font-medium truncate mt-0.5">
+                                {profile?.jobRole || profile?.department}
+                              </p>
+                              {profile?.company ? (
+                                <p className="text-xs text-primary-600 font-medium truncate flex items-center gap-1 mt-1">
+                                  <Building2 size={12} className="text-slate-400 flex-shrink-0" />
+                                  {profile.company}
+                                </p>
+                              ) : (
+                                <p className="text-xs text-slate-500 font-medium truncate flex items-center gap-1 mt-1">
+                                  <GraduationCap size={12} className="text-slate-400 flex-shrink-0" />
+                                  {profile?.year || 'Collegiate Scholar'}
+                                </p>
                               )}
                             </div>
+                          </div>
+                        </div>
+
+                        {/* Action Buttons */}
+                        <div className="flex items-center gap-2 pt-3.5 border-t border-slate-100 mt-2">
+                          <Button
+                            size="sm"
+                            variant="primary"
+                            loading={actioning === `chat_${otherId}`}
+                            onClick={() => handleStartChat(otherId, profile?.fullName)}
+                            className="flex-1 text-xs font-medium"
+                            leftIcon={MessageSquare}
+                          >
+                            Message
+                          </Button>
+                          {isAlumni ? (
+                            <Button
+                              size="sm"
+                              variant="secondary"
+                              onClick={() => navigate(`/student/alumni/${otherId}`)}
+                              className="text-xs px-3.5 font-medium"
+                            >
+                              Profile
+                            </Button>
+                          ) : (
+                            <span className="text-xs font-medium text-slate-500 px-2">
+                              Connected
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )
+            )}
+
+            {/* Pending Requests Received */}
+            {activeTab === 'pending' && (
+              pending.length === 0 ? (
+                <EmptyState
+                  icon={Clock}
+                  title="No pending requests received"
+                  description="When someone sends you a connection request, you'll see it here."
+                />
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {pending.map((conn) => {
+                    const profile = profiles[conn.senderId];
+                    return (
+                      <div
+                        key={conn.id}
+                        className="bg-white rounded-2xl border border-slate-200/85 p-5 hover:shadow-card-hover hover:border-blue-300 transition-all duration-200 flex flex-col justify-between"
+                      >
+                        <div className="flex items-start gap-3.5 mb-4">
+                          <Avatar src={profile?.photoURL} name={profile?.fullName} size="lg" />
+                          <div className="flex-1 min-w-0">
+                            <p className="font-heading font-semibold text-slate-900 text-sm truncate">
+                              {profile?.fullName || 'User'}
+                            </p>
                             <p className="text-xs text-slate-600 font-medium truncate mt-0.5">
                               {profile?.jobRole || profile?.department}
                             </p>
-                            {profile?.company ? (
-                              <p className="text-xs text-primary-600 font-medium truncate flex items-center gap-1 mt-1">
+                            {profile?.company && (
+                              <p className="text-xs text-slate-500 font-medium truncate flex items-center gap-1 mt-1">
                                 <Building2 size={12} className="text-slate-400 flex-shrink-0" />
                                 {profile.company}
                               </p>
-                            ) : (
-                              <p className="text-xs text-slate-500 font-medium truncate flex items-center gap-1 mt-1">
-                                <GraduationCap size={12} className="text-slate-400 flex-shrink-0" />
-                                {profile?.year || 'Collegiate Scholar'}
-                              </p>
                             )}
+                            <p className="text-[11px] text-slate-400 mt-1">
+                              Received {timeAgo(conn.createdAt)}
+                            </p>
                           </div>
                         </div>
-                      </div>
 
-                      {/* Action Buttons */}
-                      <div className="flex items-center gap-2 pt-3.5 border-t border-slate-100 mt-2">
-                        <Button
-                          size="sm"
-                          variant="primary"
-                          loading={actioning === `chat_${otherId}`}
-                          onClick={() => handleStartChat(otherId, profile?.fullName)}
-                          className="flex-1 text-xs font-medium"
-                          leftIcon={MessageSquare}
-                        >
-                          Message
-                        </Button>
-                        {isAlumni ? (
+                        <div className="flex gap-2 pt-3.5 border-t border-slate-100 mt-2">
+                          <Button
+                            size="sm"
+                            variant="primary"
+                            loading={actioning === conn.id}
+                            onClick={() => handleAccept(conn)}
+                            className="flex-1 text-xs font-medium"
+                          >
+                            Accept
+                          </Button>
                           <Button
                             size="sm"
                             variant="secondary"
-                            onClick={() => navigate(`/student/alumni/${otherId}`)}
-                            className="text-xs px-3.5 font-medium"
+                            loading={actioning === `reject_${conn.id}`}
+                            onClick={() => handleReject(conn)}
+                            className="flex-1 text-xs font-medium text-slate-700 hover:text-red-600"
                           >
-                            Profile
+                            Decline
                           </Button>
-                        ) : (
-                          <span className="text-xs font-medium text-slate-500 px-2">
-                            Connected
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )
-          )}
-
-          {/* Pending Requests Received */}
-          {activeTab === 'pending' && (
-            pending.length === 0 ? (
-              <EmptyState
-                icon={Clock}
-                title="No pending requests received"
-                description="When someone sends you a connection request, you'll see it here."
-              />
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                {pending.map((conn) => {
-                  const profile = profiles[conn.senderId];
-                  return (
-                    <div
-                      key={conn.id}
-                      className="bg-white rounded-2xl border border-slate-200/80 p-5 hover:shadow-md hover:border-slate-300 transition-all duration-200 flex flex-col justify-between"
-                    >
-                      <div className="flex items-start gap-3.5 mb-4">
-                        <Avatar src={profile?.photoURL} name={profile?.fullName} size="lg" />
-                        <div className="flex-1 min-w-0">
-                          <p className="font-heading font-semibold text-slate-900 text-sm truncate">
-                            {profile?.fullName || 'User'}
-                          </p>
-                          <p className="text-xs text-slate-600 font-medium truncate mt-0.5">
-                            {profile?.jobRole || profile?.department}
-                          </p>
-                          {profile?.company && (
-                            <p className="text-xs text-slate-500 font-medium truncate flex items-center gap-1 mt-1">
-                              <Building2 size={12} className="text-slate-400 flex-shrink-0" />
-                              {profile.company}
-                            </p>
-                          )}
-                          <p className="text-[11px] text-slate-400 mt-1">
-                            Received {timeAgo(conn.createdAt)}
-                          </p>
                         </div>
                       </div>
+                    );
+                  })}
+                </div>
+              )
+            )}
 
-                      <div className="flex gap-2 pt-3.5 border-t border-slate-100 mt-2">
-                        <Button
-                          size="sm"
-                          variant="primary"
-                          loading={actioning === conn.id}
-                          onClick={() => handleAccept(conn)}
-                          className="flex-1 text-xs font-medium"
-                        >
-                          Accept
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="secondary"
-                          loading={actioning === `reject_${conn.id}`}
-                          onClick={() => handleReject(conn)}
-                          className="flex-1 text-xs font-medium text-slate-700 hover:text-red-600"
-                        >
-                          Decline
-                        </Button>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )
-          )}
-
-          {/* Sent Requests */}
-          {activeTab === 'sent' && (
-            sent.length === 0 ? (
-              <EmptyState
-                icon={Link2}
-                title="No sent requests"
-                description="Requests you send to alumni and peers will appear here with pending status."
-                action={() => navigate('/student/alumni')}
-                actionLabel="Find People"
-              />
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                {sent.map((conn) => {
-                  const profile = profiles[conn.receiverId];
-                  return (
-                    <div
-                      key={conn.id}
-                      className="bg-white rounded-2xl border border-slate-200/80 p-5 hover:shadow-md hover:border-slate-300 transition-all duration-200 flex flex-col justify-between"
-                    >
-                      <div className="flex items-start gap-3.5 mb-4">
-                        <Avatar src={profile?.photoURL} name={profile?.fullName} size="lg" />
-                        <div className="flex-1 min-w-0">
-                          <p className="font-heading font-semibold text-slate-900 text-sm truncate">
-                            {profile?.fullName || 'User'}
-                          </p>
-                          <p className="text-xs text-slate-600 font-medium truncate mt-0.5">
-                            {profile?.jobRole || profile?.department}
-                          </p>
-                          {profile?.company && (
-                            <p className="text-xs text-slate-500 font-medium truncate flex items-center gap-1 mt-1">
-                              <Building2 size={12} className="text-slate-400 flex-shrink-0" />
-                              {profile.company}
+            {/* Sent Requests */}
+            {activeTab === 'sent' && (
+              sent.length === 0 ? (
+                <EmptyState
+                  icon={Link2}
+                  title="No sent requests"
+                  description="Requests you send to alumni and peers will appear here with pending status."
+                  action={() => navigate('/student/alumni')}
+                  actionLabel="Find People"
+                />
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {sent.map((conn) => {
+                    const profile = profiles[conn.receiverId];
+                    return (
+                      <div
+                        key={conn.id}
+                        className="bg-white rounded-2xl border border-slate-200/85 p-5 hover:shadow-card-hover hover:border-blue-300 transition-all duration-200 flex flex-col justify-between"
+                      >
+                        <div className="flex items-start gap-3.5 mb-4">
+                          <Avatar src={profile?.photoURL} name={profile?.fullName} size="lg" />
+                          <div className="flex-1 min-w-0">
+                            <p className="font-heading font-semibold text-slate-900 text-sm truncate">
+                              {profile?.fullName || 'User'}
                             </p>
-                          )}
-                          <p className="text-[11px] text-slate-400 mt-1">
-                            Sent {timeAgo(conn.createdAt)}
-                          </p>
+                            <p className="text-xs text-slate-600 font-medium truncate mt-0.5">
+                              {profile?.jobRole || profile?.department}
+                            </p>
+                            {profile?.company && (
+                              <p className="text-xs text-slate-500 font-medium truncate flex items-center gap-1 mt-1">
+                                <Building2 size={12} className="text-slate-400 flex-shrink-0" />
+                                {profile.company}
+                              </p>
+                            )}
+                            <p className="text-[11px] text-slate-400 mt-1">
+                              Sent {timeAgo(conn.createdAt)}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="pt-3.5 border-t border-slate-100 mt-2 flex justify-end">
+                          <Badge variant="warning" dot className="text-xs font-medium px-2.5 py-1">
+                            Pending Approval
+                          </Badge>
                         </div>
                       </div>
+                    );
+                  })}
+                </div>
+              )
+            )}
+          </div>
 
-                      <div className="pt-3.5 border-t border-slate-100 mt-2 flex justify-end">
-                        <Badge variant="warning" dot className="text-xs font-medium px-2.5 py-1">
-                          Pending Approval
-                        </Badge>
-                      </div>
-                    </div>
-                  );
-                })}
+          {/* Right Column: Network Pulse & Guidelines */}
+          <div className="lg:col-span-4 space-y-6">
+            {/* Networking Stats Card */}
+            <div className="bg-gradient-to-br from-slate-900 to-blue-950 text-white rounded-2xl p-5 border border-slate-800 shadow-card">
+              <h3 className="font-heading font-bold text-xs tracking-wider uppercase text-blue-400 mb-4">
+                Network Pulse
+              </h3>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-slate-300 font-medium">Active Network</span>
+                  <span className="text-sm font-bold bg-white/10 px-2.5 py-0.5 rounded-full border border-white/10">
+                    {connections.length}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-slate-300 font-medium">Received Invites</span>
+                  <span className="text-sm font-bold bg-white/10 px-2.5 py-0.5 rounded-full border border-white/10">
+                    {pending.length}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-slate-300 font-medium">Sent Requests</span>
+                  <span className="text-sm font-bold bg-white/10 px-2.5 py-0.5 rounded-full border border-white/10">
+                    {sent.length}
+                  </span>
+                </div>
               </div>
-            )
-          )}
-        </>
+            </div>
+
+            {/* Quick Guide Card */}
+            <div className="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-card">
+              <h3 className="font-heading font-bold text-slate-900 text-sm mb-3.5 flex items-center gap-2">
+                <Sparkles size={16} className="text-blue-600" />
+                Networking Etiquette
+              </h3>
+              <div className="space-y-3.5 text-xs text-slate-600">
+                <div className="flex gap-2.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-blue-600 mt-1.5 flex-shrink-0" />
+                  <p className="leading-relaxed">
+                    <strong>Introduce yourself:</strong> Briefly state your department, year, and learning goals.
+                  </p>
+                </div>
+                <div className="flex gap-2.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-blue-600 mt-1.5 flex-shrink-0" />
+                  <p className="leading-relaxed">
+                    <strong>Be specific:</strong> Ask targeted questions about their field or career journey.
+                  </p>
+                </div>
+                <div className="flex gap-2.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-blue-600 mt-1.5 flex-shrink-0" />
+                  <p className="leading-relaxed">
+                    <strong>Respect their time:</strong> Keep messages concise and prepare before calling.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </DashboardLayout>
   );
