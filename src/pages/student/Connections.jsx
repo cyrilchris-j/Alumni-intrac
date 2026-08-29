@@ -379,28 +379,29 @@ const Connections = () => {
           </div>
 
           {/* Right Column: Network Pulse & Guidelines */}
-          <div className="lg:col-span-4 space-y-6">
+          <div className="lg:col-span-4 space-y-5">
             {/* Networking Stats Card */}
-            <div className="bg-gradient-to-br from-slate-900 to-blue-950 text-white rounded-2xl p-5 border border-slate-800 shadow-card">
-              <h3 className="font-heading font-bold text-xs tracking-wider uppercase text-blue-400 mb-4">
+            <div className="bg-white rounded-2xl p-5 border border-slate-200/85 shadow-sm">
+              <h3 className="font-heading font-bold text-sm tracking-wide text-slate-900 mb-4 flex items-center gap-2">
+                <Users size={16} className="text-blue-600" />
                 Network Pulse
               </h3>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-slate-300 font-medium">Active Network</span>
-                  <span className="text-sm font-bold bg-white/10 px-2.5 py-0.5 rounded-full border border-white/10">
+              <div className="space-y-3">
+                <div className="flex items-center justify-between pb-2.5 border-b border-slate-100">
+                  <span className="text-xs text-slate-600 font-medium">Active Network</span>
+                  <span className="text-xs font-semibold bg-emerald-50 text-emerald-700 px-2.5 py-0.5 rounded-full border border-emerald-200">
                     {connections.length}
                   </span>
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-slate-300 font-medium">Received Invites</span>
-                  <span className="text-sm font-bold bg-white/10 px-2.5 py-0.5 rounded-full border border-white/10">
+                <div className="flex items-center justify-between py-2.5 border-b border-slate-100">
+                  <span className="text-xs text-slate-600 font-medium">Received Invites</span>
+                  <span className="text-xs font-semibold bg-amber-50 text-amber-700 px-2.5 py-0.5 rounded-full border border-amber-200">
                     {pending.length}
                   </span>
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-slate-300 font-medium">Sent Requests</span>
-                  <span className="text-sm font-bold bg-white/10 px-2.5 py-0.5 rounded-full border border-white/10">
+                <div className="flex items-center justify-between pt-2.5">
+                  <span className="text-xs text-slate-600 font-medium">Sent Requests</span>
+                  <span className="text-xs font-semibold bg-blue-50 text-blue-700 px-2.5 py-0.5 rounded-full border border-blue-200">
                     {sent.length}
                   </span>
                 </div>
@@ -408,25 +409,25 @@ const Connections = () => {
             </div>
 
             {/* Quick Guide Card */}
-            <div className="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-card">
-              <h3 className="font-heading font-bold text-slate-900 text-sm mb-3.5 flex items-center gap-2">
+            <div className="bg-white rounded-2xl border border-slate-200/85 p-5 shadow-sm">
+              <h3 className="font-heading font-bold text-slate-900 text-sm mb-4 flex items-center gap-2">
                 <Sparkles size={16} className="text-blue-600" />
                 Networking Etiquette
               </h3>
               <div className="space-y-3.5 text-xs text-slate-600">
-                <div className="flex gap-2.5">
+                <div className="flex gap-2.5 items-start">
                   <span className="w-1.5 h-1.5 rounded-full bg-blue-600 mt-1.5 flex-shrink-0" />
                   <p className="leading-relaxed">
                     <strong>Introduce yourself:</strong> Briefly state your department, year, and learning goals.
                   </p>
                 </div>
-                <div className="flex gap-2.5">
+                <div className="flex gap-2.5 items-start">
                   <span className="w-1.5 h-1.5 rounded-full bg-blue-600 mt-1.5 flex-shrink-0" />
                   <p className="leading-relaxed">
                     <strong>Be specific:</strong> Ask targeted questions about their field or career journey.
                   </p>
                 </div>
-                <div className="flex gap-2.5">
+                <div className="flex gap-2.5 items-start">
                   <span className="w-1.5 h-1.5 rounded-full bg-blue-600 mt-1.5 flex-shrink-0" />
                   <p className="leading-relaxed">
                     <strong>Respect their time:</strong> Keep messages concise and prepare before calling.
