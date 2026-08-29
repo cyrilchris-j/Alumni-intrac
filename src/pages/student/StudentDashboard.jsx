@@ -304,12 +304,12 @@ const StudentDashboard = () => {
         />
       </div>
 
-      {/* Main Grid */}
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-        {/* Left 2 Columns: Smart Matches & Opportunities */}
-        <div className="xl:col-span-2 space-y-6">
+      {/* Upper Grid: Smart Matches & Upcoming Events */}
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-6">
+        {/* Left 2 Columns: Smart Matches */}
+        <div className="xl:col-span-2">
           {/* Smart Match Recommendations Section */}
-          <div className="bg-white rounded-2xl border border-slate-200/90 p-5 sm:p-6 shadow-card">
+          <div className="bg-white rounded-2xl border border-slate-200/90 p-5 sm:p-6 shadow-card h-full">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
               <div>
                 <div className="flex items-center gap-2">
@@ -427,119 +427,12 @@ const StudentDashboard = () => {
               </div>
             )}
           </div>
-
-          {/* Latest Opportunities & Vacancies */}
-          <div className="bg-white rounded-2xl border border-slate-200/90 p-5 sm:p-6 shadow-card">
-            <div className="flex items-center justify-between mb-5">
-              <div>
-                <h2 className="text-xl font-serif font-bold text-slate-900">
-                  Latest Opportunities & Vacancies
-                </h2>
-                <p className="text-xs text-slate-500 mt-0.5">
-                  Exclusive fellowships, internships, and vacancies posted by alumni & corporate partners
-                </p>
-              </div>
-              <button
-                onClick={() => navigate('/student/opportunities')}
-                className="text-xs font-bold text-primary-800 hover:text-gold-700 flex items-center gap-1 transition-colors"
-              >
-                View all ({opportunities.length}+) <ArrowRight size={13} />
-              </button>
-            </div>
-
-            {opportunities.length === 0 ? (
-              <EmptyState
-                icon={Briefcase}
-                title="No opportunities found"
-                description="Check back soon as alumni post new vacancies and hackathons."
-              />
-            ) : (
-              <div className="divide-y divide-slate-100">
-                {opportunities.map((opp) => {
-                  const isApplied = appliedOppIds.has(opp.id);
-                  const isHackathon = opp.type?.toLowerCase().includes('hackathon');
-                  const isVacancy = opp.type?.toLowerCase().includes('vacancy') || opp.type?.toLowerCase().includes('full-time');
-                  return (
-                    <div
-                      key={opp.id}
-                      className="py-4 first:pt-0 last:pb-0 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 group hover:bg-slate-50/50 rounded-xl px-2 -mx-2 transition-colors"
-                    >
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-2 mb-1 flex-wrap">
-                          <h4 className="font-serif font-bold text-slate-900 text-sm group-hover:text-primary-800 transition-colors">
-                            {opp.title}
-                          </h4>
-                          <span
-                            className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
-                              isHackathon
-                                ? 'bg-gold-50 text-gold-900 border-gold-300'
-                                : isVacancy
-                                ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
-                                : 'bg-primary-50 text-primary-800 border-primary-200'
-                            }`}
-                          >
-                            {opp.type}
-                          </span>
-                          {isApplied && (
-                            <Badge variant="success" className="text-[10px] px-1.5 py-0.5">
-                              ✓ Applied
-                            </Badge>
-                          )}
-                        </div>
-
-                        <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500 mt-1">
-                          <span className="flex items-center gap-1 font-semibold text-slate-800">
-                            <Building2 size={12} className="text-gold-600" />
-                            {opp.company}
-                          </span>
-                          {opp.location && (
-                            <span className="flex items-center gap-1 text-slate-400">
-                              <MapPin size={11} />
-                              {opp.location}
-                            </span>
-                          )}
-                          <span className="text-slate-400">• {opp.workMode || 'Remote'}</span>
-                          {opp.deadline && (
-                            <span className="text-slate-400">
-                              • Deadline: {formatDate(opp.deadline)}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-2 flex-shrink-0">
-                        {(opp.externalLink || opp.registrationLink) && (
-                          <a
-                            href={opp.externalLink || opp.registrationLink}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="btn-secondary btn-sm text-xs p-2 rounded-lg text-blue-700 flex items-center gap-1 font-semibold"
-                            title="Open Application Form / Website Link"
-                          >
-                            Form Link →
-                          </a>
-                        )}
-                        <Button
-                          size="sm"
-                          variant="secondary"
-                          onClick={() => navigate('/student/opportunities')}
-                          className="text-xs"
-                        >
-                          Details
-                        </Button>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
         </div>
 
-        {/* Right Column: Upcoming Events & Quick Mentorship */}
-        <div className="space-y-6">
+        {/* Right Column: Upcoming Events */}
+        <div className="xl:col-span-1">
           {/* Upcoming Events Widget */}
-          <div className="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-card">
+          <div className="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-card h-full">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-800 border border-emerald-100">
@@ -615,9 +508,114 @@ const StudentDashboard = () => {
               </div>
             )}
           </div>
-
-
         </div>
+      </div>
+
+      {/* Latest Opportunities & Vacancies (Full Width) */}
+      <div className="bg-white rounded-2xl border border-slate-200/90 p-5 sm:p-6 shadow-card">
+        <div className="flex items-center justify-between mb-5">
+          <div>
+            <h2 className="text-xl font-serif font-bold text-slate-900">
+              Latest Opportunities & Vacancies
+            </h2>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Exclusive fellowships, internships, and vacancies posted by alumni & corporate partners
+            </p>
+          </div>
+          <button
+            onClick={() => navigate('/student/opportunities')}
+            className="text-xs font-bold text-primary-800 hover:text-gold-700 flex items-center gap-1 transition-colors"
+          >
+            View all ({opportunities.length}+) <ArrowRight size={13} />
+          </button>
+        </div>
+
+        {opportunities.length === 0 ? (
+          <EmptyState
+            icon={Briefcase}
+            title="No opportunities found"
+            description="Check back soon as alumni post new vacancies and hackathons."
+          />
+        ) : (
+          <div className="divide-y divide-slate-100">
+            {opportunities.map((opp) => {
+              const isApplied = appliedOppIds.has(opp.id);
+              const isHackathon = opp.type?.toLowerCase().includes('hackathon');
+              const isVacancy = opp.type?.toLowerCase().includes('vacancy') || opp.type?.toLowerCase().includes('full-time');
+              return (
+                <div
+                  key={opp.id}
+                  className="py-4 first:pt-0 last:pb-0 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 group hover:bg-slate-50/50 rounded-xl px-2 -mx-2 transition-colors"
+                >
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2 mb-1 flex-wrap">
+                      <h4 className="font-serif font-bold text-slate-900 text-sm group-hover:text-primary-800 transition-colors">
+                        {opp.title}
+                      </h4>
+                      <span
+                        className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
+                          isHackathon
+                            ? 'bg-gold-50 text-gold-900 border-gold-300'
+                            : isVacancy
+                            ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                            : 'bg-primary-50 text-primary-800 border-primary-200'
+                        }`}
+                      >
+                        {opp.type}
+                      </span>
+                      {isApplied && (
+                        <Badge variant="success" className="text-[10px] px-1.5 py-0.5">
+                          ✓ Applied
+                        </Badge>
+                      )}
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500 mt-1">
+                      <span className="flex items-center gap-1 font-semibold text-slate-800">
+                        <Building2 size={12} className="text-gold-600" />
+                        {opp.company}
+                      </span>
+                      {opp.location && (
+                        <span className="flex items-center gap-1 text-slate-400">
+                          <MapPin size={11} />
+                          {opp.location}
+                        </span>
+                      )}
+                      <span className="text-slate-400">• {opp.workMode || 'Remote'}</span>
+                      {opp.deadline && (
+                        <span className="text-slate-400">
+                          • Deadline: {formatDate(opp.deadline)}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    {(opp.externalLink || opp.registrationLink) && (
+                      <a
+                        href={opp.externalLink || opp.registrationLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn-secondary btn-sm text-xs p-2 rounded-lg text-blue-700 flex items-center gap-1 font-semibold"
+                        title="Open Application Form / Website Link"
+                      >
+                        Form Link →
+                      </a>
+                    )}
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      onClick={() => navigate('/student/opportunities')}
+                      className="text-xs"
+                    >
+                      Details
+                    </Button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       {/* Event Details / View Info Modal */}
