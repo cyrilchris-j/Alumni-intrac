@@ -264,6 +264,46 @@ export const initMockStore = () => {
         read: false,
         createdAt: new Date().toISOString(),
       },
+      {
+        id: 'notif_admin_1',
+        userId: 'demo_admin_default',
+        type: 'alumni_verification',
+        title: 'Alumni Verification Request',
+        message: 'Kavitha R (Class of 2020, Amazon) requested verification for her alumni profile.',
+        read: false,
+        createdAt: new Date(Date.now() - 15 * 60 * 1000).toISOString(),
+        link: '/admin/alumni',
+      },
+      {
+        id: 'notif_admin_2',
+        userId: 'demo_admin_default',
+        type: 'new_registration',
+        title: 'New Student Registrations',
+        message: '5 students registered today from the Department of Computer Science.',
+        read: false,
+        createdAt: new Date(Date.now() - 2 * 3600 * 1000).toISOString(),
+        link: '/admin/students',
+      },
+      {
+        id: 'notif_admin_3',
+        userId: 'demo_admin_default',
+        type: 'event_alert',
+        title: 'Annual Alumni Meet 2026',
+        message: 'Milestone reached: 50 attendees have registered for the upcoming campus reunion.',
+        read: true,
+        createdAt: new Date(Date.now() - 24 * 3600 * 1000).toISOString(),
+        link: '/admin/events',
+      },
+      {
+        id: 'notif_admin_4',
+        userId: 'demo_admin_default',
+        type: 'system_alert',
+        title: 'System Security Audit Completed',
+        message: 'Monthly database and authentication permission check passed successfully.',
+        read: true,
+        createdAt: new Date(Date.now() - 48 * 3600 * 1000).toISOString(),
+        link: '/admin/settings',
+      },
     ]);
   }
 };
@@ -306,7 +346,58 @@ export const mockStore = {
   getAnnouncements: () => getItem(STORAGE_KEYS.ANNOUNCEMENTS),
   setAnnouncements: (val) => setItem(STORAGE_KEYS.ANNOUNCEMENTS, val),
 
-  getNotifications: () => getItem(STORAGE_KEYS.NOTIFICATIONS),
+  getNotifications: () => {
+    const list = getItem(STORAGE_KEYS.NOTIFICATIONS, []);
+    const hasAdmin = list.some((n) => n.userId === 'demo_admin_default');
+    if (!hasAdmin && list.length > 0) {
+      const adminNotifs = [
+        {
+          id: 'notif_admin_1',
+          userId: 'demo_admin_default',
+          type: 'alumni_verification',
+          title: 'Alumni Verification Request',
+          message: 'Kavitha R (Class of 2020, Amazon) requested verification for her alumni profile.',
+          read: false,
+          createdAt: new Date(Date.now() - 15 * 60 * 1000).toISOString(),
+          link: '/admin/alumni',
+        },
+        {
+          id: 'notif_admin_2',
+          userId: 'demo_admin_default',
+          type: 'new_registration',
+          title: 'New Student Registrations',
+          message: '5 students registered today from the Department of Computer Science.',
+          read: false,
+          createdAt: new Date(Date.now() - 2 * 3600 * 1000).toISOString(),
+          link: '/admin/students',
+        },
+        {
+          id: 'notif_admin_3',
+          userId: 'demo_admin_default',
+          type: 'event_alert',
+          title: 'Annual Alumni Meet 2026',
+          message: 'Milestone reached: 50 attendees have registered for the upcoming campus reunion.',
+          read: true,
+          createdAt: new Date(Date.now() - 24 * 3600 * 1000).toISOString(),
+          link: '/admin/events',
+        },
+        {
+          id: 'notif_admin_4',
+          userId: 'demo_admin_default',
+          type: 'system_alert',
+          title: 'System Security Audit Completed',
+          message: 'Monthly database and authentication permission check passed successfully.',
+          read: true,
+          createdAt: new Date(Date.now() - 48 * 3600 * 1000).toISOString(),
+          link: '/admin/settings',
+        },
+      ];
+      const merged = [...adminNotifs, ...list];
+      setItem(STORAGE_KEYS.NOTIFICATIONS, merged);
+      return merged;
+    }
+    return list;
+  },
   setNotifications: (val) => setItem(STORAGE_KEYS.NOTIFICATIONS, val),
 
   getConversations: () => getItem(STORAGE_KEYS.CONVERSATIONS),

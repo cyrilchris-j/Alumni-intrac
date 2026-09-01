@@ -157,6 +157,28 @@ export const markAllNotificationsRead = async (userId) => {
 };
 
 /**
+ * Delete a notification
+ */
+export const deleteNotification = async (notificationId) => {
+  if (isSupabaseConfigured) {
+    try {
+      const { error } = await supabase
+        .from('notifications')
+        .delete()
+        .eq('id', notificationId);
+      if (error) throw error;
+      return;
+    } catch (e) {
+      console.warn('Supabase deleteNotification error:', e);
+    }
+  }
+
+  const notifs = mockStore.getNotifications();
+  mockStore.setNotifications(notifs.filter((n) => n.id !== notificationId));
+};
+
+
+/**
  * Broadcast announcement
  */
 export const broadcastAnnouncement = async (title, message, targetRole) => {

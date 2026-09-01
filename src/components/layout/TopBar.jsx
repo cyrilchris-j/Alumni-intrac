@@ -24,7 +24,7 @@ const TopBar = ({ onMenuToggle, isSidebarOpen }) => {
 
   const getNotificationPath = () => `${basePath}/notifications`;
   const getMessagePath = () => `${basePath}/messages`;
-  const getProfilePath = () => `${basePath}/profile`;
+  const getProfilePath = () => (role === 'admin' ? `${basePath}/settings` : `${basePath}/profile`);
 
   return (
     <header className="h-16 bg-white/85 backdrop-blur-md border-b border-slate-200/80 flex items-center justify-between px-6 gap-4 flex-shrink-0 z-30 sticky top-0 shadow-xs">

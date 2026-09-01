@@ -1,13 +1,16 @@
+import { useState, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, Users, GraduationCap, UserCheck, Calendar,
-  Briefcase, Megaphone, BarChart2, Settings, LogOut, Link2
+  Briefcase, Megaphone, BarChart2, Settings, LogOut, Link2, Bell
 } from 'lucide-react';
 import { signOutUser } from '../../supabase/auth';
-import Avatar from '../ui/Avatar';
+import { useAuth } from '../../context/AuthContext';
+import { listenToNotifications } from '../../services/notificationService';
 
 const navItems = [
   { to: '/admin/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
+  { to: '/admin/notifications', icon: Bell, label: 'Notifications' },
   { to: '/admin/users', icon: Users, label: 'All Users' },
   { to: '/admin/students', icon: GraduationCap, label: 'Students' },
   { to: '/admin/alumni', icon: UserCheck, label: 'Alumni' },
@@ -18,7 +21,17 @@ const navItems = [
 ];
 
 const AdminSidebar = ({ onClose }) => {
+  const { currentUser } = useAuth();
   const navigate = useNavigate();
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    if (!currentUser) return;
+    const unsub = listenToNotifications(currentUser.uid, (notifications) => {
+      setUnreadCount(notifications.filter((n) => !n.read).length);
+    });
+    return () => unsub();
+  }, [currentUser]);
 
   const handleLogout = async () => {
     try {
@@ -61,7 +74,7 @@ const AdminSidebar = ({ onClose }) => {
             to={to}
             onClick={onClose}
             className={({ isActive }) =>
-              `flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all duration-200 ${
+              `flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all duration-200 ${
                 isActive
                   ? 'bg-blue-50 text-blue-700 border-l-4 border-blue-600 shadow-2xs'
                   : 'text-slate-600 hover:text-blue-600 hover:bg-slate-50'
@@ -70,8 +83,15 @@ const AdminSidebar = ({ onClose }) => {
           >
             {({ isActive }) => (
               <>
-                <Icon size={17} className={isActive ? 'text-blue-600' : 'text-slate-400'} />
-                <span>{label}</span>
+                <div className="flex items-center gap-3">
+                  <Icon size={17} className={isActive ? 'text-blue-600' : 'text-slate-400'} />
+                  <span>{label}</span>
+                </div>
+                {to === '/admin/notifications' && unreadCount > 0 && (
+                  <span className="px-1.5 py-0.5 text-[10px] font-bold rounded-full bg-blue-600 text-white shadow-2xs">
+                    {unreadCount > 9 ? '9+' : unreadCount}
+                  </span>
+                )}
               </>
             )}
           </NavLink>

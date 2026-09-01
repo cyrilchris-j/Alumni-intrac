@@ -40,6 +40,7 @@ import AdminEvents from '../pages/admin/Events';
 import AdminOpportunities from '../pages/admin/Opportunities';
 import AdminAnnouncements from '../pages/admin/Announcements';
 import AdminAnalytics from '../pages/admin/Analytics';
+import AdminNotifications from '../pages/admin/Notifications';
 import AdminSettings from '../pages/admin/Settings';
 
 const AppRoutes = () => {
@@ -295,6 +296,18 @@ const AppRoutes = () => {
             <AdminSettings />
           </ProtectedRoute>
         }
+      />
+      <Route
+        path="/admin/notifications"
+        element={
+          <ProtectedRoute requiredRole="admin">
+            <AdminNotifications />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/profile"
+        element={<Navigate to="/admin/settings" replace />}
       />
 
       {/* Fallback */}
