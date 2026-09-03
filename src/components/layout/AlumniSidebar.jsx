@@ -1,7 +1,7 @@
 import { NavLink, Link, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, Link2, BookOpen, MessageSquare,
-  Briefcase, Calendar, FileText, Settings, LogOut
+  Briefcase, Calendar, FileText, Settings, LogOut, GraduationCap
 } from 'lucide-react';
 import { signOutUser } from '../../supabase/auth';
 import { useAuth } from '../../context/AuthContext';
@@ -38,7 +38,7 @@ const AlumniSidebar = ({ onClose }) => {
       <div className="h-16 flex items-center px-6 border-b border-slate-200/80 flex-shrink-0 bg-blue-50/50">
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-cyan-500 flex items-center justify-center shadow-sm flex-shrink-0">
-            <Link2 size={20} className="text-white stroke-[2.5]" />
+            <GraduationCap size={20} className="text-white stroke-[2.2]" />
           </div>
           <div>
             <span className="text-xl font-heading font-bold text-slate-900 tracking-wide block leading-none">

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Mail, Link2, ArrowLeft, CheckCircle } from 'lucide-react';
+import { Mail, GraduationCap, ArrowLeft, CheckCircle } from 'lucide-react';
 import { resetPassword } from '../../supabase/auth';
 import { formatAuthError } from '../../utils/formatters';
 import Input from '../../components/ui/Input';
@@ -33,7 +33,7 @@ const ForgotPasswordPage = () => {
         <div className="text-center mb-8">
           <Link to="/" className="inline-flex items-center gap-2 mb-6">
             <div className="w-9 h-9 bg-primary-600 rounded-xl flex items-center justify-center">
-              <Link2 size={20} className="text-white" />
+              <GraduationCap size={20} className="text-white" />
             </div>
             <span className="text-2xl font-heading font-bold text-text-primary">AlumLink</span>
           </Link>

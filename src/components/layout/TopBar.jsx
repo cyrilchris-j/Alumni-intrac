@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Bell, MessageSquare, Search, Menu, X, Link2 } from 'lucide-react';
+import { Bell, MessageSquare, Search, Menu, X, GraduationCap } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import Avatar from '../ui/Avatar';
 import { listenToNotifications } from '../../services/notificationService';
@@ -41,7 +41,7 @@ const TopBar = ({ onMenuToggle, isSidebarOpen }) => {
         {/* Logo (mobile only) */}
         <Link to={`${basePath}/dashboard`} className="lg:hidden font-heading font-bold text-slate-900 text-lg flex items-center gap-2">
           <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-blue-600 to-cyan-500 flex items-center justify-center text-white">
-            <Link2 size={16} />
+            <GraduationCap size={16} />
           </div>
           AlumLink
         </Link>
